@@ -2,6 +2,24 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.2] — 2026-03-10
+
+Migrated site hosting from Netlify to Cloudflare R2 + Worker, and replaced rclone with a parallel upload script for faster deploys.
+
+### Added
+
+- Custom 404 page
+- Parallel R2 upload script (`scripts/upload-to-r2.py`) — 345 files/s at concurrency 100, full deploy in ~10 minutes (down from 2+ hours with rclone)
+
+### Changed
+
+- Site hosting migrated from Netlify to Cloudflare R2 + Worker — incremental deploys via rclone sync, edge caching via Cloudflare Cache API
+- Deploy workflow rewritten to use parallel upload script instead of rclone
+
+### Removed
+
+- Netlify configuration (`netlify.toml`) and Netlify CLI deploy step
+
 ## [0.3.0] — 2026-02-21
 
 Standards-based metadata publishing, description page improvements, and title improvement for 86K Colombian descriptions.
