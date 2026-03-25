@@ -51,8 +51,8 @@ eleventyComputed:
 {# Header #}
 <div class="detail-header" data-pagefind-body>
   <div class="container">
-    <h1 class="detail-title">{{ desc.title }}</h1>
-    <div class="detail-meta">
+    <h1 class="detail-title font-sans font-semibold text-stone-900">{{ desc.title }}</h1>
+    <div class="detail-meta text-sm text-stone-500">
       <span class="level-badge">{{ ui.levels[desc.description_level] or desc.description_level }}</span>
       {% if desc.date_expression %} &middot; {{ desc.date_expression }}{% endif %}
       &middot; {{ desc.reference_code }}
@@ -70,12 +70,12 @@ eleventyComputed:
 
         {# Section: Descripcion #}
         <div class="detail-section">
-          <h3>{{ ui.description.metadataHeader }}</h3>
+          <h3 class="font-semibold text-stone-400">{{ ui.description.metadataHeader }}</h3>
 
           {% if repo %}
             <div class="detail-field">
-              <span class="detail-label">{{ ui.fields.repository }}</span>
-              <span class="detail-value"><a href="/{{ repo.code | safeSlug }}/">{{ repo.name }}</a></span>
+              <span class="detail-label font-semibold text-stone-900">{{ ui.fields.repository }}</span>
+              <span class="detail-value text-stone-700"><a href="/{{ repo.code | safeSlug }}/" class="text-burgundy hover:text-burgundy-light">{{ repo.name }}</a></span>
             </div>
           {% endif %}
 

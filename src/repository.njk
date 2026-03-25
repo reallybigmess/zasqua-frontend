@@ -37,22 +37,22 @@ layout: base.njk
   {% set repoImage = "/img/istmina.jpg" %}
 {% endif %}
 
-<nav class="breadcrumb">
+<nav class="breadcrumb" aria-label="Breadcrumb">
   <div class="container">
-    <a href="/">{{ ui.nav.home }}</a>
-    <span class="breadcrumb-separator">›</span>
-    <span>{{ repoTitle }}</span>
+    <a href="/" class="text-sm text-stone-400 hover:text-burgundy-light">{{ ui.nav.home }}</a>
+    <span class="breadcrumb-separator text-stone-400">›</span>
+    <span class="text-sm text-stone-500">{{ repoTitle }}</span>
   </div>
 </nav>
 
 <section class="repo-header" style="background-image: url('{{ repoImage }}');">
   <div class="repo-header-overlay">
     <div class="container">
-      <h1 class="repo-header-title">{{ repoTitle }}</h1>
+      <h1 class="repo-header-title font-sans text-white">{{ repoTitle }}</h1>
       {% if repoSubtitle %}
-        <p class="repo-header-subtitle">{{ repoSubtitle }}</p>
+        <p class="repo-header-subtitle text-white">{{ repoSubtitle }}</p>
       {% endif %}
-      <p class="repo-header-stats">{{ (repo.description_count or 0) | numberFormat }} {{ ui.repository.itemsCount }}</p>
+      <p class="repo-header-stats text-stone-300">{{ (repo.description_count or 0) | numberFormat }} {{ ui.repository.itemsCount }}</p>
     </div>
   </div>
 </section>
