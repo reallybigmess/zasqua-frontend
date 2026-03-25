@@ -1,0 +1,185 @@
+---
+pagination:
+  data: places
+  size: 1
+  alias: place
+permalink: "/lugar/{{ place.label }}/"
+layout: base.njk
+eleventyComputed:
+  title: "{{ place.display_name }}"
+---
+
+{# fclass to human-readable label #}
+{% set fclassLabels = {
+  "A": "División administrativa",
+  "H": "Accidente hidrográfico",
+  "P": "Lugar poblado",
+  "S": "Estructura",
+  "T": "Accidente orográfico",
+  "L": "Parque o área natural",
+  "R": "Vía de comunicación",
+  "U": "Zona urbana",
+  "V": "Vegetación"
+} %}
+
+{# Breadcrumb #}
+<nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore>
+  <div class="container">
+    <a href="/">{{ ui.breadcrumb.home }}</a>
+    <span class="breadcrumb-separator">&rsaquo;</span>
+    <span>{{ place.display_name }}</span>
+  </div>
+</nav>
+
+{# Header #}
+<div class="detail-header" data-pagefind-body>
+  <div class="container">
+    <h1 class="detail-title font-sans font-semibold text-stone-900">{{ place.display_name }}</h1>
+    <div class="detail-meta text-sm text-stone-500">
+      {% if place.fclass %}
+        <span class="level-badge">{{ fclassLabels[place.fclass] or place.fclass }}</span>
+      {% elif place.place_type %}
+        <span class="level-badge">{{ place.place_type }}</span>
+      {% endif %}
+      {% if place.country_code %}&middot; {{ place.country_code }}{% endif %}
+      &middot; {{ place.label }}
+    </div>
+  </div>
+</div>
+
+{# Detail content #}
+<div class="detail-content">
+  <div class="container">
+    <div class="desc-layout">
+
+      {# Left column: metadata #}
+      <div class="desc-metadata" data-pagefind-body>
+
+        {# Section: Identificación #}
+        <div class="detail-section">
+          <h3 class="font-semibold text-stone-400">Identificación</h3>
+
+          {% if place.display_name %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">Nombre autorizado</span>
+              <span class="detail-value text-stone-700">{{ place.display_name }}</span>
+            </div>
+          {% endif %}
+
+          {% if place.name_variants and place.name_variants.length > 0 %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">Variantes del nombre</span>
+              <ul class="detail-value detail-list">
+                {% for variant in place.name_variants %}
+                  <li>{{ variant }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% if place.fclass %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">Tipo de lugar</span>
+              <span class="detail-value text-stone-700">{{ fclassLabels[place.fclass] or place.fclass }}</span>
+            </div>
+          {% endif %}
+
+          {% if place.colonial_gobernacion or place.colonial_partido or place.colonial_region %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">División colonial</span>
+              <span class="detail-value text-stone-700">
+                {% if place.colonial_gobernacion %}Gobernación: {{ place.colonial_gobernacion }}{% endif %}
+                {% if place.colonial_gobernacion and place.colonial_partido %} &middot; {% endif %}
+                {% if place.colonial_partido %}Partido: {{ place.colonial_partido }}{% endif %}
+                {% if (place.colonial_gobernacion or place.colonial_partido) and place.colonial_region %} &middot; {% endif %}
+                {% if place.colonial_region %}Región: {{ place.colonial_region }}{% endif %}
+              </span>
+            </div>
+          {% endif %}
+
+          {% if place.admin_level_1 or place.admin_level_2 %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">División administrativa</span>
+              <span class="detail-value text-stone-700">
+                {% if place.admin_level_1 %}{{ place.admin_level_1 }}{% endif %}
+                {% if place.admin_level_1 and place.admin_level_2 %}, {% endif %}
+                {% if place.admin_level_2 %}{{ place.admin_level_2 }}{% endif %}
+              </span>
+            </div>
+          {% endif %}
+
+          {% if place.latitude and place.longitude %}
+            <div class="detail-field">
+              <span class="detail-label font-semibold text-stone-900">Coordenadas</span>
+              <span class="detail-value text-stone-700">{{ place.latitude }}, {{ place.longitude }}</span>
+            </div>
+          {% endif %}
+
+        </div>
+
+        {# Section: Identificadores de autoridad #}
+        {% if place.wikidata_id or place.whg_id or place.tgn_id or place.hgis_id %}
+          <div class="detail-section">
+            <h3 class="font-semibold text-stone-400">Identificadores de autoridad</h3>
+
+            {% if place.wikidata_id %}
+              <div class="detail-field">
+                <span class="detail-label font-semibold text-stone-900">Wikidata</span>
+                <span class="detail-value text-stone-700">
+                  <a href="https://www.wikidata.org/entity/{{ place.wikidata_id }}" target="_blank" rel="noopener" class="text-burgundy hover:text-burgundy-light">
+                    {{ place.wikidata_id }}
+                    <span class="material-symbols-outlined" style="font-size:0.9em;vertical-align:middle;">open_in_new</span>
+                  </a>
+                </span>
+              </div>
+            {% endif %}
+
+            {% if place.whg_id %}
+              <div class="detail-field">
+                <span class="detail-label font-semibold text-stone-900">World Historical Gazetteer</span>
+                <span class="detail-value text-stone-700">
+                  <a href="https://whgazetteer.org/places/{{ place.whg_id }}/" target="_blank" rel="noopener" class="text-burgundy hover:text-burgundy-light">
+                    {{ place.whg_id }}
+                    <span class="material-symbols-outlined" style="font-size:0.9em;vertical-align:middle;">open_in_new</span>
+                  </a>
+                </span>
+              </div>
+            {% endif %}
+
+            {% if place.tgn_id %}
+              <div class="detail-field">
+                <span class="detail-label font-semibold text-stone-900">Getty TGN</span>
+                <span class="detail-value text-stone-700">{{ place.tgn_id }}</span>
+              </div>
+            {% endif %}
+
+            {% if place.hgis_id %}
+              <div class="detail-field">
+                <span class="detail-label font-semibold text-stone-900">HGIS de las Indias</span>
+                <span class="detail-value text-stone-700">{{ place.hgis_id }}</span>
+              </div>
+            {% endif %}
+
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+
+    {# Linked descriptions — full width #}
+    <div class="detail-section" data-pagefind-ignore>
+      <h3>Documentos relacionados</h3>
+      <div id="place-descriptions"
+           data-place-label="{{ place.label }}"
+           data-api-url="/api/places/{{ place.label }}/descriptions/">
+        <p class="text-stone-400 text-sm">Cargando documentos...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% block scripts %}
+  <script src="/js/place.js"></script>
+{% endblock %}
