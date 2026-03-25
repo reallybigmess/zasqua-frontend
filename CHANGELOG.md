@@ -2,6 +2,28 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] — 2026-03-25
+
+New visual identity and 542 AHRB notarial volumes published on zasqua.org.
+
+### Added
+
+- New visual identity: DM Sans (UI), Crimson Text (body), burgundy/periwinkle/stone colour palette
+- Branding assets: pomegranate logo lockup (`zasqua-3-burgundy-sm.svg`), new hero image
+- Tailwind CSS v4 compilation step in CI build pipeline — `input.css` compiled at build time via GitHub Actions
+- CSS token verification script (`scripts/check-css-tokens.sh`)
+- 542 AHRB notarial volumes live at zasqua.org/co-ahrb/ with IIIF viewer links on digitised items
+
+### Changed
+
+- Header and footer redesigned with new visual identity
+- Homepage hero section and masonry repository grid updated with new typography and colour tokens
+- Repository page (Miller columns) updated with periwinkle selection highlight and burgundy links
+- Description page updated with periwinkle level badges and burgundy links
+- Search page updated with burgundy filter pills and periwinkle pagination
+- Site version bumped from 0.3.2 to 0.4.0
+- Total page count increased from ~104K to ~106K with AHRB data
+
 ## [0.3.2] — 2026-03-10
 
 Migrated site hosting from Netlify to Cloudflare R2 + Worker, and replaced rclone with a parallel upload script for faster deploys.
