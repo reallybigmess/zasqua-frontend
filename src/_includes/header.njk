@@ -1,15 +1,17 @@
 <header class="site-header">
   <div class="container">
     <a href="/" class="site-logo">
-      <img src="/img/neogranadina-plain.png" alt="{{ site.title }}">
-      <span class="site-logo-text">Neogranadina: <strong>{{ site.title }}</strong></span>
+      <img src="/img/zasqua-3-burgundy-sm.svg" alt="{{ site.title }}">
+      <span class="site-logo-text font-serif">Neogranadina: <strong>{{ site.title }}</strong></span>
     </a>
     <button class="hamburger-toggle" type="button" aria-label="Menu" aria-expanded="false">
       <span class="material-symbols-outlined">menu</span>
     </button>
-    <nav class="site-nav">
-      <a href="/">{{ ui.nav.home }}</a>
-      <a href="/buscar/">{{ ui.nav.search }}</a>
+    <nav class="site-nav font-sans">
+      <a href="/" class="text-sm uppercase tracking-wide">{{ ui.nav.home }}</a>
+      <a href="/buscar/" class="text-sm uppercase tracking-wide">{{ ui.nav.search }}</a>
+      <a href="https://neogranadina.org/proyectos/zasqua" class="text-sm uppercase tracking-wide">{{ ui.nav.about }}</a>
+      <a href="https://catalogacion.zasqua.org" class="text-sm uppercase tracking-wide">{{ ui.nav.catalogacion }}</a>
       <form class="header-search" action="/buscar/" method="get">
         <input type="search" name="q" placeholder="{{ ui.search.placeholder }}">
         <button type="submit"><span class="material-symbols-outlined">search</span></button>

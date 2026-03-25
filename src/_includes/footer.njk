@@ -1,12 +1,13 @@
-<footer class="site-footer">
+<footer class="site-footer bg-burgundy-dark text-white">
   <div class="container">
-    <div class="footer-left">
-      <p>Zasqua es una plataforma de consulta de materiales de archivo desarrollada por <a href="https://neogranadina.org" target="_blank">Neogranadina</a> y el <a href="https://ampl.clair.ucsb.edu" target="_blank">Laboratorio de Archivos, Memoria y Preservación (AMPL)</a> de la Universidad de California, Santa Barbara.</p>
+    <div class="footer-left text-sm">
+      <p>Zasqua es una plataforma de consulta de materiales de archivo desarrollada por <a href="https://neogranadina.org" target="_blank" class="text-white font-semibold hover:text-periwinkle">Neogranadina</a> y el <a href="https://ampl.clair.ucsb.edu" target="_blank" class="text-white font-semibold hover:text-periwinkle">Laboratorio de Archivos, Memoria y Preservación (AMPL)</a> de la Universidad de California, Santa Barbara.</p>
       <p class="footer-copyright">{{ ui.footer.copyright | replace("{year}", site.buildYear) }}.
-      <br><a href="https://github.com/neogranadina/zasqua-frontend/releases/tag/v{{ site.version }}">Zasqua v{{ site.version }}</a>. Última actualización: {{ site.buildDate }}.</p>
+      <br><a href="https://github.com/neogranadina/zasqua-frontend/releases/tag/v{{ site.version }}" class="text-white hover:text-periwinkle">Zasqua v{{ site.version }}</a>. Última actualización: {{ site.buildDate }}.</p>
     </div>
     <div class="footer-right">
       <img src="/img/logo_grande.svg" alt="Neogranadina" class="footer-seal">
+      <img src="/img/ampl-cropped-1.png" alt="AMP Lab, UC Santa Barbara" class="footer-seal">
     </div>
   </div>
 </footer>
