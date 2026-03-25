@@ -305,7 +305,7 @@ class SearchPage {
       landing.className = 'search-empty-query';
 
       const logo = document.createElement('img');
-      logo.src = '/img/neogranadina-plain.png';
+      logo.src = '/img/zasqua-3-burgundy-sm.svg';
       logo.alt = 'Zasqua';
       logo.className = 'search-landing-logo';
       landing.appendChild(logo);
