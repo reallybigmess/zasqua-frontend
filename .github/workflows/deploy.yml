@@ -44,6 +44,12 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Build CSS with Tailwind
+        run: |
+          curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+          chmod +x tailwindcss-linux-x64
+          ./tailwindcss-linux-x64 -i src/css/input.css -o src/css/main.css --minify
+
       - name: Build site with Eleventy
         env:
           NODE_OPTIONS: --max-old-space-size=6144

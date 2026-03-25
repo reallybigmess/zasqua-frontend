@@ -35,6 +35,22 @@ echo "Children files: $(ls data/children/ | wc -l)"
 echo "=== Installing npm dependencies ==="
 npm ci
 
+echo "=== Building CSS with Tailwind ==="
+ARCH=$(uname -m)
+if [ "$ARCH" = "arm64" ]; then
+  TW_BINARY="tailwindcss-macos-arm64"
+elif [ "$ARCH" = "x86_64" ] && [ "$(uname -s)" = "Darwin" ]; then
+  TW_BINARY="tailwindcss-macos-x64"
+else
+  TW_BINARY="tailwindcss-linux-x64"
+fi
+if [ ! -f ./tailwindcss ]; then
+  curl -sLO "https://github.com/tailwindlabs/tailwindcss/releases/latest/download/$TW_BINARY"
+  chmod +x "$TW_BINARY"
+  mv "$TW_BINARY" tailwindcss
+fi
+./tailwindcss -i src/css/input.css -o src/css/main.css --minify
+
 echo "=== Building site ==="
 npx eleventy
 
