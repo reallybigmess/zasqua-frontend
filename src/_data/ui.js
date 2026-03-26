@@ -3,6 +3,8 @@ module.exports = {
   nav: {
     home: "Inicio",
     search: "Buscar",
+    about: "Acerca",
+    catalogacion: "Catalogación",
     browse: "Explorar"
   },
 
