@@ -95,7 +95,7 @@
 
   .site-logo {
     display: flex;
-    align-items: center;
+    /*align-items: center;*/
     gap: 0.5rem;
   }
 
@@ -110,7 +110,7 @@
     font-weight: 400;
     white-space: nowrap;
     @apply text-stone-900;
-    line-height: 0.9;
+    /*line-height: 0.9;*/
   }
 
   .site-logo-text strong {
@@ -246,12 +246,12 @@
 
   .hero {
     position: relative;
-    background-image: url('/img/hero.jpg');
+    background-image: url('/img/hero/hero.jpg');
     background-attachment: fixed;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
-    min-height: 75vh;
+    min-height: 55vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -294,7 +294,7 @@
     display: block;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 4rem;
+    font-size: 3.5rem;
     padding-top: 0;
     padding-bottom: 0.5rem;
     text-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.5);
@@ -380,7 +380,7 @@
     font-size: 1.5rem;
     font-weight: 300;
     line-height: 1.8;
-    max-width: 650px;
+    max-width: 850px;
     margin: 0 auto 1rem;
     @apply text-stone-900;
   }

@@ -95,7 +95,7 @@ class SearchPage {
       const base = (num - 1) * 100;
       const years = [];
       for (let i = base; i < base + 100; i++) years.push(String(i));
-      this.state.dateFilter = { level: 'century', label: `Siglo ${this.romanCentury(num)}`, years };
+      this.state.dateFilter = { level: 'century', label: `Century ${this.romanCentury(num)}`, years };
     }
     this.state.ancestor = params.getAll('ancestor');
     this.state.parent = params.get('parent') || '';
@@ -313,8 +313,8 @@ class SearchPage {
       const hints = document.createElement('div');
       hints.className = 'search-landing-hints';
       hints.innerHTML =
-        '<p>Zasqua tiene un sistema de b\u00FAsqueda flexible a partir de filtros: escribe un t\u00E9rmino o selecciona un filtro en el panel de filtros para comenzar a explorar el cat\u00E1logo. Luego agrega m\u00E1s hasta encontrar lo que buscas. El sistema ignorar\u00E1 tildes y diacr\u00EDticos, y aproximar\u00E1 t\u00E9rminos cercanos con la misma ra\u00EDz.</p>' +
-        '<p>Agrega t\u00E9rminos escribi\u00E9ndolos en el panel de filtros \u2014 selecciona <em>s\u00ED</em> o <em>no</em> para incluir o excluir, y presiona <em>+</em> o Enter. Cada t\u00E9rmino o filtro aparecer\u00E1 como una etiqueta que puedes eliminar y reemplazar con facilidad, as\u00ED que si\u00E9ntete libre de experimentar.</p>';
+        '<p>Zasqua has a flexible search system based on filters: type a term or select a filter from the filter panel to start exploring the catalog. Then add more until you find what you\'re looking for. The system will ignore accents and diacritics, and suggest similar terms with the same root.</p>';
+        '<p>Add terms by typing them into the filter panel—select yes or no to include or exclude, and press + or Enter. Each term or filter will appear as a tag that you can easily remove and replace, so feel free to experiment.</p>';
       landing.appendChild(hints);
 
       resultsCol.appendChild(landing);
@@ -337,18 +337,18 @@ class SearchPage {
 
       const countText = document.createElement('p');
       countText.className = 'browse-prompt-count';
-      countText.innerHTML = `<strong>${data.total.toLocaleString('es-CO')}</strong> registros coinciden con estos filtros.`;
+      countText.innerHTML = `<strong>${data.total.toLocaleString('en-US')}</strong> records match these filters.`;
       prompt.appendChild(countText);
 
       const hint = document.createElement('p');
       hint.className = 'browse-prompt-hint';
-      hint.textContent = 'Agrega m\u00E1s t\u00E9rminos o filtros para acotar los resultados, o presiona:';
+      hint.textContent = 'Add more terms or filters to narrow down the results, or click:';
       prompt.appendChild(hint);
 
       const continueBtn = document.createElement('button');
       continueBtn.type = 'button';
       continueBtn.className = 'browse-prompt-btn';
-      continueBtn.textContent = 'Ver todos';
+      continueBtn.textContent = 'See all';
       continueBtn.addEventListener('click', () => {
         this.skipBrowsePrompt = true;
         this.search();
@@ -357,7 +357,7 @@ class SearchPage {
 
       const warning = document.createElement('p');
       warning.className = 'browse-prompt-warning';
-      warning.textContent = 'Tomar\u00E1 algunos segundos en cargar.';
+      warning.textContent = 'This will take a few seconds to load.';
       prompt.appendChild(warning);
 
       resultsCol.appendChild(prompt);
@@ -418,7 +418,7 @@ class SearchPage {
 
     const count = document.createElement('span');
     count.className = 'results-count';
-    count.textContent = data.total.toLocaleString('es-CO') + ' resultados';
+    count.textContent = data.total.toLocaleString('en-US') + ' results';
     info.appendChild(count);
 
     // Sort buttons
@@ -427,14 +427,14 @@ class SearchPage {
 
     const sortLabel = document.createElement('span');
     sortLabel.className = 'sort-label';
-    sortLabel.textContent = 'Ordenar por:';
+    sortLabel.textContent = 'Sort by:';
     sortWrap.appendChild(sortLabel);
 
     const sortOptions = [
-      { field: 'date_start_year', label: 'Fecha' },
-      { field: 'title', label: 'Título' },
-      { field: 'reference_code', label: 'Código' },
-      { field: '', label: 'Relevancia' }
+      { field: 'date_start_year', label: 'Date' },
+      { field: 'title', label: 'Title' },
+      { field: 'reference_code', label: 'Reference Code' },
+      { field: '', label: 'Relevance' }
     ];
 
     sortOptions.forEach((opt, i) => {
@@ -494,7 +494,7 @@ class SearchPage {
     let currentOp = 'AND';
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'B\u00FAsqueda...';
+    input.placeholder = 'Search...';
 
     const addTerm = () => {
       const term = input.value.trim();
@@ -529,14 +529,14 @@ class SearchPage {
     const opBtn = document.createElement('button');
     opBtn.type = 'button';
     opBtn.className = 'refine-op-btn';
-    opBtn.innerHTML = 'S\u00ED <span class="refine-op-caret">\u25BE</span>';
+    opBtn.innerHTML = 'Yes <span class="refine-op-caret">\u25BE</span>';
 
     const opMenu = document.createElement('div');
     opMenu.className = 'refine-op-menu';
     opMenu.style.display = 'none';
 
     const options = [
-      { value: 'AND', label: 'S\u00ED' },
+      { value: 'AND', label: 'Yes' },
       { value: 'NOT', label: 'No' }
     ];
     for (const opt of options) {
@@ -576,7 +576,7 @@ class SearchPage {
     addBtn.type = 'button';
     addBtn.className = 'refine-add-btn';
     addBtn.innerHTML = '+';
-    addBtn.setAttribute('aria-label', 'Agregar filtro de texto');
+    addBtn.setAttribute('aria-label', 'Add text filter');
     addBtn.addEventListener('click', addTerm);
     wrap.appendChild(addBtn);
 
@@ -652,15 +652,15 @@ class SearchPage {
     const panelHeader = document.createElement('div');
     panelHeader.className = 'filter-panel-header';
     panelHeader.innerHTML =
-      '<span class="filter-panel-title">Filtrar por:</span>' +
-      '<button class="filter-panel-close" type="button" aria-label="Cerrar filtros">' +
+      '<span class="filter-panel-title">Filter by:</span>' +
+      '<button class="filter-panel-close" type="button" aria-label="Clear filters">' +
       '<span class="material-symbols-outlined">close</span></button>';
     sidebar.appendChild(panelHeader);
 
     // Heading (visible on desktop, hidden on mobile when panel is open)
     const heading = document.createElement('h3');
     heading.className = 'search-sidebar-heading';
-    heading.textContent = 'Filtrar por:';
+    heading.textContent = 'Filter by:';
     sidebar.appendChild(heading);
 
     // Refine search input
@@ -671,7 +671,7 @@ class SearchPage {
     // Country facet
     if (filters.country) {
       sidebar.appendChild(this.renderFacetGroup(
-        'País',
+        'Country',
         'country',
         filters.country,
         this.state.country,
@@ -682,7 +682,7 @@ class SearchPage {
     // Repository facet — keyed by display name, no mapping needed
     if (filters.repository) {
       sidebar.appendChild(this.renderFacetGroup(
-        'Repositorio',
+        'Repository',
         'repository',
         filters.repository,
         this.state.repository,
@@ -693,9 +693,9 @@ class SearchPage {
     // Digital status facet
     if (filters.digital_status) {
       const digitalLabels = {
-        'zasqua': 'Sí, disponibles en Zasqua',
-        'external': 'Sí, en repositorio externo',
-        'none': 'No, sin digitalizar'
+        'zasqua': 'Yes, available in Zasqua',
+        'external': 'Yes, in external repositories',
+        'none': 'Not digitized'
       };
       const digitalOrder = ['zasqua', 'external', 'none'];
       const digitalSort = (a, b) => {
@@ -707,7 +707,7 @@ class SearchPage {
         return b[1] - a[1];
       };
       sidebar.appendChild(this.renderFacetGroup(
-        'Imágenes disponibles',
+        'Images available',
         'digital_status',
         filters.digital_status,
         this.state.digital_status,
@@ -718,7 +718,7 @@ class SearchPage {
 
     // Level facet — keyed by display label, sorted by archival hierarchy
     if (filters.level) {
-      const levelOrder = ['Fondo', 'Subfondo', 'Colección', 'Sección', 'Serie', 'Subserie', 'Expediente', 'Tomo', 'Unidad documental'];
+      const levelOrder = ['Fonds', 'Subfonds', 'Collection', 'Section', 'Series', 'Subseries', 'File', 'Volume', 'Item'];
       const levelSort = (a, b) => {
         const ai = levelOrder.indexOf(a[0]);
         const bi = levelOrder.indexOf(b[0]);
@@ -729,7 +729,7 @@ class SearchPage {
         return b[1] - a[1];
       };
       sidebar.appendChild(this.renderFacetGroup(
-        'Nivel de descripción',
+        'Level of description',
         'level',
         filters.level,
         this.state.level,
@@ -748,7 +748,7 @@ class SearchPage {
     panelBottom.className = 'filter-panel-bottom-close';
     panelBottom.innerHTML =
       '<button type="button">' +
-      '<span class="material-symbols-outlined">expand_less</span> Cerrar filtros</button>';
+      '<span class="material-symbols-outlined">expand_less</span> Clear filters</button>';
     sidebar.appendChild(panelBottom);
 
     // Wire up panel close handlers
@@ -825,7 +825,7 @@ class SearchPage {
 
       const countSpan = document.createElement('span');
       countSpan.className = 'facet-count';
-      countSpan.textContent = `(${Number(count).toLocaleString('es-CO')})`;
+      countSpan.textContent = `(${Number(count).toLocaleString('en-US')})`;
       label.appendChild(countSpan);
 
       content.appendChild(label);
@@ -844,7 +844,7 @@ class SearchPage {
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'facet-group-toggle';
-    toggle.innerHTML = '<span class="facet-group-title">Fecha (inicial)</span><span class="facet-group-indicator">' + (isOpen ? '\u2212' : '+') + '</span>';
+    toggle.innerHTML = '<span class="facet-group-title">Date (start)</span><span class="facet-group-indicator">' + (isOpen ? '\u2212' : '+') + '</span>';
     toggle.addEventListener('click', () => {
       this.facetGroupState.date = !this.facetGroupState.date;
       const content = group.querySelector('.facet-group-content');
@@ -890,7 +890,9 @@ class SearchPage {
     const sortedCenturies = Array.from(centuries.entries()).sort((a, b) => a[0] - b[0]);
 
     for (const [centuryNum, centuryData] of sortedCenturies) {
-      const centuryLabel = `Siglo ${this.romanCentury(centuryNum)}`;
+      // Localized century. 
+      // TODO: Remove completely or toggle to show by decade
+      const centuryLabel = `${centuryNum-1}00s`;
 
       // Drill-down: if a century is selected, only show that century
       if (df && df.level === 'century' && df.label !== centuryLabel) continue;
@@ -931,7 +933,7 @@ class SearchPage {
 
       const countSpan = document.createElement('span');
       countSpan.className = 'date-tree-count';
-      countSpan.textContent = `(${centuryData.total.toLocaleString('es-CO')})`;
+      countSpan.textContent = `(${centuryData.total.toLocaleString('en-US')})`;
 
       row.appendChild(toggleBtn);
       row.appendChild(checkbox);
@@ -987,7 +989,7 @@ class SearchPage {
 
         const decadeCount = document.createElement('span');
         decadeCount.className = 'date-tree-count';
-        decadeCount.textContent = `(${decadeTotal.toLocaleString('es-CO')})`;
+        decadeCount.textContent = `(${decadeTotal.toLocaleString('en-US')})`;
 
         decadeRow.appendChild(decadeToggle);
         decadeRow.appendChild(decadeCb);
@@ -1030,7 +1032,7 @@ class SearchPage {
 
           const yearCountSpan = document.createElement('span');
           yearCountSpan.className = 'date-tree-count';
-          yearCountSpan.textContent = `(${yearCount.toLocaleString('es-CO')})`;
+          yearCountSpan.textContent = `(${yearCount.toLocaleString('en-US')})`;
 
           yearRow.appendChild(spacer);
           yearRow.appendChild(yearCb);
@@ -1191,9 +1193,9 @@ class SearchPage {
 
     // Digital status pills
     const digitalPillLabels = {
-      'zasqua': 'Disponibles en Zasqua',
-      'external': 'Repositorio externo',
-      'none': 'Sin digitalizar'
+        'zasqua': 'Yes, available in Zasqua',
+        'external': 'Yes, in external repositories',
+        'none': 'Not digitized'
     };
     for (const ds of this.state.digital_status) {
       container.appendChild(this.createPill(
@@ -1206,7 +1208,7 @@ class SearchPage {
     const clearBtn = document.createElement('button');
     clearBtn.type = 'button';
     clearBtn.className = 'clear-filters-btn';
-    clearBtn.textContent = 'Limpiar filtros';
+    clearBtn.textContent = 'Clear filters';
     clearBtn.addEventListener('click', () => this.handleClearAll());
     container.appendChild(clearBtn);
 
@@ -1225,7 +1227,7 @@ class SearchPage {
     removeBtn.type = 'button';
     removeBtn.className = 'filter-pill-remove';
     removeBtn.innerHTML = '&times;';
-    removeBtn.setAttribute('aria-label', `Eliminar filtro: ${label}`);
+    removeBtn.setAttribute('aria-label', `Remove filter: ${label}`);
     removeBtn.addEventListener('click', onRemove);
     pill.appendChild(removeBtn);
 
@@ -1235,7 +1237,7 @@ class SearchPage {
   renderPagination(data) {
     const nav = document.createElement('nav');
     nav.className = 'search-pagination';
-    nav.setAttribute('aria-label', 'Paginación');
+    nav.setAttribute('aria-label', 'Page Layout');
 
     const currentPage = data.page;
     const totalPages = data.total_pages;
@@ -1326,7 +1328,7 @@ class SearchPage {
     div.className = 'search-no-results';
 
     const msg = document.createElement('p');
-    msg.textContent = 'No se encontraron resultados';
+    msg.textContent = 'No results were found';
     div.appendChild(msg);
 
     const hasFilters = this.state.country.length > 0 ||
@@ -1337,12 +1339,12 @@ class SearchPage {
     if (hasFilters) {
       const suggestion = document.createElement('p');
       suggestion.className = 'no-results-suggestion';
-      suggestion.textContent = 'Intenta limpiar los filtros o modificar la consulta.';
+      suggestion.textContent = 'Try clearing the filters or modifying your query.';
       div.appendChild(suggestion);
 
       const clearLink = document.createElement('a');
       clearLink.href = '#';
-      clearLink.textContent = 'Limpiar filtros';
+      clearLink.textContent = 'Clear filters';
       clearLink.addEventListener('click', (e) => {
         e.preventDefault();
         this.handleClearAll();
@@ -1383,12 +1385,12 @@ class SearchPage {
     div.className = 'search-error';
 
     const msg = document.createElement('p');
-    msg.textContent = 'Ha ocurrido un error';
+    msg.textContent = 'An error has occurred';
     div.appendChild(msg);
 
     const retry = document.createElement('a');
     retry.href = '#';
-    retry.textContent = 'Intentar de nuevo';
+    retry.textContent = 'Try again';
     retry.addEventListener('click', (e) => {
       e.preventDefault();
       this.search();

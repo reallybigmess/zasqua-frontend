@@ -8,34 +8,9 @@ layout: base.njk
 ---
 
 {% set repoTitle = repo.name %}
-{% set repoSubtitle = "" %}
-{% set repoImage = "/img/neogranadina-placeholder.png" %}
-
-{% if repo.code == "pe-bn" %}
-  {% set repoTitle = "Narra la Independencia" %}
-  {% set repoSubtitle = "Edición digital de la Colección documental de la Independencia del Perú, creada para el proyecto de historia pública Narra la Independencia desde tu pueblo, tu distrito o tu ciudad." %}
-  {% set repoImage = "/img/narra.jpg" %}
-{% endif %}
-{% if repo.code == "co-ahr" %}
-  {% set repoTitle = "Archivo Histórico de Rionegro" %}
-  {% set repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el Archivo Histórico de Rionegro, Antioquia, Colombia." %}
-  {% set repoImage = "/img/AHR_front.jpg" %}
-{% endif %}
-{% if repo.code == "co-ahrb" %}
-  {% set repoTitle = "Archivo Histórico Regional de Boyacá" %}
-  {% set repoSubtitle = "Materiales digitalizados por Neogranadina en el Archivo Histórico Regional de Boyacá, Tunja, Colombia." %}
-  {% set repoImage = "/img/AHRB_front.jpg" %}
-{% endif %}
-{% if repo.code == "co-cihjml" %}
-  {% set repoTitle = "Antiguo Archivo Central del Cauca" %}
-  {% set repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el fondo Antiguo Archivo Central del Cauca, del Centro de Investigaciones Históricas José María Arboleda Llorente, Popayán, Colombia." %}
-  {% set repoImage = "/img/ACC_front.jpg" %}
-{% endif %}
-{% if repo.code == "co-ahjci" %}
-  {% set repoTitle = "Archivo Histórico del Juzgado del Circuito de Istmina" %}
-  {% set repoSubtitle = "Materiales digitalizados en el Archivo Histórico del Juzgado del Circuito de Istmina, Chocó, Colombia, en el proyecto EAP1477." %}
-  {% set repoImage = "/img/istmina.jpg" %}
-{% endif %}
+{% set repoImage = "/img/repo/"+repo.code+".jpg" %}
+{% set repoSubtitle = repo.notes %}
+{% set repoLink = "/" + repo.code + "/" %}
 
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <div class="container">

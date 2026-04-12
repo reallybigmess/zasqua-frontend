@@ -5,13 +5,23 @@
   "scripts": {
     "dev": "DEV_MODE=true eleventy --serve",
     "build": "eleventy && npx pagefind --site _site",
+    "clean": "rm -r _site/",
+    "css": "tailwindcss --cwd src/css -i input.css -o main.css ",
     "build:dev": "DEV_MODE=true eleventy && npx pagefind --site _site",
     "debug": "DEBUG=Eleventy* eleventy"
   },
-  "keywords": ["archive", "catalog", "11ty"],
+  "keywords": [
+    "archive",
+    "catalog",
+    "11ty"
+  ],
   "author": "Neogranadina",
   "license": "GPL-3.0-only",
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.2"
+    "@11ty/eleventy": "^3.1.2",
+    "tailwindcss": "^4.2.2"
+  },
+  "dependencies": {
+    
   }
 }

@@ -4,9 +4,9 @@ layout: base.njk
 
 <section class="hero">
   <div class="hero-content">
-    <img src="/img/zasqua-3-burgundy-sm.svg" alt="" class="hero-logo">
+    {# <img src="/img/zasqua-3-burgundy-sm.svg" alt="" class="hero-logo"> #}
     <h1>
-      <span class="site-name font-serif">{{ site.title }}</span>
+      <span class="site-name font-serif">The {{ site.title }}</span>
     </h1>
     <form class="search-form" action="/buscar/" method="get">
       <input type="search" name="q" class="search-input" placeholder="{{ ui.search.placeholder }}">
@@ -17,54 +17,22 @@ layout: base.njk
 
 <section class="section intro-section">
   <div class="container">
-    <p class="section-intro font-display"><strong>Zasqua</strong> es la nueva plataforma de consulta de materiales de archivo, libros, revistas e instrumentos de consulta digitalizados y sistematizados por <strong>Neogranadina</strong> y sus aliados.</p>
-    <p class="section-intro font-display"><strong>Neogranadina</strong> es una fundación colombiana sin ánimo de lucro que busca utilizar nuevas tecnologías para proteger, rescatar y promover el patrimonio histórico, artístico y cultural de América Latina.</p>
+    <p class="section-intro font-display">This site is a showcase of the archival collections of the York University Computer Museum, specifically its Micro Computing Machines, Inc. collection. To begin, select the museum below.
   </div>
 </section>
-
 <section class="section repo-section">
-  <h2 class="section-title font-display">Explora nuestras colecciones</h2>
+  <h2 class="section-title font-display">Repositories</h2>
 
-  {% set repoOrder = ["pe-bn","co-ahjci", "co-ahr", "co-ahrb", "co-cihjml"] %}
+  {% set repoOrder = ["yucom"] %}
 
+  {# name repos' images accordingly in img/repo #}
   <div class="repo-grid">
     {% for repo in repositories | sortByOrder(repoOrder) %}
-      {% set repoImage = "/img/neogranadina-placeholder.png" %}
       {% set repoTitle = repo.name %}
-      {% set repoSubtitle = "" %}
+      {% set repoImage = "/img/repo/"+repo.code+".jpg" %}
+      {% set repoSubtitle = repo.notes %}
       {% set repoCategory = "" %}
-      {% set repoLink = "/" + repo.code + "/" %}
-      {% if repo.code == "pe-bn" %}
-        {% set repoImage = "/img/narra.jpg" %}
-        {% set repoTitle = "Narra la Independencia" %}
-        {% set repoSubtitle = "Edición digital de la Colección documental de la Independencia del Perú, creada para el proyecto de historia pública Narra la Independencia desde tu pueblo, tu distrito o tu ciudad." %}
-        {% set repoCategory = "Fuentes sobre la independencia del Perú" %}
-        {% set repoLink = "/pe-bn-cdip/" %}
-      {% endif %}
-      {% if repo.code == "co-ahr" %}
-        {% set repoImage = "/img/AHR_front.jpg" %}
-        {% set repoTitle = "Archivo Histórico de Rionegro" %}
-        {% set repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el Archivo Histórico de Rionegro, Antioquia, Colombia." %}
-        {% set repoCategory = "Rionegro, Antioquia" %}
-      {% endif %}
-      {% if repo.code == "co-ahrb" %}
-        {% set repoImage = "/img/AHRB_front.jpg" %}
-        {% set repoTitle = "Archivo Histórico Regional de Boyacá" %}
-        {% set repoSubtitle = "Materiales digitalizados por Neogranadina en el Archivo Histórico Regional de Boyacá, Tunja, Colombia." %}
-        {% set repoCategory = "Tunja, Boyacá" %}
-      {% endif %}
-      {% if repo.code == "co-cihjml" %}
-        {% set repoImage = "/img/ACC_front.jpg" %}
-        {% set repoTitle = "Antiguo Archivo Central del Cauca" %}
-        {% set repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el fondo Antiguo Archivo Central del Cauca, del Centro de Investigaciones Históricas José María Arboleda Llorente, Popayán, Colombia." %}
-        {% set repoCategory = "Popayán, Cauca" %}
-      {% endif %}
-      {% if repo.code == "co-ahjci" %}
-        {% set repoImage = "/img/istmina.jpg" %}
-        {% set repoTitle = "Archivo Histórico del Juzgado del Circuito de Istmina" %}
-        {% set repoSubtitle = "Materiales digitalizados en el Archivo Histórico del Juzgado del Circuito de Istmina, Chocó, Colombia, en el proyecto EAP1477." %}
-        {% set repoCategory = "Istmina, Chocó" %}
-      {% endif %}
+      {% set repoLink = "/" + repo.code + "/" %} 
 
       <div class="repo-item">
         <a href="{{ repoLink }}" class="repo-link">
