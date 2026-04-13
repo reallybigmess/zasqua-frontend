@@ -27,7 +27,7 @@ class MillerColumnsTree {
    */
   async loadRoot(rootDescriptions) {
     this.clearColumns();
-    const column = this.createColumn(rootDescriptions, 0, 'Contenido');
+    const column = this.createColumn(rootDescriptions, 0, 'Contents');
     this.wrapper.appendChild(column);
     this.columns.push(column);
   }
@@ -54,7 +54,7 @@ class MillerColumnsTree {
     // Filter input (shown in rightmost/active column)
     const filterInput = document.createElement('input');
     filterInput.type = 'text';
-    filterInput.placeholder = 'Filtrar...';
+    filterInput.placeholder = 'Filter...';
     filterInput.className = 'column-filter';
     filterInput.addEventListener('input', (e) => this.filterColumn(column, e.target.value));
     filterInput.addEventListener('click', (e) => e.stopPropagation());
@@ -80,7 +80,7 @@ class MillerColumnsTree {
       titleSpan.className = 'miller-item-title';
 
       // Container words - skip number prefix if title contains these
-      const containerWords = /\b(legajo|caja|tomo|carpeta|vol\.|volumen|expediente|sección|seccion|subsección|subseccion|serie|subserie|fondo|subfondo|unidad|protocolo|capítulo|capitulo)\b/i;
+      const containerWords = /\b(file|box|volume|folder|vol\.|volume|case|section|subsection|series|subseries|collection|subcollection|unit|registry|chapter)\b/i;
 
       if (item.child_count > 0) {
         // Container: show just title in main row
@@ -313,22 +313,24 @@ class MillerColumnsTree {
       const count = document.createElement('p');
       count.className = 'metadata-count';
 
-      // Container types that indicate children are "unidades compuestas"
-      const containerTypes = ['caja', 'carpeta', 'tomo', 'legajo', 'volume', 'serie', 'subserie', 'section', 'fonds', 'subfonds', 'file'];
+      // Container types that indicate children are "composite units"
+      const containerTypes = ['box', 'folder', 'volume', 'series', 'subseries', 'section', 'fonds', 'subfonds', 'file'];
 
       let label;
       if (!item.children_level) {
-        // Mixed or unknown → generic "unidades"
-        label = item.child_count === 1 ? 'unidad' : 'unidades';
+	//are units/containers/items the right translation? 
+
+	// Mixed or unknown → generic "unidades"
+        label = item.child_count === 1 ? 'unit' : 'units';
       } else if (containerTypes.includes(item.children_level)) {
         // Children are containers
-        label = item.child_count === 1 ? 'unidad compuesta' : 'unidades compuestas';
+        label = item.child_count === 1 ? 'container' : 'containers';
       } else {
         // Children are items/documents
-        label = item.child_count === 1 ? 'unidad simple' : 'unidades simples';
+        label = item.child_count === 1 ? 'item' : 'items';
       }
 
-      count.textContent = `(${item.child_count.toLocaleString('es-ES')} ${label})`;
+      count.textContent = `(${item.child_count.toLocaleString('en-US')} ${label})`;
       metadata.appendChild(count);
     }
 
@@ -336,7 +338,7 @@ class MillerColumnsTree {
     const link = document.createElement('a');
     link.href = `/${item.reference_code.replace(/[?#]/g, '')}/`;
     link.className = 'metadata-link';
-    link.textContent = 'Ver registro →';
+    link.textContent = 'View record →';
     metadata.appendChild(link);
 
     return metadata;

@@ -23,7 +23,7 @@ eleventyComputed:
   <div class="container">
     <h1 class="detail-title font-sans font-semibold text-stone-900">{{ entity.display_name }}</h1>
     <div class="detail-meta text-sm text-stone-500">
-      <span class="level-badge">{% if entity.entity_type == 'person' %}Persona{% else %}Institución{% endif %}</span>
+      <span class="level-badge">{% if entity.entity_type == 'person' %}Person{% else %}Institution{% endif %}</span>
       {% if entity.date_earliest or entity.date_latest %}
         &middot;
         {% if entity.date_earliest %}{{ entity.date_earliest }}{% endif %}
@@ -45,18 +45,18 @@ eleventyComputed:
 
         {# Section: Nombre #}
         <div class="detail-section">
-          <h3 class="font-semibold text-stone-400">Identificación</h3>
+          <h3 class="font-semibold text-stone-400">Identification</h3>
 
           {% if entity.display_name %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Nombre autorizado</span>
+              <span class="detail-label font-semibold text-stone-900">Authorized name</span>
               <span class="detail-value text-stone-700">{{ entity.display_name }}</span>
             </div>
           {% endif %}
 
           {% if entity.given_name or entity.particle or entity.surname %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Nombre estructurado</span>
+              <span class="detail-label font-semibold text-stone-900">Structured name</span>
               <span class="detail-value text-stone-700">
                 {% if entity.honorific %}{{ entity.honorific }} {% endif %}
                 {% if entity.given_name %}{{ entity.given_name }} {% endif %}
@@ -68,7 +68,7 @@ eleventyComputed:
 
           {% if entity.name_variants and entity.name_variants.length > 0 %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Variantes del nombre</span>
+              <span class="detail-label font-semibold text-stone-900">Name variants</span>
               <ul class="detail-value detail-list">
                 {% for variant in entity.name_variants %}
                   <li>{{ variant }}</li>
@@ -79,7 +79,7 @@ eleventyComputed:
 
           {% if entity.date_earliest or entity.date_latest %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Fechas de existencia</span>
+              <span class="detail-label font-semibold text-stone-900">Dates of existence</span>
               <span class="detail-value text-stone-700">
                 {% if entity.dates_of_existence %}
                   {{ entity.dates_of_existence }}
@@ -94,14 +94,14 @@ eleventyComputed:
 
           {% if entity.primary_function %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Función o cargo</span>
+              <span class="detail-label font-semibold text-stone-900">Function or position</span>
               <span class="detail-value text-stone-700">{{ entity.primary_function }}</span>
             </div>
           {% endif %}
 
           {% if entity.history %}
             <div class="detail-field">
-              <span class="detail-label font-semibold text-stone-900">Historia</span>
+              <span class="detail-label font-semibold text-stone-900">History</span>
               <span class="detail-value text-stone-700">{{ entity.history }}</span>
             </div>
           {% endif %}
@@ -118,7 +118,7 @@ eleventyComputed:
       <div id="entity-descriptions"
            data-entity-code="{{ entity.entity_code }}"
            data-api-url="/api/entities/{{ entity.entity_code }}/descriptions/">
-        <p class="text-stone-400 text-sm">Cargando documentos...</p>
+        <p class="text-stone-400 text-sm">Uploading documents...</p>
       </div>
     </div>
 

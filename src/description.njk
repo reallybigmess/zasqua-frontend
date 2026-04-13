@@ -219,18 +219,18 @@ eleventyComputed:
             <span class="detail-label">{{ ui.fields.reproductionConditions }}</span>
             <div class="detail-value">
               <div class="repro-subsection">
-                <strong class="repro-subheading">Catálogos y descripciones</strong>
-                <span>Los catálogos y descripciones de Zasqua son de libre acceso.</span>
+                <strong class="repro-subheading">Catalogs and descriptions</strong>
+                <span>Catalogs and descriptions in Zasqua are freely available.</span>
               </div>
               {% if desc.reproduction_conditions %}
                 <div class="repro-subsection">
-                  <strong class="repro-subheading">Documentos originales</strong>
+                  <strong class="repro-subheading">Original Documents</strong>
                   <span>{{ desc.reproduction_conditions }}</span>
                 </div>
               {% endif %}
               {% if desc.iiif_manifest_url and repo %}
                 <div class="repro-subsection">
-                  <strong class="repro-subheading">Imágenes</strong>
+                  <strong class="repro-subheading">Images</strong>
                   <span>{{ repo.image_reproduction_text }}</span>
                 </div>
               {% endif %}
@@ -305,9 +305,9 @@ eleventyComputed:
         <div class="detail-section">
           <h3>{{ ui.description.reuseHeader }}</h3>
           {% if desc.iiif_manifest_url %}
-            <p class="reuse-blurb">Zasqua se inspira en los <a href="https://journal.code4lib.org/articles/13427" target="_blank" rel="noopener">principios FAIR</a> para hacer sus colecciones más abiertas y reutilizables. Utiliza el estándar <a href="https://www.loc.gov/standards/mets/" target="_blank" rel="noopener">METS</a> para publicar metadatos e <a href="https://iiif.io" target="_blank" rel="noopener">IIIF</a> para publicar imágenes. Copia la dirección del manifiesto IIIF a continuación para abrir o integrar este documento en otro visor o plataforma compatible, como <a href="https://telar.org" target="_blank" rel="noopener">Telar</a>.</p>
+            <p class="reuse-blurb">Zasqua is inspired by <a href="https://journal.code4lib.org/articles/13427" target="_blank" rel="noopener">FAIR principles</a> for making its collections more open and reusable. It utilizes the <a href="https://www.loc.gov/standards/mets/" target="_blank" rel="noopener">METS</a> standard to publish metadata and <a href="https://iiif.io" target="_blank" rel="noopener">IIIF</a> to publish images. Copy the IIIF manifest URL below to open or embed this document in another compatible viewer or platform, such as <a href="https://telar.org" target="_blank" rel="noopener">Telar</a>.</p>
           {% else %}
-            <p class="reuse-blurb">Zasqua se inspira en los <a href="https://journal.code4lib.org/articles/13427" target="_blank" rel="noopener">principios FAIR</a> para hacer sus colecciones más abiertas y reutilizables. Utiliza el estándar <a href="https://www.loc.gov/standards/mets/" target="_blank" rel="noopener">METS</a> para publicar metadatos.</p>
+            <p class="reuse-blurb">Zasqua is inspired by <a href="https://journal.code4lib.org/articles/13427" target="_blank" rel="noopener">FAIR principles</a> for making its collections more open and reusable. It utilizes the <a href="https://www.loc.gov/standards/mets/" target="_blank" rel="noopener">METS</a> standard to publish metadata. </p>
           {% endif %}
           {% if desc.mets_url %}
             <div class="reuse-manifest">
@@ -366,7 +366,7 @@ eleventyComputed:
         <div class="tree-header">
           <a href="/buscar/?ancestor={{ desc.reference_code }}" class="search-collection-link">
             <span class="material-symbols-outlined">search</span>
-            Buscar en esta unidad
+            Search this unit
           </a>
         </div>
         <div id="collection-tree"

@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
     .then(function(data) {
       var descriptions = Array.isArray(data) ? data : (data.results || []);
       if (descriptions.length === 0) {
-        container.innerHTML = '<p class="text-stone-400 text-sm">No se encontraron documentos relacionados.</p>';
+        container.innerHTML = '<p class="text-stone-400 text-sm">No related documents were found.</p>';
         return;
       }
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
       container.innerHTML = html;
     })
     .catch(function(err) {
-      container.innerHTML = '<p class="text-stone-400 text-sm">No se pudieron cargar los documentos relacionados.</p>';
+      container.innerHTML = '<p class="text-stone-400 text-sm">The related documents could not be loaded.</p>';
       console.error("place.js: failed to load descriptions", err);
     });
 });

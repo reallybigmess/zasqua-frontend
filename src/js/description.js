@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var icon = btn.querySelector(".material-symbols-outlined");
         var originalHTML = btn.innerHTML;
         icon.textContent = "check";
-        btn.lastChild.textContent = " Copiado";
+        btn.lastChild.textContent = " Copied";
         setTimeout(function() {
           btn.innerHTML = originalHTML;
         }, 2000);
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var expandBtn = document.createElement("button");
     expandBtn.className = "viewer-pill viewer-pill-expand";
-    expandBtn.innerHTML = '<span class="material-symbols-outlined">open_in_full</span> Expandir';
+    expandBtn.innerHTML = '<span class="material-symbols-outlined">open_in_full</span> Expand';
     expandBtn.addEventListener("click", function() {
       document.querySelector(".desc-layout").classList.add("viewer-expanded");
       resetViewport();
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var contraerBtn = document.createElement("button");
     contraerBtn.className = "viewer-pill viewer-pill-contraer";
-    contraerBtn.innerHTML = '<span class="material-symbols-outlined">close_fullscreen</span> Contraer';
+    contraerBtn.innerHTML = '<span class="material-symbols-outlined">close_fullscreen</span> Collapse';
     contraerBtn.addEventListener("click", function() {
       document.querySelector(".desc-layout").classList.remove("viewer-expanded");
       resetViewport();
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var fullscreenBtn = document.createElement("button");
     fullscreenBtn.className = "viewer-pill viewer-pill-fullscreen";
-    fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span> Pantalla completa';
+    fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span> Full screen';
     fullscreenBtn.addEventListener("click", function() {
       if (document.fullscreenElement === viewerEl) {
         document.exitFullscreen();
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var miniBtn = document.createElement("button");
     miniBtn.className = "viewer-pill viewer-pill-mini";
-    miniBtn.innerHTML = '<span class="material-symbols-outlined">grid_view</span> Miniaturas';
+    miniBtn.innerHTML = '<span class="material-symbols-outlined">grid_view</span> Mini view';
     miniBtn.addEventListener("click", function() {
       // TIFY's popup is hidden via CSS; temporarily unhide to click the
       // native Pages button, which properly toggles the thumbnails panel
@@ -111,9 +111,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // -- Fullscreen label toggle + viewport reset --
     document.addEventListener("fullscreenchange", function() {
       if (document.fullscreenElement === viewerEl) {
-        fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen_exit</span> Cerrar pantalla completa';
+        fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen_exit</span> Exit full screen';
       } else {
-        fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span> Pantalla completa';
+        fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span> Full screen';
       }
       resetViewport();
     });

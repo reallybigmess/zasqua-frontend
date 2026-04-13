@@ -891,7 +891,7 @@ class SearchPage {
 
     for (const [centuryNum, centuryData] of sortedCenturies) {
       // Localized century. 
-      // TODO: Remove completely or toggle to show by decade
+      // TODO: Remove completely or toggle to show by decade?
       const centuryLabel = `${centuryNum-1}00s`;
 
       // Drill-down: if a century is selected, only show that century

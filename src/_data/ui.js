@@ -1,167 +1,168 @@
 module.exports = {
   // Navigation
   nav: {
-    home: "Inicio",
-    search: "Buscar",
-    about: "Acerca",
-    catalogacion: "Catalogación",
-    browse: "Explorar"
+    home: "Home",
+    search: "Search",
+    about: "About",
+    catalogacion: "Cataloging",
+    browse: "Browse"
   },
 
   // Error pages
   error404: {
-    title: "Página no encontrada",
-    message: "La página solicitada no existe o fue trasladada.",
-    home: "Volver al inicio",
-    search: "Buscar en el catálogo"
+    title: "Page not found",
+    message: "The requested page does not exist or has been moved.",
+    home: "Return Home",
+    search: "Search the catalog"
   },
 
   // Breadcrumbs
   breadcrumb: {
-    home: "Inicio"
+    home: "Home"
   },
 
   // Search page
   search: {
-    placeholder: "Buscar en el catálogo...",
-    button: "Buscar",
-    results: "{count} resultados",
-    noResults: "No se encontraron resultados",
-    clearFilters: "Limpiar filtros",
-    filtersHeader: "Filtros",
-    sidebarHeading: "Filtrar por:",
-    sidebarSearch: "Buscar en resultados...",
+    placeholder: "Search the catalog...",
+    button: "Search",
+    results: "{count} results",
+    noResults: "No results found",
+    clearFilters: "Clear filters",
+    filtersHeader: "Filters",
+    sidebarHeading: "Filter for:",
+    sidebarSearch: "Search within results...",
     sort: {
-      label: "Ordenar por",
-      relevance: "Relevancia",
-      dateAsc: "Fecha (más antiguo)",
-      dateDesc: "Fecha (más reciente)",
-      titleAsc: "Título (A-Z)"
+      label: "Order by",
+      relevance: "Relevance",
+      dateAsc: "Date (oldest)",
+      dateDesc: "Date (recent)",
+      titleAsc: "Title (A-Z)"
     },
-    filterToggle: "Filtros",
-    noResultsSuggestion: "Intenta limpiar los filtros o modificar la consulta.",
-    dateFrom: "Desde",
-    dateTo: "Hasta"
+    filterToggle: "Filters",
+    noResultsSuggestion: "Try clearing the filters or modifying your query.",
+    dateFrom: "From",
+    dateTo: "To"
   },
 
   // Facet labels
   facets: {
-    repository: "Repositorio",
-    level: "Nivel de descripción",
-    dateRange: "Rango de fechas",
-    hasDigital: "Copia digitalizada disponible",
-    country: "País"
+    repository: "Repository",
+    level: "Level of description",
+    dateRange: "Range of dates",
+    hasDigital: "Digital object available",
+    country: "Country"
   },
 
   // Description levels (singular)
   levels: {
-    fonds: "Fondo",
-    subfonds: "Subfondo",
-    series: "Serie",
-    subseries: "Subserie",
-    file: "Expediente",
-    item: "Unidad documental",
-    collection: "Colección",
-    section: "Sección",
-    volume: "Tomo"
+    fonds: "Fond",
+    subfonds: "Subfond",
+    series: "Series",
+    subseries: "Subseries",
+    file: "File",
+    item: "Item",
+    collection: "Collection",
+    section: "Section",
+    volume: "Volume"
   },
 
   // Description levels (plural, for child counts)
   levelsPlural: {
-    fonds: "fondos",
-    subfonds: "subfondos",
+    fonds: "fonds",
+    subfonds: "subfonds",
     series: "series",
     subseries: "subseries",
-    file: "expedientes",
-    item: "documentos",
-    collection: "colecciones",
-    section: "secciones",
-    volume: "tomos",
+    file: "files",
+    item: "items",
+    collection: "collections",
+    section: "sections",
+    volume: "volumes",
     // Container types (from titles)
-    caja: "cajas",
-    carpeta: "carpetas",
-    legajo: "legajos",
-    tomo: "tomos"
+    caja: "boxes",
+    carpeta: "folders",
+    legajo: "files",
+    tomo: "volumes"
   },
 
   // Description page
   description: {
-    metadataHeader: "Descripción",
-    bibliographicHeader: "Información bibliográfica",
-    accessConditionsHeader: "Condiciones de acceso",
-    relatedMaterialsHeader: "Materiales relacionados",
-    notesHeader: "Notas",
-    entitiesHeader: "Personas y entidades relacionadas",
-    placesHeader: "Lugares",
-    reuseHeader: "Reutilización",
-    metsLabel: "Metadatos METS",
-    iiifLabel: "Manifiesto IIIF",
-    childrenHeader: "Contenido",
-    previous: "Anterior",
-    next: "Siguiente",
-    notDigitised: "Material no digitalizado",
-    notDigitisedText: "Este documento no cuenta con copia digital. Para consultarlo, diríjase al repositorio de origen.",
-    externalDigital: "Copia digital disponible",
-    externalDigitalText: "Este documento ha sido digitalizado y puede consultarse en el repositorio de la institución custodia.",
-    viewAllChildren: "Ver los {count} documentos"
+    metadataHeader: "Description",
+    bibliographicHeader: "Bibliographic information",
+    accessConditionsHeader: "Access conditions",
+    relatedMaterialsHeader: "Related materials",
+    notesHeader: "Notes",
+    entitiesHeader: "Related people and entities",
+    placesHeader: "Places",
+    reuseHeader: "Reuse",
+    metsLabel: "METS Manifest",
+    iiifLabel: "IIIF Manifest",
+    childrenHeader: "Contents",
+    previous: "Previous",
+    next: "Next",
+    notDigitised: "Material not digitized",
+    notDigitisedText: "This document doesn't have a digital version available. To view it, go to the source repository.",
+    externalDigital: "Digital version available",
+    externalDigitalText: "This document has a digital version available in the custodial institution's repository.",
+    viewAllChildren: "View the {count} documents"
   },
 
   // Entity roles
   roles: {
-    creator: "Productor",
-    contributor: "Colaborador",
-    publisher: "Editor",
-    subject: "Materia",
-    mentioned: "Mencionado"
+    creator: "Creator",
+    contributor: "Contributor",
+    publisher: "Publisher",
+    subject: "Subject",
+    mentioned: "Mentioned"
   },
 
   // Metadata field labels
   fields: {
-    referenceCode: "Código de referencia",
-    title: "Título",
-    date: "Fecha",
-    extent: "Extensión",
-    scopeContent: "Alcance y contenido",
-    arrangement: "Signatura original",
-    accessConditions: "Condiciones de acceso",
-    reproductionConditions: "Condiciones de reproducción",
-    language: "Idioma",
-    repository: "Repositorio",
-    locationOfOriginals: "Localización de los originales",
-    locationOfCopies: "Existencia y localización de copias",
-    relatedMaterials: "Materiales relacionados",
-    findingAids: "Instrumentos de consulta",
-    notes: "Notas",
+    referenceCode: "Reference Code",
+    title: "Title",
+    date: "Date",
+    extent: "Extent",
+    scopeContent: "Scope and Content",
+    arrangement: "Arrangement",
+    accessConditions: "Access Conditions",
+    reproductionConditions: "Reproduction Conditions",
+    language: "Language",
+    repository: "Repository",
+    locationOfOriginals: "Location of originals",
+    locationOfCopies: "Location of copies",
+    relatedMaterials: "Related materials",
+    findingAids: "Finding aids",
+    notes: "Notes",
     // Bibliographic
-    publicationTitle: "Publicación",
-    imprint: "Pie de imprenta",
-    editionStatement: "Edición",
-    seriesStatement: "Serie",
-    uniformTitle: "Título uniforme",
-    sectionTitle: "Sección",
-    pages: "Páginas",
-    country: "País"
+    publicationTitle: "Publication",
+    imprint: "Imprint",
+    editionStatement: "Edition",
+    seriesStatement: "Series",
+    uniformTitle: "Uniform Title",
+    sectionTitle: "Section",
+    pages: "Pages",
+    country: "Country"
   },
 
   // Repository page
   repository: {
-    itemsCount: "documentos",
-    dateRange: "Fechas extremas",
-    collections: "Fondos y colecciones",
-    noCollections: "No hay colecciones disponibles"
+    itemsCount: "items",
+    dateRange: "Date range",
+    collections: "Collections",
+    noCollections: "No collections available"
   },
 
   // Footer
   footer: {
-    credits: "Desarrollado por Neogranadina con el apoyo de la Universidad de California, Santa Bárbara",
+    credits: "Developed by Neogranadina with help from the University of California, Santa Bárbara",
     copyright: "© {year} Fundación Histórica Neogranadina"
+
   },
 
   // General
   general: {
-    loading: "Cargando...",
-    error: "Ha ocurrido un error",
-    viewMore: "Ver más",
-    back: "Volver"
+    loading: "Loading...",
+    error: "An error has occurred",
+    viewMore: "View more",
+    back: "Back"
   }
 };
