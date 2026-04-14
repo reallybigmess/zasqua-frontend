@@ -1,0 +1,256 @@
+{#
+  Entity Explorer Page
+
+  Renders the `/entidades/` page — a two-panel interface that lets visitors
+  browse and search the ~92,000 entities (people, corporate bodies, families)
+  linked to descriptions in the Zasqua catalogue. The left-hand column holds
+  filters and a Pagefind-backed result list; the right-hand column holds an
+  interactive force-directed graph (loaded via the force-graph CDN bundle)
+  that expands from a focal entity out through its linked documents to the
+  other entities those documents touch.
+
+  The template sets up the layout, wires the empty-state overlay (shown until
+  an entity is selected or a `?entidad=` URL param is present), and boots
+  both the `EntityExplorer` sidebar controller and the `InfiniteBipartiteExplorer`
+  graph controller. Cross-panel callbacks keep the selected entity, active
+  filters, and viewport-scoped result list in sync between the two.
+
+  Version: v0.5.0
+#}
+---
+layout: base.njk
+title: "Explorar entidades"
+permalink: /entidades/
+---
+
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/force-graph"></script>
+{% endblock %}
+
+{# Breadcrumb #}
+<nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore>
+  <div class="container">
+    <a href="/">{{ ui.breadcrumb.home }}</a>
+    <span class="breadcrumb-separator">&rsaquo;</span>
+    <span>Explorar entidades</span>
+  </div>
+</nav>
+
+<div class="explorer-page" data-pagefind-ignore>
+
+  {# Page header #}
+  <header class="explorer-page-header">
+    <h1 class="explorer-page-title">Explorar entidades</h1>
+    <p class="explorer-page-intro">
+      Explora las <strong id="entity-count-live">92.042</strong> entidades vinculadas a las descripciones de Zasqua.
+      Busca por nombre, filtra por tipo, fecha o rol.
+    </p>
+  </header>
+
+  {# Two-row grid:
+       Row 1 — graph (spans filters+results columns) | selected entity card
+       Row 2 — filters | entity index (results spans results+selected) #}
+  <div class="explorer-grid">
+
+    {# Row 1 left — graph panel #}
+    <section class="explorer-graph-panel entity-graph-frame">
+      <div id="graph-container" style="width:100%;height:100%"></div>
+      <div id="graph-legend" class="graph-legend"></div>
+      <div id="graph-tooltip" class="graph-tooltip" style="display:none"></div>
+
+      {# First-load empty state — hidden once any entity loads. #}
+      <div id="graph-empty-state" class="graph-empty-state">
+        <div class="graph-empty-state-inner">
+          <img src="/img/zasqua-3-burgundy-sm.svg"
+               alt="Zasqua"
+               class="graph-empty-state-logo">
+          <p class="graph-empty-state-text">
+            Cada entidad del archivo — personas, familias e instituciones — se
+            conecta con los documentos donde aparece. Selecciona una entidad
+            para ver sus documentos vinculados; haz clic en un documento para
+            descubrir las otras entidades que aparecen en él, y sigue así el
+            hilo a través del archivo: del notario al testigo, del demandante
+            al juez, de un convento a sus albaceas.
+          </p>
+          <p class="graph-empty-state-text">
+            Desplázate hacia abajo para buscar una entidad por nombre o filtrar
+            el índice por tipo y fecha. O empieza con uno de estos ejemplos:
+            <button type="button" class="graph-empty-state-link" data-entity="ne-05968">Real Audiencia de Quito</button>,
+            <button type="button" class="graph-empty-state-link" data-entity="ne-33874">Cabildo de Rionegro</button>,
+            <button type="button" class="graph-empty-state-link" data-entity="ne-82064">José Gabriel Túpac Amaru</button>
+            o
+            <button type="button" class="graph-empty-state-link" data-entity="ne-91872">Simón Bolívar</button>.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    {# Row 1 right — selected entity card (sticky) #}
+    <aside class="explorer-selected-col">
+      <div id="focal-entity-card" class="selected-entity-card">
+        <div class="selected-entity-stub">Selecciona una entidad para ver más detalles</div>
+      </div>
+    </aside>
+
+    {# Row 2 left — filters #}
+    <aside class="explorer-filters-col">
+      {# Filter-by-viewport toggle — sits above the search bar so it's
+         visually adjacent to the graph (top row) it filters from. The
+         vertical-arrows icon symbolises the link between the graph above
+         and the entity index below. #}
+      <button type="button"
+              id="viewport-filter-toggle"
+              class="viewport-filter-btn"
+              aria-pressed="false">
+        <svg class="viewport-filter-icon" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M5 2.5 L5 13.5 M2.5 5 L5 2.5 L7.5 5 M11 13.5 L11 2.5 M8.5 11 L11 13.5 L13.5 11"
+                stroke="currentColor" stroke-width="1.6" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="viewport-filter-label">Filtrar por vista del explorador</span>
+      </button>
+
+      {# Search input — filled by JS #}
+      <div id="entity-search-input" class="explorer-filter-search"></div>
+
+      {# Facets (entity type, date) — filled by JS #}
+      <div id="sidebar-facets"></div>
+    </aside>
+
+    {# Row 2 right — results (spans results + selected columns) #}
+    <div class="explorer-results-col">
+      {# Search results, active filter pills, sort, pagination #}
+      <div id="entity-explorer"
+           data-entity-types='{{ ui.entity.types | dump | safe }}'></div>
+    </div>
+
+  </div>
+
+</div>
+
+{% block scripts %}
+  <script src="/js/infinite-bipartite-explorer.js"></script>
+  <script src="/js/entity-explorer.js"></script>
+  <script>
+    (function() {
+      'use strict';
+
+      var graphContainer = document.getElementById('graph-container');
+      var sidebarContainer = document.getElementById('entity-explorer');
+
+      var graph = new InfiniteBipartiteExplorer(graphContainer);
+      var sidebar = new EntityExplorer(sidebarContainer);
+
+      // Graph -> Sidebar: when graph refocuses on entity, update sidebar
+      graph.onEntityFocused = function(entityCode, entityMeta, shard) {
+        sidebar.highlightEntity(entityCode, entityMeta, shard);
+      };
+
+      // Focal-card role filter -> graph: filter docs hanging off focal entity
+      sidebar.onFocalRoleFilterChanged = function(rolesSet) {
+        graph.setFocalRoleFilter(rolesSet);
+      };
+
+      // X on the selected-entity card → tell the graph to drop its selection
+      sidebar.onFocalCleared = function() {
+        graph.dismissTooltip && graph.dismissTooltip();
+      };
+
+      // Graph -> Sidebar: shade the selected-entity card if the focal entity
+      // is currently filtered out by the active filter combination.
+      graph.onFocalVisibilityChanged = function(visible) {
+        var card = document.getElementById('focal-entity-card');
+        if (!card) return;
+        if (visible) {
+          card.classList.remove('is-excluded');
+        } else {
+          card.classList.add('is-excluded');
+        }
+      };
+
+      // Sidebar -> Graph: when user clicks entity in sidebar, load in graph
+      sidebar.onEntitySelected = function(entityCode) {
+        graph.refocusOn(entityCode);
+      };
+
+      // Sidebar -> Graph: when filters/search change, filter graph
+      sidebar.onFilterChanged = function(filters) {
+        graph.applyFilters(filters);
+      };
+
+      // Wire viewport filter — sidebar reads visible entity codes (and full
+      // entity records for the fast viewport-only render path) from the
+      // graph via these callbacks when its viewportFilter state is on.
+      sidebar._visibleCodeSource = function() { return graph.getVisibleEntityCodes(); };
+      sidebar._visibleEntitiesSource = function() { return graph.getVisibleEntities(); };
+
+      // Viewport filter toggle (sits above the search bar in the filter col).
+      var viewportToggle = document.getElementById('viewport-filter-toggle');
+      var viewportLabel = viewportToggle && viewportToggle.querySelector('.viewport-filter-label');
+      var rerunDebounced = null;
+      if (viewportToggle) {
+        viewportToggle.addEventListener('click', function() {
+          sidebar.viewportFilter = !sidebar.viewportFilter;
+          viewportToggle.classList.toggle('is-active', sidebar.viewportFilter);
+          viewportToggle.setAttribute('aria-pressed', sidebar.viewportFilter ? 'true' : 'false');
+          if (viewportLabel) {
+            viewportLabel.textContent = sidebar.viewportFilter
+              ? 'Filtrando por vista del explorador'
+              : 'Filtrar por vista del explorador';
+          }
+          sidebar.state.page = 1;
+          sidebar.search();
+        });
+      }
+
+      // Empty-state overlay — visible until an entity loads. Example
+      // buttons load the corresponding entity into the graph (which
+      // hides the overlay via graph.onEntityFocused below).
+      var emptyState = document.getElementById('graph-empty-state');
+      var hasUrlEntity = !!new URLSearchParams(location.search).get('entidad');
+      if (emptyState) {
+        if (!hasUrlEntity) emptyState.classList.add('is-active');
+        emptyState.querySelectorAll('button[data-entity]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var code = btn.getAttribute('data-entity');
+            if (code) graph.refocusOn(code);
+          });
+        });
+      }
+
+      // Hide the empty state once any entity becomes focal
+      var prevOnFocused = graph.onEntityFocused;
+      graph.onEntityFocused = function(entityCode, entityMeta, shard) {
+        if (emptyState) emptyState.classList.remove('is-active');
+        if (prevOnFocused) prevOnFocused(entityCode, entityMeta, shard);
+      };
+
+      // Initialise both — graph first (renders immediately), sidebar async (Pagefind WASM)
+      graph.init({ skipAutoLoad: !hasUrlEntity });
+      sidebar.init();
+
+      // After graph.initGraph() has run (synchronously inside init()),
+      // graphInstance exists. Wrap its onZoom so the viewport-filtered list
+      // re-runs whenever the user pans or zooms. Force-graph fires onZoom
+      // on every interaction step, so debounce the re-run.
+      if (graph.graphInstance && typeof graph.graphInstance.onZoom === 'function') {
+        graph.graphInstance.onZoom(function() {
+          graph.updateTooltipPosition && graph.updateTooltipPosition();
+          if (!sidebar.viewportFilter) return;
+          clearTimeout(rerunDebounced);
+          rerunDebounced = setTimeout(function() { sidebar.search(); }, 250);
+        });
+      }
+
+      // After Pagefind init resolves, replace the live entity count placeholder
+      sidebar.onReady = function() {
+        var el = document.getElementById('entity-count-live');
+        if (el && typeof sidebar.getTotalEntityCount === 'function') {
+          var n = sidebar.getTotalEntityCount();
+          if (n > 0) el.textContent = n.toLocaleString('es-CO');
+        }
+      };
+    })();
+  </script>
+{% endblock %}
