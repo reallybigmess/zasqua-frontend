@@ -1,0 +1,250 @@
+{#
+  Entity Detail Page
+
+  Renders one page per authority record for a historical person,
+  corporate body, or family — the "who" behind the archival material.
+  Eleventy iterates over the entities loaded by `src/_data/entities.js`
+  and produces a page at `/{entity_code}/` for each one (entity codes
+  already carry the `ne-` prefix).
+
+  The page has three roles:
+
+    1. Display the ISAAR-CPF authority record — authorised name,
+       structured name parts, name variants, dates of existence,
+       primary function or office, and biographical history.
+    2. Feed the entity explorer's Pagefind index with hidden
+       `data-pagefind-filter`, `-sort`, and `-meta` spans covering
+       entity type, primary function, year/century/decade ranges, and
+       role set, so the entity shows up correctly in explorer facets.
+    3. Host the timeline and network-graph views of linked
+       descriptions. The linked descriptions themselves are loaded at
+       runtime by `js/entity.js` from a per-entity shard so each page
+       stays small.
+
+  Version: v0.5.0
+#}
+---
+pagination:
+  data: entities
+  size: 1
+  alias: ent
+permalink: "/{{ ent.entity_code }}/"
+layout: base.njk
+eleventyComputed:
+  title: "{{ ent.display_name }}"
+---
+
+{# Pagefind metadata for entity index #}
+<div style="display:none">
+  <span data-pagefind-filter="entity_type">{{ ent.entity_type }}</span>
+  {% if ent.primary_function %}
+    <span data-pagefind-filter="primary_function">{{ ent.primary_function }}</span>
+  {% endif %}
+  {% for y in ent.date_earliest | yearRange(ent.date_latest) %}
+    <span data-pagefind-filter="year">{{ y }}</span>
+  {% endfor %}
+  {% for c in ent.date_earliest | centuryRange(ent.date_latest) %}
+    <span data-pagefind-filter="century">{{ c }}</span>
+  {% endfor %}
+  {% for d in ent.date_earliest | decadeRange(ent.date_latest) %}
+    <span data-pagefind-filter="decade">{{ d }}</span>
+  {% endfor %}
+  {% if ent.roles and ent.roles.length %}
+    {% for r in ent.roles %}
+      <span data-pagefind-filter="role">{{ r }}</span>
+    {% endfor %}
+  {% endif %}
+  <span data-pagefind-sort="name">{{ ent.sort_name or ent.display_name }}</span>
+  <span data-pagefind-sort="date">{{ ent.date_earliest or '' }}</span>
+  <span data-pagefind-sort="count">{{ ent._linked_count }}</span>
+  <span data-pagefind-meta="entity_type">{{ ent.entity_type }}</span>
+  <span data-pagefind-meta="date_earliest">{{ ent.date_earliest or '' }}</span>
+  <span data-pagefind-meta="date_latest">{{ ent.date_latest or '' }}</span>
+  <span data-pagefind-meta="primary_function">{{ ent.primary_function or '' }}</span>
+  <span data-pagefind-meta="linked_count">{{ ent._linked_count }}</span>
+  {% if ent.name_variants and ent.name_variants.length %}
+    <span data-pagefind-meta="name_variants">{{ ent.name_variants | join(', ') }}</span>
+  {% endif %}
+</div>
+<div data-pagefind-body style="display:none">
+  {{ ent.entity_code }}
+  {{ ent.display_name }}
+  {% if ent.name_variants %}{{ ent.name_variants | join(' ') }}{% endif %}
+</div>
+
+{# Breadcrumb #}
+<nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore data-pagefind-entity-page>
+  <div class="container">
+    <a href="/">{{ ui.breadcrumb.home }}</a>
+    <span class="breadcrumb-separator">&rsaquo;</span>
+    <span>{{ ui.entity.breadcrumbParent }}</span>
+    <span class="breadcrumb-separator">&rsaquo;</span>
+    <span>{{ ent.display_name }}</span>
+  </div>
+</nav>
+
+{# Header #}
+<div class="detail-header" data-pagefind-ignore>
+  <div class="container">
+    <h1 class="detail-title font-sans font-semibold text-stone-900">{{ ent.display_name }}</h1>
+    <div class="detail-meta text-sm text-stone-500">
+      <span class="level-badge">{{ ui.entity.types[ent.entity_type] or ent.entity_type }}</span>
+      {% if ent.dates_of_existence %} &middot; {{ ent.dates_of_existence }}{% endif %}
+    </div>
+  </div>
+</div>
+
+{# Two-column layout #}
+<div class="detail-content" data-pagefind-ignore>
+  <div class="container">
+    <div class="desc-layout entity-layout">
+
+      {# Left column: metadata #}
+      <div class="desc-metadata">
+
+        {# Section: Identificacion #}
+        <div class="detail-section">
+          <h3 class="font-semibold text-stone-400">{{ ui.entity.sections.identification }}</h3>
+
+          <div class="detail-field">
+            <span class="detail-label">{{ ui.entity.fields.name }}</span>
+            <span class="detail-value">{{ ent.display_name }}</span>
+          </div>
+
+          {% if ent.surname or ent.given_name %}
+            <div class="detail-field">
+              <span class="detail-label">{{ ui.entity.fields.normalizedName }}</span>
+              <span class="detail-value">{{ ent.surname }}{% if ent.surname and ent.given_name %}, {% endif %}{{ ent.given_name }}{% if ent.honorific %} ({{ ent.honorific }}){% endif %}</span>
+            </div>
+          {% endif %}
+
+          <div class="detail-field">
+            <span class="detail-label">{{ ui.entity.fields.type }}</span>
+            <span class="detail-value">{{ ui.entity.types[ent.entity_type] or ent.entity_type }}</span>
+          </div>
+
+          {% if ent.dates_of_existence %}
+            <div class="detail-field">
+              <span class="detail-label">{{ ui.entity.fields.datesOfExistence }}</span>
+              <span class="detail-value">{{ ent.dates_of_existence }}</span>
+            </div>
+          {% endif %}
+
+          {% if ent.primary_function %}
+            <div class="detail-field">
+              <span class="detail-label">{{ ui.entity.fields.primaryFunction }}</span>
+              <span class="detail-value">{{ ent.primary_function }}</span>
+            </div>
+          {% endif %}
+
+          {% if ent.name_variants and ent.name_variants.length %}
+            <div class="detail-field">
+              <span class="detail-label">{{ ui.entity.fields.nameVariants }}</span>
+              <span class="detail-value">{{ ent.name_variants | join(', ') }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        {# Section: Historia #}
+        {% if ent.history %}
+          <div class="detail-section">
+            <h3 class="font-semibold text-stone-400">{{ ui.entity.sections.history }}</h3>
+            <div class="detail-field">
+              <span class="detail-value text-stone-700">{{ ent.history }}</span>
+            </div>
+          </div>
+        {% endif %}
+
+        {# Section: Control #}
+        <div class="detail-section">
+          <h3 class="font-semibold text-stone-400">{{ ui.entity.sections.control }}</h3>
+          <div class="detail-field">
+            <span class="detail-label">{{ ui.entity.fields.entityCode }}</span>
+            <span class="detail-value detail-value-mono">{{ ent.entity_code }}</span>
+          </div>
+          <div class="detail-field">
+            <a href="/entidades/?entidad={{ ent.entity_code }}"
+               class="inline-flex items-center gap-1.5 text-sm font-medium rounded-md transition-colors"
+               style="padding:0.5rem 1rem;background:var(--color-burgundy);color:#fff"
+               onmouseover="this.style.background='var(--color-burgundy-deep)'"
+               onmouseout="this.style.background='var(--color-burgundy)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                <circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="16"/><circle cx="6" cy="19" r="3"/><circle cx="18" cy="19" r="3"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="12" y1="16" x2="18" y2="16"/>
+              </svg>
+              Ver en explorador
+            </a>
+          </div>
+        </div>
+
+        {# Section: Reutilizacion #}
+        <div class="detail-section">
+          <h3 class="font-semibold text-stone-400">{{ ui.entity.sections.reuse }}</h3>
+          <p class="reuse-blurb">Zasqua se inspira en los <a href="https://journal.code4lib.org/articles/13427" target="_blank" rel="noopener">principios FAIR</a> para hacer sus registros de autoridad más abiertos y reutilizables. Utiliza el estándar <a href="https://eac.staatsbibliothek-berlin.de/" target="_blank" rel="noopener">EAC-CPF</a> para publicar registros de autoridad en formato interoperable.</p>
+          <div class="reuse-manifest">
+            <strong class="reuse-manifest-label">EAC-CPF</strong>
+            <div class="reuse-manifest-row">
+              <code class="reuse-manifest-url reuse-coming-soon">Disponible próximamente</code>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {# Right column: aside with timeline/graph #}
+      <div class="desc-aside">
+        <div class="detail-section">
+          <h3 class="font-semibold text-stone-400">{{ ui.entity.timelineHeader }}</h3>
+
+          {# Intro sentence with view links + role filters #}
+          <p class="entity-intro" id="entity-intro"
+             data-entity-type="{{ ui.entity.types[ent.entity_type] or ent.entity_type }}"
+             data-entity-code="{{ ent.entity_code }}"
+             data-count="{{ ent._linked_count }}">
+          </p>
+
+          {# Segmented control for view switching #}
+          <div class="entity-view-toggle" id="entity-view-toggle">
+            <button type="button" class="entity-toggle-btn active" data-view="timeline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Línea de tiempo
+            </button>
+            <button type="button" class="entity-toggle-btn" data-view="graph">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="16"/><circle cx="6" cy="19" r="3"/><circle cx="18" cy="19" r="3"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="12" y1="16" x2="18" y2="16"/></svg>
+              Red de conexiones
+            </button>
+          </div>
+
+          <div class="entity-role-filters" id="entity-role-filters"></div>
+
+          {# Timeline view #}
+          <div class="entity-timeline-frame" id="entity-timeline-frame">
+            <div class="entity-timeline" id="entity-timeline" data-entity-code="{{ ent.entity_code }}">
+              <p class="text-stone-500 text-sm">{{ ui.general.loading }}</p>
+            </div>
+          </div>
+
+          {# Graph view #}
+          <div class="entity-graph-frame" id="entity-graph-frame" style="display: none">
+            <div class="entity-graph-canvas" id="entity-graph-canvas"></div>
+            <div class="graph-legend">
+              <span class="graph-legend-item"><span class="graph-legend-dot graph-legend-person"></span> Persona</span>
+              <span class="graph-legend-item"><span class="graph-legend-dot graph-legend-corporate"></span> Institución</span>
+              <span class="graph-legend-item"><span class="graph-legend-dot graph-legend-doc-filled"></span> Descripción con más conexiones</span>
+              <span class="graph-legend-item"><span class="graph-legend-dot graph-legend-doc"></span> Descripción sin más conexiones</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/force-graph"></script>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/entity.js"></script>
+{% endblock %}
