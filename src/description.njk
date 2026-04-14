@@ -5,23 +5,31 @@
   page per archival description loaded by `src/_data/descriptions.js`, with
   the URL built from the reference code (for example `/co-ahrb-1-12-3/`).
 
-  The page has three roles:
+  The page has four roles:
 
     1. Display the ISAD(G) metadata for a single unit of description —
        title, dates, scope and content, access conditions, related
        materials, notes, and reuse information (METS and IIIF links).
-    2. Feed Pagefind — the client-side search library used to index the
+    2. Render the linked entity and place authority records as sections
+       with roles, each linking out to the full authority page. The
+       enriched link arrays come precomputed on the description from
+       `src/_data/descriptions.js`.
+    3. Feed Pagefind — the client-side search library used to index the
        built site — by emitting hidden `data-pagefind-filter`, `-sort`,
        and `-meta` spans so the description shows up correctly in search
-       results and facets.
-    3. Embed the TIFY IIIF viewer when the description has a manifest,
+       results and facets. Entity and place codes are emitted as `entidad`
+       and `lugar` filter spans so the search page can narrow by linked
+       authority.
+    4. Embed the TIFY IIIF viewer when the description has a manifest,
        and a Miller-columns tree (`js/tree.js`) when it has children.
 
   OCR text, if present, is rendered inside a hidden `data-pagefind-body`
   block so it contributes to search relevance without appearing in the
-  visible page.
+  visible page. The `escapeTemplate` filter escapes `{{` and `{%` in the
+  OCR before it reaches the layout pass — some scanned documents contain
+  these sequences verbatim and would otherwise crash the build.
 
-  Version: v0.4.0
+  Version: v0.5.0
 #}
 ---
 pagination:
@@ -57,6 +65,12 @@ eleventyComputed:
     <span data-pagefind-filter="ancestor">{{ anc.reference_code }}</span>
   {% endfor %}
   <span data-pagefind-filter="ancestor">{{ desc.reference_code }}</span>
+  {% for code in desc._entity_codes %}
+    <span data-pagefind-filter="entidad">{{ code }}</span>
+  {% endfor %}
+  {% for code in desc._place_codes %}
+    <span data-pagefind-filter="lugar">{{ code }}</span>
+  {% endfor %}
 </div>
 
 {# Breadcrumb #}
@@ -79,8 +93,8 @@ eleventyComputed:
     <h1 class="detail-title font-sans font-semibold text-stone-900">{{ desc.title }}</h1>
     <div class="detail-meta text-sm text-stone-500">
       <span class="level-badge">{{ ui.levels[desc.description_level] or desc.description_level }}</span>
-      {% if desc.date_expression %} &middot; {{ desc.date_expression }}{% endif %}
-      &middot; {{ desc.reference_code }}
+      {% if desc.date_expression %} &middot; {{ desc.date_expression | formatDate }}{% endif %}
+      &middot; <span class="detail-value-mono">{{ desc.reference_code }}</span>
     </div>
   </div>
 </div>
@@ -107,13 +121,13 @@ eleventyComputed:
           {% if desc.date_expression %}
             <div class="detail-field">
               <span class="detail-label">{{ ui.fields.date }}</span>
-              <span class="detail-value">{{ desc.date_expression }}</span>
+              <span class="detail-value">{{ desc.date_expression | formatDate }}</span>
             </div>
           {% endif %}
 
           <div class="detail-field">
             <span class="detail-label">{{ ui.fields.referenceCode }}</span>
-            <span class="detail-value">{{ desc.reference_code }}</span>
+            <span class="detail-value detail-value-mono">{{ desc.reference_code }}</span>
           </div>
 
           {% if desc.scope_content %}
@@ -209,23 +223,29 @@ eleventyComputed:
         {% endif %}
 
         {# Section: Personas y entidades #}
-        {% if desc.creator_display %}
+        {% if desc._entity_links.length > 0 %}
           <div class="detail-section">
             <h3>{{ ui.description.entitiesHeader }}</h3>
-            <div class="detail-field">
-              <span class="detail-label">{{ ui.roles.creator }}</span>
-              <span class="detail-value">{{ desc.creator_display }}</span>
-            </div>
+            {% for ent in desc._entity_links %}
+              <div class="detail-field">
+                <a href="/{{ ent.code }}/">{{ ent.display_name }}</a>
+                {% if ent.role_labels.length > 0 %}
+                 &mdash; <em class="text-stone-400">{{ ent.role_labels | join(", ") }}</em>
+                {% endif %}
+              </div>
+            {% endfor %}
           </div>
         {% endif %}
 
         {# Section: Lugares #}
-        {% if desc.place_display %}
+        {% if desc._place_links.length > 0 %}
           <div class="detail-section">
             <h3>{{ ui.description.placesHeader }}</h3>
-            <div class="detail-field">
-              <span class="detail-value">{{ desc.place_display }}</span>
-            </div>
+            {% for place in desc._place_links %}
+              <div class="detail-field">
+                <a href="/nl-{{ place.id }}/">{{ place.display_name }}</a>
+              </div>
+            {% endfor %}
           </div>
         {% endif %}
 
@@ -406,7 +426,7 @@ eleventyComputed:
 
 {# OCR text: indexed for search but never displayed #}
 {% if desc.ocr_text %}
-  <div data-pagefind-body data-pagefind-weight="0.5" hidden>{{ desc.ocr_text }}</div>
+  <div data-pagefind-body data-pagefind-weight="0.5" hidden>{{ desc.ocr_text | escapeTemplate | safe }}</div>
 {% endif %}
 
 {% block head %}
