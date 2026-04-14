@@ -1,8 +1,30 @@
 /**
  * Miller Columns Tree Navigation
  *
- * Displays hierarchical data in columns where clicking an item
- * reveals its children in the next column.
+ * Renders the archival hierarchy — fonds, series, files, items — as a chain of
+ * side-by-side columns in the Miller style familiar from the macOS Finder.
+ * Clicking an entry in one column opens its children in the next column to the
+ * right, so visitors can drill from a fonds down to an individual document
+ * without ever leaving the page.
+ *
+ * The tree is used in two places: repository landing pages (where the root
+ * descriptions are embedded directly in the HTML under
+ * `#root-descriptions-data`) and description pages (where the first column is
+ * fetched via the `data-parent-id` attribute). Child levels are loaded lazily
+ * from static JSON shards under `/data/children/<id>.json` — the catalogue is
+ * too large to ship in one file, so shards are fetched on demand and cached in
+ * memory for the session.
+ *
+ * Each item shows a filter input, an inline metadata drawer (reference code,
+ * dates, scope and content excerpt, and a count of child units labelled as
+ * unidad / unidad compuesta / unidad simple depending on the children's level),
+ * and a link to the full record at a flat URL built from the reference code.
+ * For leaf items, a small helper extracts the document number from the
+ * reference code — preferring explicit `dNNN` or `nNNN` segments and falling
+ * back to the last purely numeric segment — so titles read like "005 - Carta
+ * del gobernador".
+ *
+ * @version v0.3.0
  */
 
 class MillerColumnsTree {

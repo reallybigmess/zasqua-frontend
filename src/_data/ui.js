@@ -1,3 +1,26 @@
+/**
+ * UI Strings
+ *
+ * Central dictionary of user-facing Spanish text used throughout the
+ * site — navigation labels, the 404 page, breadcrumbs, search page
+ * copy and sort options, facet labels, ISAD(G) description level names
+ * (in singular and plural), descriptive headings for each section of the
+ * description page, ISAAR role names, individual metadata field labels,
+ * repository page copy, and footer credits and copyright.
+ *
+ * Every template reads through the `ui` variable so wording changes flow
+ * from a single source of truth. The description levels (fondo,
+ * subfondo, serie, subserie, expediente, unidad documental, colección,
+ * sección, tomo) and the field labels follow ISAD(G) and the
+ * platform-wide terminology agreed with the archival partners. The
+ * plural level table includes a few container types (caja, carpeta,
+ * legajo, tomo) extracted from titles so child counts read naturally.
+ *
+ * All strings are in Colombian Spanish; user-facing English copy is not
+ * currently rendered from this file.
+ *
+ * @version v0.4.0
+ */
 module.exports = {
   // Navigation
   nav: {

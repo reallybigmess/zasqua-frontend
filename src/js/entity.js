@@ -1,3 +1,22 @@
+/**
+ * Entity Detail Page — Related Descriptions
+ *
+ * Runs on entity pages, which represent people, corporate bodies, or families
+ * that appear as creators or subjects across the archive. The static template
+ * renders the entity's ISAAR-style biographical data at build time, but the
+ * list of archival descriptions that mention the entity would be too large to
+ * bake into every page, so this script fetches that list on demand.
+ *
+ * It looks for an `#entity-descriptions` container, reads the API URL from the
+ * element's `data-api-url` attribute, and calls that endpoint to retrieve the
+ * related descriptions. Each result is rendered as a link to the description
+ * page using its reference code as the URL slug, with the date expression
+ * appended when available. If the fetch fails or the list is empty, a short
+ * Spanish-language placeholder is shown instead.
+ *
+ * @version v0.4.0
+ */
+
 document.addEventListener("DOMContentLoaded", function() {
   var container = document.getElementById("entity-descriptions");
   if (!container) return;

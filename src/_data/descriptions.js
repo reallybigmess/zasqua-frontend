@@ -1,3 +1,24 @@
+/**
+ * Descriptions Data Module
+ *
+ * Eleventy data module that feeds the archival description pages. At build
+ * time it reads `data/descriptions.json` — the full export produced by the
+ * Zasqua backend and downloaded from Backblaze B2 during the build — and
+ * returns an array that pagination in `src/description.njk` iterates over
+ * to generate one static page per description.
+ *
+ * Before returning, the module enriches each entry with two precomputed
+ * fields so templates can stay simple: `_ancestors` is the full breadcrumb
+ * chain of parent descriptions walked by reference code, and `_repo` is
+ * the full repository object resolved from `data/repositories.json`.
+ *
+ * When the `DEV_MODE` environment variable is set to `true`, the list is
+ * capped at the first 100 descriptions to keep local development builds
+ * fast. The `DATA_DIR` variable lets the build override the default data
+ * directory — useful in CI and when running tests.
+ *
+ * @version v0.3.0
+ */
 const fs = require('fs');
 const path = require('path');
 

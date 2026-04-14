@@ -1,7 +1,30 @@
 #!/bin/bash
-# CSS token verification for Phase 1.
-# Checks that input.css defines all brand tokens and that compiled main.css
-# contains no legacy colours.
+# CSS Token Verification
+#
+# This script guards the visual consistency of the site by checking that
+# the hand-written CSS source (`src/css/input.css`) declares every brand
+# colour token that the design system relies on, and that the compiled
+# output (`src/css/main.css`) does not still contain any of the older
+# accent colours that the redesign retired.
+#
+# It runs two groups of checks:
+#
+#   1. Every named brand token — burgundy and its shades, pale rose,
+#      ochre, sage, periwinkle, and the base background — must appear
+#      somewhere in `input.css`. These are the colour variables exposed
+#      to Tailwind through the `@theme` block so they can be used as
+#      utility classes across templates.
+#   2. The compiled stylesheet must contain zero instances of the legacy
+#      blue accents (the old RGB triple and the two discarded hex codes)
+#      and none of the retired orange hover colours.
+#
+# Run it after editing colour tokens or before merging any change that
+# touches the stylesheet. It exits 0 when every check passes and 1 when
+# anything is missing or left behind, so it slots naturally into a
+# pre-commit hook or CI step.
+#
+# Version: v0.4.0
+
 set -e
 
 INPUT="src/css/input.css"

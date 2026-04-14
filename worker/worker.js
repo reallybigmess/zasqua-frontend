@@ -1,3 +1,40 @@
+/**
+ * Edge Worker — Serves the Site from R2
+ *
+ * This Cloudflare Worker is the code that answers every HTTP request
+ * for zasqua.org. Cloudflare runs it in their edge network — close to
+ * the visitor, not in a traditional datacentre — and gives it a direct
+ * binding to the `zasqua-site` R2 bucket that holds the built site.
+ *
+ * The worker's job is deliberately small:
+ *
+ *   1. Accept only `GET` and `HEAD` requests. Anything else gets a 405.
+ *   2. Normalise the URL path so it maps to a file key in R2. Paths
+ *      ending in `/` become `/index.html`, and any path without a file
+ *      extension is treated as a directory and rewritten the same way.
+ *      This lets the static site use clean URLs like `/repositorios/`
+ *      without needing an `.html` suffix.
+ *   3. Check Cloudflare's edge cache first. If the response is already
+ *      cached at this edge, return it immediately.
+ *   4. Otherwise fetch the object from R2. If nothing is found, try to
+ *      serve the custom `404.html` page; if even that is missing, fall
+ *      back to a plain text 404.
+ *   5. Attach the right `Content-Type`, `Cache-Control`, and `ETag`
+ *      headers. The helpers at the bottom of the file map file
+ *      extensions to MIME types and to cache lifetimes that mirror the
+ *      ones applied at upload time by `scripts/upload-to-r2.py` — short
+ *      for HTML and JSON, week-long for CSS and JS, and a year with the
+ *      `immutable` flag for fonts and images.
+ *   6. Store a clone of the response in the edge cache so the next
+ *      visitor at this edge is served without touching R2.
+ *
+ * Pipeline context: the deploy workflow uploads `_site/` to the
+ * `zasqua-site` R2 bucket, and this worker is what turns those objects
+ * into a live site. It is configured in `wrangler.toml` and deployed
+ * with `wrangler deploy`.
+ *
+ * @version v0.3.2
+ */
 export default {
   async fetch(request, env) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {

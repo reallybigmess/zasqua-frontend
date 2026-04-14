@@ -1,3 +1,28 @@
+{#
+  Archival Description Page
+
+  The main per-document template. Eleventy's pagination feature renders one
+  page per archival description loaded by `src/_data/descriptions.js`, with
+  the URL built from the reference code (for example `/co-ahrb-1-12-3/`).
+
+  The page has three roles:
+
+    1. Display the ISAD(G) metadata for a single unit of description —
+       title, dates, scope and content, access conditions, related
+       materials, notes, and reuse information (METS and IIIF links).
+    2. Feed Pagefind — the client-side search library used to index the
+       built site — by emitting hidden `data-pagefind-filter`, `-sort`,
+       and `-meta` spans so the description shows up correctly in search
+       results and facets.
+    3. Embed the TIFY IIIF viewer when the description has a manifest,
+       and a Miller-columns tree (`js/tree.js`) when it has children.
+
+  OCR text, if present, is rendered inside a hidden `data-pagefind-body`
+  block so it contributes to search relevance without appearing in the
+  visible page.
+
+  Version: v0.4.0
+#}
 ---
 pagination:
   data: descriptions

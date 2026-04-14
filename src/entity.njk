@@ -1,3 +1,21 @@
+{#
+  Entity Detail Page
+
+  Renders one page per authority record for a person or institution — the
+  "who" behind the archival material. Eleventy iterates over the entities
+  loaded by `src/_data/entities.js` and produces a page at
+  `/entidad/{entity_code}/` for each one.
+
+  The left column shows identity metadata following the ISAAR(CPF)
+  standard — authorised name, structured name parts, name variants,
+  dates of existence, primary function or office, and biographical
+  history. Linked documents are loaded lazily at runtime by
+  `js/entity.js`, which calls the backend API at
+  `/api/entities/{entity_code}/descriptions/` so the list stays current
+  without requiring a full rebuild of the static site.
+
+  Version: v0.4.0
+#}
 ---
 pagination:
   data: entities

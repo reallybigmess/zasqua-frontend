@@ -1,3 +1,22 @@
+/**
+ * Place Detail Page — Related Descriptions
+ *
+ * Runs on place pages, which represent geographic authorities — towns, cities,
+ * regions, and other named locations — that appear in the archive's subject
+ * index. The static template bakes in the place's name, coordinates, and
+ * notes, but the list of archival descriptions that reference the place is
+ * fetched at view time so the build doesn't need to embed it on every page.
+ *
+ * It looks for a `#place-descriptions` container, reads the API URL from the
+ * element's `data-api-url` attribute, and calls that endpoint to retrieve the
+ * related descriptions. Each result is rendered as a link to the description
+ * page using its reference code as the URL slug, with the date expression
+ * appended when available. If the fetch fails or the list is empty, a short
+ * Spanish-language placeholder is shown instead.
+ *
+ * @version v0.4.0
+ */
+
 document.addEventListener("DOMContentLoaded", function() {
   var container = document.getElementById("place-descriptions");
   if (!container) return;

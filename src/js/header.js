@@ -1,3 +1,20 @@
+/**
+ * Site Header — Mobile Navigation Toggle
+ *
+ * Drives the hamburger menu in the site header on narrow viewports, where the
+ * primary navigation collapses behind a toggle button. The script runs on every
+ * page, attaches to `.hamburger-toggle` and `.site-nav`, and flips a `nav-open`
+ * class to show or hide the menu. It also swaps the Material Symbols glyph
+ * between `menu` and `close` and updates `aria-expanded` so screen readers
+ * announce the current state.
+ *
+ * The menu closes automatically when the user clicks outside the header or
+ * presses the Escape key — standard dismissal patterns that keep keyboard and
+ * pointer users on equal footing.
+ *
+ * @version v0.1.0
+ */
+
 // Hamburger menu toggle
 (function () {
   const btn = document.querySelector('.hamburger-toggle');

@@ -1,3 +1,26 @@
+{#
+  Place Detail Page
+
+  Renders one page per place authority record — the geographic referents
+  (cities, regions, rivers, parishes) that appear in the archival
+  descriptions. Eleventy iterates over the places loaded by
+  `src/_data/places.js` and produces a page at `/lugar/{label}/` for
+  each one.
+
+  The template maps GeoNames feature classes (A, H, P, S, T, L, R, U, V)
+  to human-readable Spanish labels via the local `fclassLabels` table,
+  then shows identity details — authorised name, name variants, place
+  type, colonial-era administrative divisions (gobernación, partido,
+  región), modern administrative levels, and coordinates — followed by a
+  section for external authority identifiers from Wikidata, the World
+  Historical Gazetteer, Getty TGN, and HGIS de las Indias.
+
+  Linked documents are fetched lazily by `js/place.js` from
+  `/api/places/{label}/descriptions/` so the list reflects the current
+  backend state without needing a rebuild.
+
+  Version: v0.4.0
+#}
 ---
 pagination:
   data: places

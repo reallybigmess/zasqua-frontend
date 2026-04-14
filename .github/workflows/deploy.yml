@@ -1,4 +1,41 @@
 name: Build and deploy to R2
+#
+# CI Build and Deploy
+#
+# This workflow is the production path that publishes the Zasqua site.
+# It runs on demand (workflow_dispatch) — typically after a new data
+# export is pushed to Backblaze B2 or after a change is merged to main
+# that needs to reach zasqua.org.
+#
+# There are two equally valid ways to build the site: locally on a
+# contributor's machine (using `build.sh`) or here in GitHub Actions,
+# which additionally uploads the build to Cloudflare R2 and purges the
+# edge cache so visitors see the new version immediately.
+#
+# Pipeline:
+#
+#   1. Check out the repo and set up Node (version pinned in `.nvmrc`)
+#      and Python runtimes
+#   2. Install the Backblaze B2 CLI and `boto3`
+#   3. Download the archival data exports from the `zasqua-export` B2
+#      bucket — `descriptions.json`, `repositories.json`, and the
+#      per-description children shards
+#   4. Install npm dependencies with `npm ci`
+#   5. Download the standalone Tailwind CSS binary and compile
+#      `src/css/input.css` into `src/css/main.css`
+#   6. Run Eleventy to render the static site into `_site/`, with a
+#      generous Node heap size for the large build
+#   7. Run Pagefind over `_site/` to build the client-side search index
+#   8. Upload `_site/` to the `zasqua-site` R2 bucket in parallel using
+#      `scripts/upload-to-r2.py`
+#   9. Purge the Cloudflare edge cache so the new build is served
+#      straight away
+#
+# Secrets required: `B2_APPLICATION_KEY_ID`, `B2_APPLICATION_KEY`,
+# `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `CLOUDFLARE_ACCOUNT_ID`,
+# `CF_API_TOKEN`, and `CF_ZONE_ID`.
+#
+# Version: v0.4.0
 
 on:
   workflow_dispatch:

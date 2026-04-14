@@ -1,3 +1,21 @@
+{#
+  Homepage
+
+  The landing page for zasqua.org. It presents the Zasqua logo and title,
+  a prominent search form that submits to `/buscar/`, two short
+  introductory paragraphs explaining what Zasqua and Neogranadina are, and
+  a grid of the repositories available on the platform.
+
+  Repository cards are pulled from the `repositories` data source and
+  ordered by the hand-curated `repoOrder` list. Each card overrides the
+  generic repository name and placeholder image with a project-specific
+  title, subtitle, category, cover image, and link — for the Peruvian
+  independence collection, the Boyacá regional archive, Rionegro, the
+  Cauca historical fonds, and Istmina. The `sortByOrder` filter is defined
+  in the Eleventy config.
+
+  Version: v0.4.0
+#}
 ---
 layout: base.njk
 ---

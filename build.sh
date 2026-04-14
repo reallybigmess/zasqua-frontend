@@ -1,16 +1,37 @@
 #!/bin/bash
-set -e
-
-# Zasqua frontend local build script.
-# CI builds run in GitHub Actions — see .github/workflows/deploy.yml.
-# This script is a convenience for running the full pipeline locally.
+# Local Build Pipeline
 #
-# Downloads exported data from B2, builds the site with Eleventy,
-# then indexes with Pagefind.
+# This script runs the full Zasqua frontend build on the developer's own
+# machine — an alternative to the GitHub Actions workflow that normally
+# builds and deploys the site (see `.github/workflows/deploy.yml`). It
+# exists so that contributors can reproduce a production-equivalent build
+# locally, test changes end-to-end, and troubleshoot issues without
+# waiting for CI.
+#
+# The pipeline walks through these steps in order:
+#
+#   1. Install the Backblaze B2 CLI and authenticate with the read-only
+#      credentials that grant access to the `zasqua-export` bucket
+#   2. Download the archival data exported from the backend Django app
+#      (`descriptions.json`, `repositories.json`, and the per-description
+#      children shards under `data/children/`)
+#   3. Install Node dependencies with `npm ci`
+#   4. Fetch the correct standalone Tailwind CSS binary for the host
+#      platform and compile `src/css/input.css` into `src/css/main.css`
+#   5. Run Eleventy (the static site generator) to render every page in
+#      the archive out to `_site/`
+#   6. Run Pagefind over `_site/` to build the client-side search index
 #
 # Required environment variables:
-#   B2_APPLICATION_KEY_ID  — read-only key ID for zasqua-export bucket
-#   B2_APPLICATION_KEY     — read-only application key
+#   B2_APPLICATION_KEY_ID  — read-only key ID for the `zasqua-export` bucket
+#   B2_APPLICATION_KEY     — matching read-only application key
+#
+# Inputs:  archival JSON exports in the `zasqua-export` B2 bucket.
+# Outputs: a fully built `_site/` directory, ready to be uploaded to R2.
+#
+# Version: v0.4.0
+
+set -e
 
 # Increase Node heap for large Eleventy builds (free tier has 8 GB)
 export NODE_OPTIONS="--max-old-space-size=7168"

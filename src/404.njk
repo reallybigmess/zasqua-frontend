@@ -1,3 +1,15 @@
+{#
+  404 Error Page
+
+  Renders the static "page not found" screen served by Cloudflare when a
+  visitor requests a URL that does not resolve to a description, repository,
+  entity, or place. The template reads its title, message, and call-to-action
+  labels from `ui.error404` so the wording stays in sync with the rest of
+  the UI strings in `src/_data/ui.js`, and offers two recovery actions —
+  returning home or jumping to the search page.
+
+  Version: v0.3.2
+#}
 ---
 layout: base.njk
 title: "Página no encontrada"

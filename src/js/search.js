@@ -1,8 +1,28 @@
 /**
  * Search Page
  *
- * Uses the Pagefind static search index to provide full-text search
- * with facets, pagination, and URL-driven state. No server required.
+ * Powers the `/buscar/` page — the faceted search interface over the whole
+ * Zasqua catalogue. Because the site is statically hosted, the search runs
+ * entirely in the visitor's browser using Pagefind, a static search library
+ * that ships a pre-built index alongside the site and loads WebAssembly to
+ * query it. No server is required.
+ *
+ * This module parses the URL query string to rebuild the active search state
+ * (query text, text-filter chips with AND/NOT operators, country, repository,
+ * level, digital status, date filter at year/decade/century granularity,
+ * ancestor scope, parent reference code, sort, and page), sends a search to
+ * Pagefind, and renders the results panel and facet sidebar. It also writes
+ * state back to the URL with `history.pushState` so results are shareable and
+ * the browser back button works as expected.
+ *
+ * Two performance safeguards live here — a "browse prompt" that skips the
+ * expensive Pagefind scan when a filter-only query would return more than ten
+ * thousand results, and a requestAnimationFrame nudge before each search so
+ * the loading spinner paints before the WASM call blocks the main thread.
+ * Level labels (fondo, serie, file, etc.) are passed in via a data attribute
+ * on the container so the same script can honour English or Spanish builds.
+ *
+ * @version v0.4.0
  */
 
 class SearchPage {

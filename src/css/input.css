@@ -1,3 +1,38 @@
+/**
+ * Tailwind Source Stylesheet
+ *
+ * This is the single CSS source file the Zasqua frontend compiles into
+ * the site's production stylesheet. Tailwind CSS is a utility-first
+ * framework — instead of writing bespoke classes, templates combine
+ * small single-purpose utilities ("flex", "text-stone-600",
+ * "max-w-5xl") and Tailwind generates the final stylesheet from the
+ * classes it actually sees in the templates.
+ *
+ * The file is organised in three parts:
+ *
+ *   1. An `@theme` block that declares the brand design tokens —
+ *      burgundy and its shades, pale rose, ochre, sage, periwinkle, the
+ *      page background colour, and the DM Sans, Crimson Text, and
+ *      Cormorant Garamond font stacks. Tokens in `@theme` become
+ *      Tailwind utility classes automatically ("bg-burgundy",
+ *      "font-display").
+ *   2. A `:root` block for layout constants that are used inside
+ *      `calc()` expressions (max content width, header height) and
+ *      therefore cannot live in `@theme`.
+ *   3. `@layer base` resets and typography defaults, followed by a long
+ *      `@layer components` section that defines the visual components
+ *      that recur across the site — the header, navigation, cards, the
+ *      archival tree browser, description pages, search results, and so
+ *      on.
+ *
+ * Build pipeline context: `build.sh` and the GitHub Actions deploy
+ * workflow both download the standalone Tailwind binary and run it
+ * against this file to produce `src/css/main.css`, which is the
+ * stylesheet actually shipped to browsers. Never edit `main.css`
+ * directly — it is regenerated on every build.
+ *
+ * @version v0.4.0
+ */
 @import "tailwindcss" source("..");
 
 @theme {

@@ -1,3 +1,39 @@
+/**
+ * Eleventy Configuration
+ *
+ * Eleventy (stylised "11ty") is the static site generator that turns the
+ * archival data in `data/` and the Nunjucks templates in `src/` into the
+ * finished HTML site under `_site/`. This file is Eleventy's main
+ * configuration hook — it tells the generator where to find templates,
+ * which folders to copy over untouched, and adds the custom filters and
+ * transforms that the templates rely on.
+ *
+ * What this file sets up:
+ *
+ *   - Passthrough copies for the CSS, JS, image, and vendor asset
+ *     folders, plus the `data/children/` directory of per-description
+ *     JSON shards produced by the backend's export command. These files
+ *     are copied verbatim into `_site/` rather than being processed by
+ *     Eleventy.
+ *   - Watch targets for CSS and JS so `eleventy --serve` rebuilds when
+ *     those folders change during development.
+ *   - A set of template filters used throughout the Nunjucks views:
+ *     `limit`, `splitPipe`, `safeSlug`, `formatDate`, `numberFormat`
+ *     (which groups thousands with dots in the Colombian convention),
+ *     `sortByOrder`, `filterByRepo`, `filterByLevel`, `findByRef`,
+ *     `siblingsOf`, `extractYear`, and `truncate`.
+ *   - A `progress` transform that logs every five thousandth page and a
+ *     post-build summary — useful because full builds render tens of
+ *     thousands of description pages and can otherwise feel silent.
+ *   - A `year` shortcode for the footer.
+ *
+ * Directory layout returned at the bottom: input from `src/`, output to
+ * `_site/`, includes under `src/_includes/`, layouts under
+ * `src/_layouts/`, and global data under `src/_data/`. Templates are
+ * Nunjucks by default, with HTML and Markdown also accepted.
+ *
+ * @version v0.2.0
+ */
 module.exports = function(eleventyConfig) {
   // Pass through static assets
   eleventyConfig.addPassthroughCopy("src/css");
