@@ -6,24 +6,28 @@
   array in context — each entry with a `title` and optional `url` —
   and always prepends a link home using the `ui.breadcrumb.home` label.
   Entries without a URL are rendered as plain text, which is how the
-  current page is indicated.
+  current page is indicated. Link and separator styling uses the shared
+  Tailwind colour tokens (`text-stone-400`, `hover:text-burgundy-light`,
+  `text-stone-500`) so the chain stays visually consistent with the
+  inline breadcrumbs on description, entity, place, and repository
+  pages.
 
   Currently kept as a shared include for pages that need arbitrary
   breadcrumb chains; the description, entity, place, and repository
   templates render their own inline breadcrumbs tailored to their
   specific hierarchy.
 
-  Version: v0.1.0
+  Version: v0.5.0
 #}
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <div class="container">
-    <a href="/">{{ ui.breadcrumb.home }}</a>
+    <a href="/" class="text-sm text-stone-400 hover:text-burgundy-light">{{ ui.breadcrumb.home }}</a>
     {% for crumb in breadcrumbs %}
-      <span class="breadcrumb-separator">&rsaquo;</span>
+      <span class="breadcrumb-separator text-stone-400">&rsaquo;</span>
       {% if crumb.url %}
-        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+        <a href="{{ crumb.url }}" class="text-sm text-stone-400 hover:text-burgundy-light">{{ crumb.title }}</a>
       {% else %}
-        <span>{{ crumb.title }}</span>
+        <span class="text-sm text-stone-500">{{ crumb.title }}</span>
       {% endif %}
     {% endfor %}
   </div>

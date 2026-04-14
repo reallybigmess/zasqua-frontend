@@ -6,9 +6,11 @@
   entity, or place. The template reads its title, message, and call-to-action
   labels from `ui.error404` so the wording stays in sync with the rest of
   the UI strings in `src/_data/ui.js`, and offers two recovery actions —
-  returning home or jumping to the search page.
+  returning home or jumping to the search page. Typography and button
+  styling now use the shared Tailwind colour tokens (burgundy family,
+  stone neutrals) for parity with the rest of the site.
 
-  Version: v0.3.2
+  Version: v0.5.0
 #}
 ---
 layout: base.njk
@@ -18,10 +20,10 @@ permalink: /404.html
 
 <section class="section error-page">
   <div class="container">
-    <h1 class="section-title">{{ ui.error404.title }}</h1>
-    <p class="error-message">{{ ui.error404.message }}</p>
+    <h1 class="section-title font-display text-stone-900">{{ ui.error404.title }}</h1>
+    <p class="error-message text-stone-500">{{ ui.error404.message }}</p>
     <div class="error-actions">
-      <a href="/" class="btn btn-primary btn-pill">{{ ui.error404.home }}</a>
+      <a href="/" class="btn btn-primary btn-pill bg-burgundy-deep text-white hover:bg-burgundy">{{ ui.error404.home }}</a>
       <a href="/buscar/" class="btn btn-secondary btn-pill">{{ ui.error404.search }}</a>
     </div>
   </div>

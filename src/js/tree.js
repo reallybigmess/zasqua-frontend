@@ -24,7 +24,7 @@
  * back to the last purely numeric segment — so titles read like "005 - Carta
  * del gobernador".
  *
- * @version v0.3.0
+ * @version v0.5.0
  */
 
 class MillerColumnsTree {
