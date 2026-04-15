@@ -1,8 +1,35 @@
 /**
  * Search Page
  *
- * Uses the Pagefind static search index to provide full-text search
- * with facets, pagination, and URL-driven state. No server required.
+ * Powers the `/buscar/` page — the faceted search interface over the whole
+ * Zasqua catalogue. Because the site is statically hosted, the search runs
+ * entirely in the visitor's browser using Pagefind, a static search library
+ * that ships a pre-built index alongside the site and loads WebAssembly to
+ * query it. No server is required.
+ *
+ * This module parses the URL query string to rebuild the active search state
+ * (query text, text-filter chips with AND/NOT operators, country, repository,
+ * level, digital status, date filter at year/decade/century granularity,
+ * ancestor scope, parent reference code, linked entity authority codes,
+ * linked place authority ids, sort, and page), sends a search to Pagefind,
+ * and renders the results panel and facet sidebar. It also writes state
+ * back to the URL with `history.pushState` so results are shareable and
+ * the browser back button works as expected.
+ *
+ * The `entidad` and `lugar` filters narrow results to descriptions that
+ * mention a specific entity or place — the description pages emit these
+ * as Pagefind filter spans, and the entity and place explorers link into
+ * the search page with these filters set so a visitor can go from an
+ * authority record straight to the documents that reference it.
+ *
+ * Two performance safeguards live here — a "browse prompt" that skips the
+ * expensive Pagefind scan when a filter-only query would return more than ten
+ * thousand results, and a requestAnimationFrame nudge before each search so
+ * the loading spinner paints before the WASM call blocks the main thread.
+ * Level labels (fondo, serie, file, etc.) are passed in via a data attribute
+ * on the container so the same script can honour English or Spanish builds.
+ *
+ * @version v0.5.0
  */
 
 class SearchPage {
@@ -34,7 +61,9 @@ class SearchPage {
       ancestor: [],
       parent: '',
       sort: '',
-      page: 1
+      page: 1,
+      entidad: [],
+      lugar: []
     };
 
     this.facetGroupState = { country: true, repository: true, digital_status: true, level: true, date: true };
@@ -98,6 +127,8 @@ class SearchPage {
       this.state.dateFilter = { level: 'century', label: `Siglo ${this.romanCentury(num)}`, years };
     }
     this.state.ancestor = params.getAll('ancestor');
+    this.state.entidad = params.getAll('entidad');
+    this.state.lugar = params.getAll('lugar');
     this.state.parent = params.get('parent') || '';
     this.state.sort = params.get('sort') || '';
     this.state.page = parseInt(params.get('page'), 10) || 1;
@@ -133,6 +164,8 @@ class SearchPage {
     for (const a of this.state.ancestor) {
       params.append('ancestor', a);
     }
+    for (const e of this.state.entidad) params.append('entidad', e);
+    for (const l of this.state.lugar) params.append('lugar', l);
     if (this.state.parent) params.set('parent', this.state.parent);
     if (this.state.sort) params.set('sort', this.state.sort);
     if (this.state.page > 1) params.set('page', this.state.page);
@@ -224,6 +257,8 @@ class SearchPage {
         pfFilters.year = { any: this.state.dateFilter.years };
       }
       if (this.state.ancestor.length) pfFilters.ancestor = { any: this.state.ancestor };
+      if (this.state.entidad.length) pfFilters.entidad = { any: this.state.entidad };
+      if (this.state.lugar.length) pfFilters.lugar = { any: this.state.lugar };
       if (this.state.parent) {
         pfFilters.parent_reference_code = this.state.parent;
       }

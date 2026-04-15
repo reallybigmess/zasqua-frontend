@@ -1,4 +1,25 @@
 name: Test parallel R2 upload
+#
+# CI Test Upload
+#
+# This workflow is a dry-run companion to the main deploy workflow. It
+# builds the full site and pushes the result to a separate R2 bucket,
+# `zasqua-tests`, which is not wired to the public domain. Its purpose
+# is to verify that the parallel upload script behaves correctly under
+# production-scale data — tens of thousands of files, several gigabytes —
+# without risking the live site or triggering a cache purge.
+#
+# It runs only on demand (workflow_dispatch) and follows the same shape
+# as `deploy.yml`: install tooling, download data from B2, build with
+# Eleventy, index with Pagefind, then run `scripts/upload-to-r2.py` with
+# the test bucket as its target. The Tailwind CSS step and the final
+# Cloudflare cache purge are intentionally skipped — this workflow is
+# about stressing the uploader, not deploying to visitors.
+#
+# Use it when changing `scripts/upload-to-r2.py`, tuning concurrency, or
+# investigating regressions in build output size.
+#
+# Version: v0.5.0
 
 on:
   workflow_dispatch:

@@ -1,3 +1,21 @@
+{#
+  Base Layout
+
+  The outermost HTML wrapper used by every page on the site. It sets the
+  document language from `site.language`, composes the page title as
+  "Page Title | Site Title", wires up the meta description, favicon, and
+  Google Fonts (DM Sans, Crimson Text, Cormorant Garamond, and the
+  Material Symbols icon set), and loads the compiled `main.css`.
+
+  The body includes the shared header and footer partials and exposes
+  three Nunjucks blocks that child templates can extend —  `head` for
+  per-page stylesheets (the TIFY viewer CSS on IIIF pages, for example),
+  `content` for the page body, and `scripts` for per-page scripts (tree,
+  search, entity, place, description). The Cloudflare Web Analytics
+  beacon is loaded at the end of the body.
+
+  Version: v0.5.0
+#}
 <!DOCTYPE html>
 <html lang="{{ site.language }}">
 <head>

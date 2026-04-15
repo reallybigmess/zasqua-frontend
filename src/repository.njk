@@ -7,6 +7,24 @@ permalink: "/{{ repo.code }}/"
 layout: base.njk
 ---
 
+{#
+  Repository Page
+
+  Renders one page per custodial institution — for example the Archivo
+  Histórico Regional de Boyacá or the Antiguo Archivo Central del Cauca.
+  Eleventy paginates over the repositories loaded by
+  `src/_data/repositories.js` and builds each page at `/{code}/`.
+
+  Per-repository branding — title, subtitle, and hero image — is applied
+  by matching the repo code, mirroring the cards on the homepage so the
+  two surfaces stay consistent. The body hosts a Miller-columns tree (the
+  three-pane hierarchical browser rendered by `js/tree.js`) seeded with
+  the repository's root descriptions, plus a shortcut to scope the search
+  page to this collection.
+
+  Version: v0.5.0
+#}
+
 {% set repoTitle = repo.name %}
 {% set repoSubtitle = "" %}
 {% set repoImage = "/img/neogranadina-placeholder.png" %}

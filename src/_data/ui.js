@@ -1,3 +1,31 @@
+/**
+ * UI Strings
+ *
+ * Central dictionary of user-facing Spanish text used throughout the
+ * site — navigation labels, the 404 page, breadcrumbs, search page
+ * copy and sort options, facet labels, ISAD(G) description level names
+ * (in singular and plural), descriptive headings for each section of
+ * the description page, entity role names, ISAAR-CPF entity field and
+ * section labels, place type and field labels, individual metadata
+ * field labels, repository page copy, and footer credits and copyright.
+ *
+ * Every template reads through the `ui` variable so wording changes flow
+ * from a single source of truth. The description levels (fondo,
+ * subfondo, serie, subserie, expediente, unidad documental, colección,
+ * sección, tomo) and the field labels follow ISAD(G) and the
+ * platform-wide terminology agreed with the archival partners. The
+ * plural level table includes a few container types (caja, carpeta,
+ * legajo, tomo) extracted from titles so child counts read naturally.
+ * The entity section follows ISAAR-CPF — the International Standard
+ * Archival Authority Record for Corporate Bodies, Persons and Families —
+ * with the full 29-role vocabulary the backend surfaces in entity_links.
+ *
+ * All strings are in Colombian Spanish; user-facing English copy is not
+ * currently rendered from this file.
+ *
+ * @version v0.5.0
+ */
+
 module.exports = {
   // Navigation
   nav: {
@@ -106,13 +134,119 @@ module.exports = {
     viewAllChildren: "Ver los {count} documentos"
   },
 
-  // Entity roles
+  // Entity roles — complete 29-role vocabulary surfaced in entity_links.json
   roles: {
+    // Core roles
     creator: "Productor",
     contributor: "Colaborador",
     publisher: "Editor",
     subject: "Materia",
-    mentioned: "Mencionado"
+    mentioned: "Mencionado",
+    // Extended roles
+    sender: "Remitente",
+    recipient: "Destinatario",
+    defendant: "Demandado",
+    plaintiff: "Demandante",
+    witness: "Testigo",
+    official: "Oficial",
+    scribe: "Escribano",
+    notary: "Notario",
+    judge: "Juez",
+    author: "Autor",
+    buyer: "Comprador",
+    seller: "Vendedor",
+    guarantor: "Fiador",
+    petitioner: "Solicitante",
+    appellant: "Apelante",
+    executor: "Albacea",
+    guardian: "Tutor",
+    attorney: "Apoderado",
+    interpreter: "Intérprete",
+    appraiser: "Tasador",
+    lessee: "Arrendatario",
+    lessor: "Arrendador",
+    debtor: "Deudor",
+    creditor: "Acreedor"
+  },
+
+  // Entity authority records (ISAAR-CPF)
+  entity: {
+    // Type labels
+    types: {
+      person: "Persona",
+      corporate_body: "Entidad corporativa",
+      corporate: "Entidad corporativa",
+      family: "Familia"
+    },
+    // Section headers — ISAAR-CPF areas of description
+    sections: {
+      identification: "Identificación",
+      history: "Historia",
+      relations: "Relaciones",
+      control: "Control",
+      reuse: "Reutilización",
+      sources: "Fuentes"
+    },
+    // Field labels
+    fields: {
+      entityCode: "Identificador Neogranadina",
+      name: "Nombre",
+      normalizedName: "Nombre normalizado",
+      type: "Tipo",
+      datesOfExistence: "Fechas de existencia",
+      primaryFunction: "Función principal",
+      nameVariants: "Variantes del nombre",
+      history: "Historia"
+    },
+    // Page copy
+    breadcrumbParent: "Entidades",
+    timelineHeader: "Apariciones en el archivo",
+    linkedDescriptions: "Descripciones vinculadas",
+    linkedDescriptionsLink: "Ver las {count} descripciones vinculadas",
+    noLinkedDescriptions: "No se encontraron descripciones vinculadas a este registro.",
+    shardError: "No se pudieron cargar las descripciones vinculadas. Intente recargar la página.",
+    noDateLabel: "Sin fecha"
+  },
+
+  // Place authority records
+  place: {
+    // Type labels — plain Spanish geographic terms
+    types: {
+      city: "Lugar poblado",
+      administrative_division: "División administrativa",
+      region: "Región",
+      country: "País",
+      geographical_feature: "Accidente geográfico",
+      river: "Cuerpo de agua",
+      other: "Accidente geográfico"
+    },
+    // Section headers
+    sections: {
+      identification: "Identificación",
+      externalIds: "Identificadores externos",
+      control: "Control",
+      reuse: "Reutilización"
+    },
+    // Field labels
+    fields: {
+      name: "Nombre",
+      type: "Tipo",
+      placeCode: "Identificador Neogranadina",
+      nameVariants: "Variantes del nombre",
+      coordinates: "Coordenadas",
+      countryCode: "País"
+    },
+    // Page copy
+    breadcrumbParent: "Lugares",
+    timelineHeader: "Apariciones en el archivo",
+    map: "Mapa",
+    linkedDescriptions: "Descripciones vinculadas",
+    linkedDescriptionsLink: "Ver las {count} descripciones vinculadas",
+    noLinkedDescriptions: "No se encontraron descripciones vinculadas a este registro.",
+    shardError: "No se pudieron cargar las descripciones vinculadas. Intente recargar la página.",
+    noDateLabel: "Sin fecha",
+    noCoordinatesTitle: "Ubicación no disponible",
+    noCoordinatesText: "Este lugar no cuenta con coordenadas geográficas en el registro de autoridad."
   },
 
   // Metadata field labels

@@ -1,3 +1,24 @@
+/**
+ * Description Page Behaviours
+ *
+ * Powers the interactive controls on a single archival description page — the
+ * page a visitor lands on when viewing one document, file, series, or fonds.
+ * Two features live here: copy-to-clipboard for the IIIF manifest URL exposed
+ * in the reuse panel, and the embedded deep-zoom image viewer.
+ *
+ * The viewer is TIFY, a self-hosted IIIF viewer bundled under `src/vendor/tify/`.
+ * IIIF (International Image Interoperability Framework) is the standard Zasqua
+ * uses to serve high-resolution scans as tiled pyramids so the browser only
+ * fetches the tiles currently visible. When the page contains a `.desc-viewer`
+ * element with a `data-manifest` attribute, this script boots TIFY against that
+ * manifest and then injects custom pill-style controls into its header — an
+ * expand/contract toggle that widens the viewer within the page, a fullscreen
+ * toggle, and a thumbnails button that reuses TIFY's own Pages panel by briefly
+ * unhiding its popup so Vue's internal state stays in sync.
+ *
+ * @version v0.3.0
+ */
+
 document.addEventListener("DOMContentLoaded", function() {
 
   // Copy-to-clipboard for IIIF manifest URL

@@ -4,7 +4,24 @@ title: "Buscar"
 permalink: /buscar/
 ---
 
-<div class="container">
+{#
+  Search Page
+
+  The main search surface for Zasqua. This template hands off rendering to
+  Pagefind — the client-side search library that indexes the built site at
+  the end of each deploy — by placing an empty `#search-page` container that
+  `js/search.js` populates with results, filters, and pagination.
+
+  Level labels (fondo, serie, expediente, etc.) and facet labels are passed
+  from `ui.js` into the container as JSON data attributes so the script can
+  render localised filter chips without fetching extra data. An inline
+  beacon ping sends the raw query string to the Neogranadina analytics
+  worker so the team can see which terms visitors search for.
+
+  Version: v0.5.0
+#}
+
+<div class="container font-sans">
   <div id="search-page"
        data-level-labels='{{ ui.levels | dump | safe }}'
        data-facet-labels='{{ ui.facets | dump | safe }}'>

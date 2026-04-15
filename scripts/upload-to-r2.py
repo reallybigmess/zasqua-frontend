@@ -1,10 +1,34 @@
 #!/usr/bin/env python3
 """
-Upload _site/ to Cloudflare R2 with high concurrency.
+Parallel Upload to Cloudflare R2
 
-Replaces rclone for full rebuilds. Walks the build output directory and
-PUTs every file to R2 using boto3 with a thread pool. Content-Type and
-Cache-Control headers mirror the serving Worker (worker/worker.js).
+This script takes the directory produced by the Eleventy build — normally
+`_site/` — and uploads every file inside it to a Cloudflare R2 bucket,
+which is the object store that backs the live Zasqua site. R2 is
+Cloudflare's S3-compatible storage, so the script talks to it using the
+standard AWS `boto3` library pointed at Cloudflare's endpoint.
+
+A Zasqua build produces tens of thousands of small HTML pages — one for
+every archival description — plus the Pagefind search index, CSS, JS,
+and image assets. Uploading them one at a time takes an impractically
+long time, so this script walks the source tree once, then hands every
+file off to a thread pool (100 workers by default) that streams them to
+R2 in parallel. On each upload the script sets the `Content-Type` based
+on the file extension and applies a `Cache-Control` header that matches
+what the edge Worker (`worker/worker.js`) sends to visitors: short-lived
+for HTML and JSON, week-long for CSS and JS, and a year with the
+`immutable` flag for fonts and images.
+
+Before the parallel phase begins the script uploads one file on its own
+as a connection test. If credentials or networking are wrong it fails
+fast with a clear error instead of burying the problem under a thousand
+concurrent failures.
+
+Pipeline context:
+    Runs after `npx eleventy` and `npx pagefind` in the GitHub Actions
+    deploy workflow (`.github/workflows/deploy.yml`). The `zasqua-site`
+    bucket is read by the Cloudflare Worker in `worker/worker.js`, which
+    serves the site to visitors.
 
 Required environment variables:
     R2_ACCESS_KEY_ID
@@ -17,6 +41,8 @@ Usage:
 Examples:
     python3 scripts/upload-to-r2.py _site zasqua-site --concurrency 100
     python3 scripts/upload-to-r2.py _site zasqua-tests --dry-run
+
+Version: v0.3.2
 """
 
 import argparse

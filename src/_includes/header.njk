@@ -1,3 +1,18 @@
+{#
+  Site Header
+
+  Global header included at the top of every page via the base layout.
+  Shows the Zasqua mark and wordmark linking home, a hamburger toggle for
+  narrow viewports — wired up by `js/header.js` — and the primary
+  navigation: a homepage link, a Browse dropdown that groups the three
+  discovery surfaces (documents via `/buscar/`, entities via
+  `/entidades/`, and places via `/lugares/`), the Neogranadina "about"
+  page for Zasqua, and the catalogación app. A compact search form on
+  the right mirrors the homepage search and submits to `/buscar/`. Link
+  labels and the search placeholder come from `src/_data/ui.js`.
+
+  Version: v0.5.0
+#}
 <header class="site-header">
   <div class="container">
     <a href="/" class="site-logo">
@@ -9,7 +24,16 @@
     </button>
     <nav class="site-nav font-sans">
       <a href="/" class="text-sm uppercase tracking-wide">{{ ui.nav.home }}</a>
-      <a href="/buscar/" class="text-sm uppercase tracking-wide">{{ ui.nav.search }}</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger text-sm uppercase tracking-wide">
+          {{ ui.nav.browse }} <span class="material-symbols-outlined nav-dropdown-arrow">expand_more</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/buscar/">Documentos</a>
+          <a href="/entidades/">Entidades</a>
+          <a href="/lugares/">Lugares</a>
+        </div>
+      </div>
       <a href="https://neogranadina.org/proyectos/zasqua" class="text-sm uppercase tracking-wide">{{ ui.nav.about }}</a>
       <a href="https://catalogacion.zasqua.org" class="text-sm uppercase tracking-wide">{{ ui.nav.catalogacion }}</a>
       <form class="header-search" action="/buscar/" method="get">
