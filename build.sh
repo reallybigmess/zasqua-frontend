@@ -63,8 +63,7 @@ b2 file download b2://zasqua-export/entities.json data/entities.json
 b2 file download b2://zasqua-export/places.json data/places.json
 b2 file download b2://zasqua-export/entity_links.json data/entity_links.json
 b2 file download b2://zasqua-export/place_links.json data/place_links.json
-b2 file download b2://zasqua-export/curated-entity-graph.json data/curated-entity-graph.json
-ls -lh data/entities.json data/places.json data/entity_links.json data/place_links.json data/curated-entity-graph.json
+ls -lh data/entities.json data/places.json data/entity_links.json data/place_links.json
 
 echo "=== Pre-computing entity/place link shards and index files ==="
 node scripts/precompute-links.js

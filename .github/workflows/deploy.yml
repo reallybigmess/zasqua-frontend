@@ -19,8 +19,7 @@ name: Build and deploy to R2
 #   2. Install the Backblaze B2 CLI and `boto3`
 #   3. Download all data exports from the `zasqua-export` B2 bucket —
 #      descriptions, repositories, per-description children shards,
-#      entities, places, entity_links, place_links, and the curated
-#      entity graph used by the entity explorer's graph panel
+#      entities, places, entity_links, and place_links
 #   4. Run `scripts/precompute-links.js` to shard the link tables per
 #      authority record and build the explorer index files
 #   5. Run `scripts/places-to-geojson.js` and tippecanoe to generate
@@ -88,8 +87,7 @@ jobs:
           b2 file download b2://zasqua-export/places.json data/places.json
           b2 file download b2://zasqua-export/entity_links.json data/entity_links.json
           b2 file download b2://zasqua-export/place_links.json data/place_links.json
-          b2 file download b2://zasqua-export/curated-entity-graph.json data/curated-entity-graph.json
-          ls -lh data/entities.json data/places.json data/entity_links.json data/place_links.json data/curated-entity-graph.json
+          ls -lh data/entities.json data/places.json data/entity_links.json data/place_links.json
 
       - name: Pre-compute link shards and index files
         run: |

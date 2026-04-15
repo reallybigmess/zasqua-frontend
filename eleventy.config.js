@@ -13,9 +13,8 @@
  *   - Passthrough copies for the CSS, JS, image, and vendor asset
  *     folders, plus the per-description children shards, the per-entity
  *     and per-place link shards fetched on demand by detail pages and
- *     explorers, the explorer index files, and the curated entity graph
- *     read by the entity explorer. These are copied verbatim into
- *     `_site/` rather than being processed by Eleventy.
+ *     explorers, and the place explorer's index file. These are copied
+ *     verbatim into `_site/` rather than being processed by Eleventy.
  *   - Watch targets for CSS and JS so `eleventy --serve` rebuilds when
  *     those folders change during development.
  *   - A set of template filters used throughout the Nunjucks views:
@@ -60,9 +59,6 @@ module.exports = function(eleventyConfig) {
   // Explorer search index files loaded once by explorer pages.
   // Entity pages are indexed via Pagefind rather than a separate index file.
   eleventyConfig.addPassthroughCopy({ "data/place-index.json": "data/place-index.json" });
-
-  // Curated entity graph loaded by the entity explorer's graph panel
-  eleventyConfig.addPassthroughCopy({ "data/curated-entity-graph.json": "data/curated-entity-graph.json" });
 
   // Watch for changes in CSS/JS during dev
   eleventyConfig.addWatchTarget("src/css/");

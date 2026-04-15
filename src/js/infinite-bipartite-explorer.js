@@ -87,7 +87,6 @@
   // entities and only one doc breaks 200, so a normal trail will never
   // hit this and the prune is mostly a long-session safety valve.
   var MAX_HOPS = 50;
-  var DEFAULT_ENTITY = 'ne-69501';
 
   // -----------------------------------------------------------------------
   // InfiniteBipartiteExplorer
@@ -181,25 +180,11 @@
     // refocusOn() which populates the graph.
     if (opts.skipAutoLoad) return;
 
-    // Determine starting entity
-    var startingEntity = DEFAULT_ENTITY;
+    // Auto-load only runs when a `?entidad=` URL param is present.
     var urlParam = new URLSearchParams(location.search).get('entidad');
-    if (urlParam) {
-      startingEntity = urlParam;
-    } else {
-      try {
-        var cg = await fetch('/data/curated-entity-graph.json');
-        if (cg.ok) {
-          var cgData = await cg.json();
-          if (cgData.nodes && cgData.nodes.length > 0) {
-            startingEntity = cgData.nodes[0].id;
-          }
-        }
-      } catch (e) {
-        // fall back to DEFAULT_ENTITY
-      }
-    }
+    if (!urlParam) return;
 
+    var startingEntity = urlParam;
     await this.loadEntity(startingEntity);
 
     // Fire focal callback so the sidebar/overlay shows the initial entity
