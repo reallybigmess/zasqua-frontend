@@ -1,3 +1,14 @@
+---
+pagination:
+  data: places
+  size: 1
+  alias: place
+permalink: "/nl-{{ place.id }}/"
+layout: base.njk
+eleventyComputed:
+  title: "{{ place.display_name }}"
+---
+
 {#
   Place Detail Page
 
@@ -25,16 +36,6 @@
 
   Version: v0.5.0
 #}
----
-pagination:
-  data: places
-  size: 1
-  alias: place
-permalink: "/nl-{{ place.id }}/"
-layout: base.njk
-eleventyComputed:
-  title: "{{ place.display_name }}"
----
 
 {# Pagefind metadata for place index #}
 <div style="display:none">

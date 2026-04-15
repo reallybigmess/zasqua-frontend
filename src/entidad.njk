@@ -1,3 +1,14 @@
+---
+pagination:
+  data: entities
+  size: 1
+  alias: ent
+permalink: "/{{ ent.entity_code }}/"
+layout: base.njk
+eleventyComputed:
+  title: "{{ ent.display_name }}"
+---
+
 {#
   Entity Detail Page
 
@@ -23,16 +34,6 @@
 
   Version: v0.5.0
 #}
----
-pagination:
-  data: entities
-  size: 1
-  alias: ent
-permalink: "/{{ ent.entity_code }}/"
-layout: base.njk
-eleventyComputed:
-  title: "{{ ent.display_name }}"
----
 
 {# Pagefind metadata for entity index #}
 <div style="display:none">

@@ -1,3 +1,14 @@
+---
+pagination:
+  data: descriptions
+  size: 1
+  alias: desc
+permalink: "/{{ desc.reference_code | safeSlug }}/"
+layout: base.njk
+eleventyComputed:
+  title: "{{ desc.title }}"
+---
+
 {#
   Archival Description Page
 
@@ -31,16 +42,6 @@
 
   Version: v0.5.0
 #}
----
-pagination:
-  data: descriptions
-  size: 1
-  alias: desc
-permalink: "/{{ desc.reference_code | safeSlug }}/"
-layout: base.njk
-eleventyComputed:
-  title: "{{ desc.title }}"
----
 
 {# Pagefind metadata (filters, sorting, meta — work outside data-pagefind-body) #}
 {% set repo = desc._repo %}
