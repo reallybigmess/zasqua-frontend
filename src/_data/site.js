@@ -14,7 +14,7 @@
  * the moment the static site was generated, which the footer surfaces as
  * "Última actualización".
  *
- * @version v0.4.0
+ * @version v0.5.0
  */
 module.exports = {
   title: "Zasqua",
@@ -24,5 +24,5 @@ module.exports = {
   buildTime: new Date().toISOString(),
   buildDate: new Date().toISOString().split('T')[0],
   buildYear: new Date().getFullYear(),
-  version: "0.4.0"
+  version: "0.5.0"
 };

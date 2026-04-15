@@ -2,6 +2,40 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] — 2026-04-15
+
+Entity and place discovery: every authority record now has a detail page, two new explorers surface them, and description pages link out to their linked entities and places.
+
+### Added
+
+- **Entity detail pages** at `/{entity_code}/` — ISAAR-CPF authority records for ~78,000 persons, corporate bodies, and families. Each page carries a segmented Timeline/Network-graph view of the entity's document appearances, role-filter pills, and lazy-loaded per-entity link shards
+- **Place detail pages** at `/nl-{id}/` — authority records for ~6,900 geographic entities, with an always-visible MapLibre map (or an "Ubicación no disponible" notice when coordinates are missing), a sortable description list (chronological / alphabetical), and external authority links (Wikidata, Getty TGN, World Historical Gazetteer, HGIS de las Indias)
+- **Entity explorer** at `/entidades/` — two-panel interface with a force-directed graph on one side and a Pagefind-backed facet search on the other. Selecting an entity loads an infinite bipartite graph (entity → document → entity) so visitors can keep pulling threads across the archive. Facets include entity type, primary function, date range, and role
+- **Place explorer** at `/lugares/` — map-centric interface with clustered burgundy markers rendered from PMTiles. The sidebar lists places from Pagefind with facets for type, coordinate availability, and external authority presence, plus a viewport-scoped filter that restricts the list to places currently visible on the map
+- **Description ↔ authority linking** — description pages now surface their linked entities and places as inline sections with roles, and emit Pagefind filter spans so the search page can narrow results to descriptions that mention a specific entity or place
+- Function-principal facet modal on the entity explorer — searchable, alphabetically grouped with letter headers, to keep the 1,573-value facet navigable
+- `/tiles/*` route on the Cloudflare Worker with HTTP Range support so the PMTiles JS library can fetch only the bytes it needs
+- Three Pagefind indexes at build time: descriptions (`/pagefind/`), entities (`/pagefind-entities/`), and places (`/pagefind-places/`)
+- Narrative headers and version footers across every source file in the codebase
+- `escapeTemplate` filter that escapes `{{` and `{%` sequences in OCR text before the layout pass — fixes a build crash on descriptions with literal template syntax in scanned pages
+
+### Changed
+
+- Templates renamed to Spanish filenames to match URLs and the rest of the codebase: `entity.njk` → `entidad.njk`, `place.njk` → `lugar.njk`
+- Site version bumped from 0.4.0 to 0.5.0
+- Header navigation picks up a Browse dropdown grouping the three discovery surfaces (documents, entities, places)
+- Breadcrumb partial adopts the burgundy and stone Tailwind colour tokens
+- Build pipeline downloads the new entity and place exports from B2, pre-computes per-authority link shards and explorer index files, generates PMTiles from places, and uploads the tiles to the `zasqua-map-tiles` R2 bucket
+
+### Fixed
+
+- Entity explorer "Ver en explorador" button now renders burgundy instead of white-on-white
+- Place explorer: facet checkboxes no longer revert after rapid clicks (generation counter guards against stale in-flight searches)
+- Place explorer: map markers now sync with search and filter state; index clicks select on the map instead of navigating to the detail page
+- Place detail page: removed the broken segmented map/timeline toggle (where `mapEl` was out of scope)
+- Merged duplicate role pills on place detail pages — `subject` and `mentioned` both display as "Lugar mencionado" and now share a single pill
+- Pagefind glob patterns in the build script corrected to match the actual URL structure (`ne-*/` and `nl-*/` rather than the non-existent `entidad/` and `lugar/`)
+
 ## [0.4.0] — 2026-03-25
 
 New visual identity and 542 AHRB notarial volumes published on zasqua.org.
