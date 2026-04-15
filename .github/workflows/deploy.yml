@@ -17,25 +17,32 @@ name: Build and deploy to R2
 #   1. Check out the repo and set up Node (version pinned in `.nvmrc`)
 #      and Python runtimes
 #   2. Install the Backblaze B2 CLI and `boto3`
-#   3. Download the archival data exports from the `zasqua-export` B2
-#      bucket — `descriptions.json`, `repositories.json`, and the
-#      per-description children shards
-#   4. Install npm dependencies with `npm ci`
-#   5. Download the standalone Tailwind CSS binary and compile
+#   3. Download all data exports from the `zasqua-export` B2 bucket —
+#      descriptions, repositories, per-description children shards,
+#      entities, places, entity_links, place_links, and the curated
+#      entity graph used by the entity explorer's graph panel
+#   4. Run `scripts/precompute-links.js` to shard the link tables per
+#      authority record and build the explorer index files
+#   5. Run `scripts/places-to-geojson.js` and tippecanoe to generate
+#      the PMTiles used by the place explorer's clustered marker map,
+#      then upload the PMTiles to the `zasqua-map-tiles` R2 bucket
+#   6. Install npm dependencies with `npm ci`
+#   7. Download the standalone Tailwind CSS binary and compile
 #      `src/css/input.css` into `src/css/main.css`
-#   6. Run Eleventy to render the static site into `_site/`, with a
+#   8. Run Eleventy to render the static site into `_site/`, with a
 #      generous Node heap size for the large build
-#   7. Run Pagefind over `_site/` to build the client-side search index
-#   8. Upload `_site/` to the `zasqua-site` R2 bucket in parallel using
+#   9. Run Pagefind three times to build the main description search
+#      index, the entity explorer index, and the place explorer index
+#  10. Upload `_site/` to the `zasqua-site` R2 bucket in parallel using
 #      `scripts/upload-to-r2.py`
-#   9. Purge the Cloudflare edge cache so the new build is served
+#  11. Purge the Cloudflare edge cache so the new build is served
 #      straight away
 #
 # Secrets required: `B2_APPLICATION_KEY_ID`, `B2_APPLICATION_KEY`,
 # `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `CLOUDFLARE_ACCOUNT_ID`,
 # `CF_API_TOKEN`, and `CF_ZONE_ID`.
 #
-# Version: v0.4.0
+# Version: v0.5.0
 
 on:
   workflow_dispatch:
@@ -71,12 +78,53 @@ jobs:
           B2_APPLICATION_KEY: ${{ secrets.B2_APPLICATION_KEY }}
         run: |
           b2 account authorize "$B2_APPLICATION_KEY_ID" "$B2_APPLICATION_KEY"
-          mkdir -p data/children
+          mkdir -p data/children data/entity-links data/place-links
           b2 file download b2://zasqua-export/descriptions.json data/descriptions.json
           b2 file download b2://zasqua-export/repositories.json data/repositories.json
           b2 sync b2://zasqua-export/children/ data/children/
           ls -lh data/descriptions.json data/repositories.json
           echo "Children files: $(ls data/children/ | wc -l)"
+          b2 file download b2://zasqua-export/entities.json data/entities.json
+          b2 file download b2://zasqua-export/places.json data/places.json
+          b2 file download b2://zasqua-export/entity_links.json data/entity_links.json
+          b2 file download b2://zasqua-export/place_links.json data/place_links.json
+          b2 file download b2://zasqua-export/curated-entity-graph.json data/curated-entity-graph.json
+          ls -lh data/entities.json data/places.json data/entity_links.json data/place_links.json data/curated-entity-graph.json
+
+      - name: Pre-compute link shards and index files
+        run: |
+          node scripts/precompute-links.js
+          echo "Entity shards: $(ls data/entity-links/ | wc -l)"
+          echo "Place shards: $(ls data/place-links/ | wc -l)"
+          ls -lh data/entity-index.json data/place-index.json
+
+      - name: Install Tippecanoe
+        run: pip install tippecanoe==2.72.0
+
+      - name: Generate PMTiles
+        run: |
+          node scripts/places-to-geojson.js
+          tippecanoe -Z0 -z14 --drop-densest-as-needed -l places \
+            -o data/zasqua-places.pmtiles data/places.geojson
+          ls -lh data/zasqua-places.pmtiles
+
+      - name: Upload PMTiles to R2
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          python3 - << 'EOF'
+          import boto3, os
+          s3 = boto3.client('s3',
+              endpoint_url=os.environ['R2_ENDPOINT'],
+              aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+              aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+          )
+          s3.upload_file('data/zasqua-places.pmtiles', 'zasqua-map-tiles', 'zasqua-places.pmtiles',
+              ExtraArgs={'ContentType': 'application/octet-stream'})
+          print("PMTiles uploaded to zasqua-map-tiles/zasqua-places.pmtiles")
+          EOF
 
       - name: Install npm dependencies
         run: npm ci
@@ -97,7 +145,18 @@ jobs:
           echo "Site size: $(du -sh _site | cut -f1)"
 
       - name: Index with Pagefind
-        run: npx pagefind --site _site
+        run: |
+          # Run 1: Description search index (exclude entity and place pages)
+          npx pagefind --site _site --output-subdir pagefind \
+            --exclude-selectors "[data-pagefind-entity-page],[data-pagefind-place-page]"
+
+          # Run 2: Entity explorer index — entity pages at /ne-{code}/
+          npx pagefind --site _site --output-subdir pagefind-entities \
+            --glob "ne-*/**/*.html"
+
+          # Run 3: Place explorer index — place pages at /nl-{id}/
+          npx pagefind --site _site --output-subdir pagefind-places \
+            --glob "nl-*/**/*.html"
 
       - name: Deploy to R2
         env:

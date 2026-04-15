@@ -4,14 +4,24 @@
   "description": "Zasqua archival catalog frontend",
   "scripts": {
     "dev": "DEV_MODE=true eleventy --serve",
-    "build": "eleventy && npx pagefind --site _site",
-    "build:dev": "DEV_MODE=true eleventy && npx pagefind --site _site",
+    "build": "eleventy && npx pagefind --site _site --output-subdir pagefind --exclude-selectors \"[data-pagefind-entity-page],[data-pagefind-place-page]\" && npx pagefind --site _site --output-subdir pagefind-entities --glob \"ne-*/**/*.html\" && npx pagefind --site _site --output-subdir pagefind-places --glob \"nl-*/**/*.html\"",
+    "build:dev": "DEV_MODE=true eleventy && npx pagefind --site _site --output-subdir pagefind --exclude-selectors \"[data-pagefind-entity-page],[data-pagefind-place-page]\" && npx pagefind --site _site --output-subdir pagefind-entities --glob \"ne-*/**/*.html\" && npx pagefind --site _site --output-subdir pagefind-places --glob \"nl-*/**/*.html\"",
     "debug": "DEBUG=Eleventy* eleventy"
   },
-  "keywords": ["archive", "catalog", "11ty"],
+  "keywords": [
+    "archive",
+    "catalog",
+    "11ty"
+  ],
   "author": "Neogranadina",
   "license": "GPL-3.0-only",
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.2"
+    "@11ty/eleventy": "^3.1.2",
+    "graphology": "^0.26.0",
+    "graphology-layout-forceatlas2": "^0.10.1"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
   }
 }

@@ -2,9 +2,10 @@
 #
 # Wrangler is Cloudflare's deployment tool for Workers — the small
 # programs that run at Cloudflare's edge — and this file is what it
-# reads to know how to build and publish `worker.js`. The companion
-# worker serves zasqua.org by reading objects straight out of the
-# `zasqua-site` R2 bucket.
+# reads to know how to build and publish `worker.js`. The worker
+# serves zasqua.org by reading objects straight out of the
+# `zasqua-site` R2 bucket, and also serves the place explorer's
+# PMTiles from the `zasqua-map-tiles` bucket.
 #
 # Settings defined here:
 #
@@ -12,8 +13,10 @@
 #   - `main` points at the entry module (`worker.js`)
 #   - `compatibility_date` pins the Workers runtime behaviour to a known
 #     snapshot so deploys stay reproducible
-#   - The `[[r2_buckets]]` block binds the `zasqua-site` R2 bucket to
-#     the `SITE` variable the worker uses at runtime (`env.SITE.get(...)`)
+#   - The first `[[r2_buckets]]` block binds `zasqua-site` to the `SITE`
+#     variable the worker uses at runtime (`env.SITE.get(...)`)
+#   - The second `[[r2_buckets]]` block binds `zasqua-map-tiles` to the
+#     `TILES` variable used by the `/tiles/*` PMTiles route
 #
 # The Cloudflare account ID is intentionally not stored in this file —
 # the repo is public. Wrangler reads it from the `CLOUDFLARE_ACCOUNT_ID`
@@ -25,7 +28,7 @@
 #   cd worker && npx wrangler deploy   # publish the worker
 #   cd worker && npx wrangler tail     # stream live logs
 #
-# Version: v0.3.2
+# Version: v0.5.0
 
 name = "zasqua-site"
 main = "worker.js"
@@ -34,3 +37,7 @@ compatibility_date = "2025-01-01"
 [[r2_buckets]]
 binding = "SITE"
 bucket_name = "zasqua-site"
+
+[[r2_buckets]]
+binding = "TILES"
+bucket_name = "zasqua-map-tiles"

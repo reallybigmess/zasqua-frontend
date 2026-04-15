@@ -19,7 +19,7 @@ name: Test parallel R2 upload
 # Use it when changing `scripts/upload-to-r2.py`, tuning concurrency, or
 # investigating regressions in build output size.
 #
-# Version: v0.3.2
+# Version: v0.5.0
 
 on:
   workflow_dispatch:
