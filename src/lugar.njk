@@ -3,7 +3,7 @@ pagination:
   data: places
   size: 1
   alias: place
-permalink: "/nl-{{ place.id }}/"
+permalink: "/{{ place.place_code }}/"
 layout: base.njk
 eleventyComputed:
   title: "{{ place.display_name }}"

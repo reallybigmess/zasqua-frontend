@@ -187,8 +187,6 @@ async function main() {
 
   // -------------------------------------------------------------------------
   // 4. Build place-index.json for the place explorer
-  // Renames latitude/longitude to lat/lon to match the explorer's
-  // MapLibre GeoJSON expectations.
   // -------------------------------------------------------------------------
 
   const placesPath = path.join(DATA_DIR, 'places.json');
@@ -201,9 +199,11 @@ async function main() {
     id: p.id,
     display_name: p.display_name,
     place_type: p.place_type,
-    lat: p.latitude,
-    lon: p.longitude,
+    latitude: p.latitude,
+    longitude: p.longitude,
+    place_code: p.place_code || ('nl-' + p.id),
     has_wikidata: !!p.wikidata_id,
+    has_tgn: !!p.tgn_id,
     has_whg: !!p.whg_id,
     has_hgis: !!p.hgis_id,
     linked_description_count: (byPlace.get(String(p.id)) || []).length,
