@@ -17,14 +17,12 @@
 #      and sync the per-description children shards under `data/children/`
 #   3. Run `scripts/precompute-links.js` to shard the entity and place
 #      links per authority record and build the explorer index files
-#   4. Run `scripts/places-to-geojson.js` and tippecanoe to generate the
-#      PMTiles used by the place explorer's clustered marker map
-#   5. Install Node dependencies with `npm ci`
-#   6. Fetch the correct standalone Tailwind CSS binary for the host
+#   4. Install Node dependencies with `npm ci`
+#   5. Fetch the correct standalone Tailwind CSS binary for the host
 #      platform and compile `src/css/input.css` into `src/css/main.css`
-#   7. Run Eleventy (the static site generator) to render every page in
+#   6. Run Eleventy (the static site generator) to render every page in
 #      the archive out to `_site/`
-#   8. Run Pagefind three times to build the main description search
+#   7. Run Pagefind three times to build the main description search
 #      index, the entity explorer index, and the place explorer index
 #
 # Required environment variables:
@@ -70,17 +68,6 @@ node scripts/precompute-links.js
 echo "Entity shards: $(ls data/entity-links/ | wc -l)"
 echo "Place shards: $(ls data/place-links/ | wc -l)"
 ls -lh data/entity-index.json data/place-index.json
-
-echo "=== Generating PMTiles ==="
-node scripts/places-to-geojson.js
-if command -v tippecanoe &> /dev/null; then
-  tippecanoe -Z0 -z14 --drop-densest-as-needed -l places \
-    -o data/zasqua-places.pmtiles data/places.geojson
-  ls -lh data/zasqua-places.pmtiles
-else
-  echo "Tippecanoe not installed — skipping PMTiles generation"
-  echo "Install with: brew install tippecanoe (macOS) or pip install tippecanoe (Linux)"
-fi
 
 echo "=== Installing npm dependencies ==="
 npm ci

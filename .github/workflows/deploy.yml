@@ -96,34 +96,6 @@ jobs:
           echo "Place shards: $(ls data/place-links/ | wc -l)"
           ls -lh data/entity-index.json data/place-index.json
 
-      - name: Install Tippecanoe
-        run: pip install tippecanoe==2.72.0
-
-      - name: Generate PMTiles
-        run: |
-          node scripts/places-to-geojson.js
-          tippecanoe -Z0 -z14 --drop-densest-as-needed -l places \
-            -o data/zasqua-places.pmtiles data/places.geojson
-          ls -lh data/zasqua-places.pmtiles
-
-      - name: Upload PMTiles to R2
-        env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-        run: |
-          python3 - << 'EOF'
-          import boto3, os
-          s3 = boto3.client('s3',
-              endpoint_url=os.environ['R2_ENDPOINT'],
-              aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
-              aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
-          )
-          s3.upload_file('data/zasqua-places.pmtiles', 'zasqua-map-tiles', 'zasqua-places.pmtiles',
-              ExtraArgs={'ContentType': 'application/octet-stream'})
-          print("PMTiles uploaded to zasqua-map-tiles/zasqua-places.pmtiles")
-          EOF
-
       - name: Install npm dependencies
         run: npm ci
 
