@@ -253,7 +253,8 @@ class PlaceExplorer {
       container: 'explorer-map',
       style: style,
       center: [-74.0, 5.5],
-      zoom: 5
+      zoom: 5,
+      renderWorldCopies: false
     });
 
     this.map.fitBounds([[-83.0, -5.0], [-60.0, 15.0]], { padding: 20, animate: false });
@@ -435,6 +436,7 @@ class PlaceExplorer {
     var n = place.linked_description_count || 0;
     var docText = n + ' ' + (n === 1 ? 'documento vinculado' : 'documentos vinculados');
     var placeId = place.id;
+    var placeCode = place.place_code || ('nl-' + placeId);
 
     card.innerHTML =
       '<div class="selected-entity-header">' +
@@ -443,7 +445,7 @@ class PlaceExplorer {
       '</div>' +
       '<span class="selected-entity-badge">' + this.escapeHtml(typeLabel) + '</span>' +
       '<div class="selected-entity-stat" style="margin-top:0.75rem">' + this.escapeHtml(docText) + '</div>' +
-      '<a href="/nl-' + this.escapeHtml(String(placeId)) + '/" class="selected-entity-link" ' +
+      '<a href="/' + this.escapeHtml(placeCode) + '/" class="selected-entity-link" ' +
       'style="display:block;margin-top:0.5rem">Ver ficha &rarr;</a>';
 
     // Close button clears back to stub
@@ -455,8 +457,8 @@ class PlaceExplorer {
     }
 
     // Pan/zoom map to place coordinates
-    if (place.lat != null && place.lon != null && this.map && this.mapReady) {
-      this.map.easeTo({ center: [place.lon, place.lat], zoom: Math.max(this.map.getZoom(), 8) });
+    if (place.latitude != null && place.longitude != null && this.map && this.mapReady) {
+      this.map.easeTo({ center: [place.longitude, place.latitude], zoom: Math.max(this.map.getZoom(), 8) });
     }
   }
 
@@ -546,9 +548,9 @@ class PlaceExplorer {
         var viewportNames = new Set(
           this.allPlaces
             .filter(function(p) {
-              return p.lat != null && p.lon != null &&
-                p.lon >= bounds.getWest() && p.lon <= bounds.getEast() &&
-                p.lat >= bounds.getSouth() && p.lat <= bounds.getNorth();
+              return p.latitude != null && p.longitude != null &&
+                p.longitude >= bounds.getWest() && p.longitude <= bounds.getEast() &&
+                p.latitude >= bounds.getSouth() && p.latitude <= bounds.getNorth();
             })
             .map(function(p) { return p.display_name; })
         );
@@ -585,16 +587,40 @@ class PlaceExplorer {
 
       // Sync map markers with search/filter state
       if (this.state.q || this.state.type.length || this.state.hasCoords !== null || this.state.hasAuthority !== null) {
-        var matchingIds = new Set();
+        var matchingCodes = new Set();
         for (var ri = 0; ri < allResults.length; ri++) {
           var url = allResults[ri].url || '';
-          var match = url.match(/\/nl-(\d+)\//);
-          if (match) matchingIds.add(parseInt(match[1], 10));
+          var segments = url.split('/').filter(Boolean);
+          if (segments.length > 0) matchingCodes.add(segments[segments.length - 1]);
         }
-        var filteredPlaces = this.allPlaces.filter(function(p) { return matchingIds.has(p.id); });
+        var filteredPlaces = this.allPlaces.filter(function(p) {
+          return matchingCodes.has(p.place_code);
+        });
         this.updateMap(filteredPlaces);
       } else {
         this.updateMap(this.allPlaces);
+      }
+
+      // When viewport-filtering, recompute facet counts from the
+      // in-memory place data filtered to the current map bounds.
+      if (this.state.mapBound && this.map && this.mapReady) {
+        var vpBounds = this.map.getBounds();
+        var vpPlaces = this.allPlaces.filter(function(p) {
+          return p.latitude != null && p.longitude != null &&
+            p.longitude >= vpBounds.getWest() && p.longitude <= vpBounds.getEast() &&
+            p.latitude >= vpBounds.getSouth() && p.latitude <= vpBounds.getNorth();
+        });
+        var vpFacets = { place_type: {}, has_coordinates: {}, has_authority: {} };
+        for (var vi = 0; vi < vpPlaces.length; vi++) {
+          var vp = vpPlaces[vi];
+          var pt = vp.place_type || 'unknown';
+          vpFacets.place_type[pt] = (vpFacets.place_type[pt] || 0) + 1;
+          var hasCoords = (vp.latitude != null && vp.longitude != null) ? 'true' : 'false';
+          vpFacets.has_coordinates[hasCoords] = (vpFacets.has_coordinates[hasCoords] || 0) + 1;
+          var hasAuth = (vp.has_wikidata || vp.has_tgn || vp.has_whg || vp.has_hgis) ? 'true' : 'false';
+          vpFacets.has_authority[hasAuth] = (vpFacets.has_authority[hasAuth] || 0) + 1;
+        }
+        scopedFilters = vpFacets;
       }
 
       this.renderResultsInfo(total, allResults.length);
@@ -1018,11 +1044,11 @@ class PlaceExplorer {
   updateMap(places) {
     if (!this.mapReady) return;
     var features = places
-      .filter(function(p) { return p.lat != null && p.lon != null; })
+      .filter(function(p) { return p.latitude != null && p.longitude != null; })
       .map(function(p) {
         return {
           type: 'Feature',
-          geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
+          geometry: { type: 'Point', coordinates: [p.longitude, p.latitude] },
           properties: {
             id: p.id,
             display_name: p.display_name,

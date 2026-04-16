@@ -279,7 +279,8 @@ function escapeHtml(str) {
       container: 'place-map',
       style: style,
       center: [lon, lat],
-      zoom: 7
+      zoom: 7,
+      renderWorldCopies: false
     });
 
     // Burgundy dot marker
