@@ -341,18 +341,49 @@ class PlaceExplorer {
         this.highlightPlace(placeRecord);
       });
 
-      // Cursor pointer on interactive layers
-      this.map.on('mouseenter', 'clusters', () => {
+      // Reusable hover popup (no close button, positioned above marker)
+      this._hoverPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: [0, -10],
+        className: 'place-tooltip'
+      });
+
+      // Cluster hover: show place count
+      this.map.on('mouseenter', 'clusters', (e) => {
         this.map.getCanvas().style.cursor = 'pointer';
+        var feat = e.features[0];
+        if (!feat) return;
+        var count = feat.properties.point_count || 0;
+        this._hoverPopup
+          .setLngLat(feat.geometry.coordinates)
+          .setHTML(count.toLocaleString('es-CO') + ' lugares')
+          .addTo(this.map);
       });
       this.map.on('mouseleave', 'clusters', () => {
         this.map.getCanvas().style.cursor = '';
+        this._hoverPopup.remove();
       });
-      this.map.on('mouseenter', 'unclustered-point', () => {
+
+      // Unclustered point hover: show place name + doc count
+      this.map.on('mouseenter', 'unclustered-point', (e) => {
         this.map.getCanvas().style.cursor = 'pointer';
+        var feat = e.features[0];
+        if (!feat) return;
+        var props = feat.properties;
+        var name = props.display_name || '';
+        var n = props.linked_description_count || 0;
+        var docText = n > 0
+          ? ' \u2014 ' + n.toLocaleString('es-CO') + ' ' + (n === 1 ? 'documento' : 'documentos')
+          : '';
+        this._hoverPopup
+          .setLngLat(feat.geometry.coordinates)
+          .setHTML(this.escapeHtml(name) + docText)
+          .addTo(this.map);
       });
       this.map.on('mouseleave', 'unclustered-point', () => {
         this.map.getCanvas().style.cursor = '';
+        this._hoverPopup.remove();
       });
 
       // Initial search after map is ready
@@ -436,7 +467,7 @@ class PlaceExplorer {
     var n = place.linked_description_count || 0;
     var docText = n + ' ' + (n === 1 ? 'documento vinculado' : 'documentos vinculados');
     var placeId = place.id;
-    var placeCode = place.place_code || ('nl-' + placeId);
+    var placeCode = place.place_code;
 
     card.innerHTML =
       '<div class="selected-entity-header">' +
