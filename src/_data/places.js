@@ -55,9 +55,6 @@ module.exports = async function() {
 
   for (const place of places) {
     place._linked_count = countByCode.get(place.id) || 0;
-    if (!place.place_code) {
-      place.place_code = 'nl-' + place.id;
-    }
   }
 
   return places;

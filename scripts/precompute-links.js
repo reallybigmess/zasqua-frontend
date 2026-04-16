@@ -195,19 +195,31 @@ async function main() {
   const places = JSON.parse(placesRaw);
   console.log(`[precompute-links] places.json: ${places.length} records`);
 
-  const placeIndex = places.map(p => ({
+  const placeIndexAll = places.map(p => ({
     id: p.id,
     display_name: p.display_name,
     place_type: p.place_type,
     latitude: p.latitude,
     longitude: p.longitude,
-    place_code: p.place_code || ('nl-' + p.id),
+    place_code: p.place_code,
     has_wikidata: !!p.wikidata_id,
     has_tgn: !!p.tgn_id,
     has_whg: !!p.whg_id,
     has_hgis: !!p.hgis_id,
-    linked_description_count: (byPlace.get(String(p.id)) || []).length,
+    linked_description_count: (byPlace.get(p.place_code) || []).length,
   }));
+
+  // Exclude coordinate-less singletons from the explorer index —
+  // places without coordinates and with at most 1 linked document
+  // add noise to the explorer without providing useful discovery.
+  // The place pages still exist for direct linking.
+  const placeIndex = placeIndexAll.filter(p =>
+    (p.latitude != null && p.longitude != null) || p.linked_description_count > 1
+  );
+  const excluded = placeIndexAll.length - placeIndex.length;
+  if (excluded > 0) {
+    console.log(`[precompute-links] Excluded ${excluded} coordinate-less singletons from place-index.json`);
+  }
 
   const placeIndexPath = path.join(DATA_DIR, 'place-index.json');
   fs.writeFileSync(placeIndexPath, JSON.stringify(placeIndex));
@@ -255,8 +267,7 @@ async function main() {
   console.log(`[precompute-links] Wrote enriched desc-entity-lookup.json with ${descToEntities.size} keys`);
 
   // 5b. Place enriched reverse lookup
-  // place_links.place_code === String(places.id)
-  const placeById = new Map(places.map(p => [String(p.id), p]));
+  const placeByCode = new Map(places.map(p => [p.place_code, p]));
   const descToPlaces = new Map();
 
   for (const link of placeLinks) {
@@ -265,11 +276,11 @@ async function main() {
     const refCode = link.reference_code;
     if (!descToPlaces.has(refCode)) descToPlaces.set(refCode, new Map());
     const placeMap = descToPlaces.get(refCode);
-    if (!placeMap.has(String(code))) {
-      const pl = placeById.get(String(code));
-      placeMap.set(String(code), {
-        id: String(code),
-        display_name: pl ? pl.display_name : String(code),
+    if (!placeMap.has(code)) {
+      const pl = placeByCode.get(code);
+      placeMap.set(code, {
+        place_code: code,
+        display_name: pl ? pl.display_name : code,
       });
     }
   }

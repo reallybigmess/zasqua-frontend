@@ -244,7 +244,7 @@ eleventyComputed:
             <h3>{{ ui.description.placesHeader }}</h3>
             {% for place in desc._place_links %}
               <div class="detail-field">
-                <a href="/nl-{{ place.id }}/">{{ place.display_name }}</a>
+                <a href="/{{ place.place_code }}/">{{ place.display_name }}</a>
               </div>
             {% endfor %}
           </div>

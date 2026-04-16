@@ -112,7 +112,7 @@ module.exports = async function() {
 
     // String arrays for Pagefind filter spans (must stay as strings)
     desc._entity_codes = entityLinks.map(e => e.code);
-    desc._place_codes = placeLinks.map(p => p.id);
+    desc._place_codes = placeLinks.map(p => p.place_code);
   }
 
   console.log(`[descriptions] Precomputed ancestors and repos`);

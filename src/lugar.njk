@@ -37,6 +37,12 @@ eleventyComputed:
   Version: v0.5.0
 #}
 
+{# Coordinate-less singletons are excluded from the place explorer
+   and pagefind-places index — they add noise without useful discovery.
+   The page itself still exists for direct linking from descriptions. #}
+{% set _in_explorer = (place.latitude and place.longitude) or place._linked_count > 1 %}
+
+{% if _in_explorer %}
 {# Pagefind metadata for place index #}
 <div style="display:none">
   <span data-pagefind-filter="place_type">{{ place.place_type }}</span>
@@ -54,6 +60,7 @@ eleventyComputed:
   {{ place.display_name }}
   {% if place.name_variants %}{{ place.name_variants | join(' ') }}{% endif %}
 </div>
+{% endif %}
 
 {# Breadcrumb #}
 <nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore data-pagefind-place-page>
@@ -158,6 +165,7 @@ eleventyComputed:
               <span class="detail-value">{{ place.latitude }}, {{ place.longitude }}</span>
             </div>
           {% endif %}
+          {% if _in_explorer %}
           <div class="detail-field">
             <a href="/lugares/?q={{ place.display_name | urlencode }}"
                class="inline-flex items-center gap-1.5 text-sm font-medium rounded-md transition-colors"
@@ -168,6 +176,7 @@ eleventyComputed:
               Ver en explorador
             </a>
           </div>
+          {% endif %}
         </div>
 
         {# Section: Reutilizacion #}
@@ -220,7 +229,7 @@ eleventyComputed:
                 <button type="button" class="sort-btn" data-sort="alphabetical">Alfab&eacute;tico</button>
               </div>
             </div>
-            <div id="place-timeline" data-place-id="{{ place.id }}">
+            <div id="place-timeline" data-place-id="{{ place.place_code }}">
               <p class="text-stone-500 text-sm">{{ ui.general.loading }}</p>
             </div>
           </div>
