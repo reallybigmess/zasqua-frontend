@@ -107,7 +107,7 @@ jobs:
 
       - name: Build site with Eleventy
         env:
-          NODE_OPTIONS: --max-old-space-size=6144
+          NODE_OPTIONS: --max-old-space-size=7168
           SITE_URL: https://zasqua.org
         run: |
           npx eleventy
