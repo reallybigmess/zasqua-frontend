@@ -25,7 +25,7 @@ eleventyComputed:
 {# Breadcrumb #}
 <nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore>
   <div class="container">
-    <a href="/">{{ ui.breadcrumb.home }}</a>
+    <a href="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/">{{ ui.breadcrumb.home }}</a>
     <span class="breadcrumb-separator">&rsaquo;</span>
     <span>{{ place.display_name }}</span>
   </div>
@@ -172,7 +172,7 @@ eleventyComputed:
       <h3>Documentos relacionados</h3>
       <div id="place-descriptions"
            data-place-label="{{ place.label }}"
-           data-api-url="/api/places/{{ place.label }}/descriptions/">
+           data-api-url="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/api/places/{{ place.label }}/descriptions/">
         <p class="text-stone-400 text-sm">Cargando documentos...</p>
       </div>
     </div>
@@ -181,5 +181,5 @@ eleventyComputed:
 </div>
 
 {% block scripts %}
-  <script src="/js/place.js"></script>
+  <script src="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/js/place.js"></script>
 {% endblock %}

@@ -6,5 +6,5 @@ module.exports = {
   buildTime: new Date().toISOString(),
   buildDate: new Date().toISOString().split('T')[0],
   buildYear: new Date().getFullYear(),
-  version: "0.4.0"
+  version: "0.4.0",
 };

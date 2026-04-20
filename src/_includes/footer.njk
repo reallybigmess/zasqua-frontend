@@ -6,8 +6,8 @@
       <br><a href="https://github.com/neogranadina/zasqua-frontend/releases/tag/v{{ site.version }}" class="text-white hover:text-periwinkle">Zasqua v{{ site.version }}</a>. Last build date: {{ site.buildDate }}.</p>
     </div>
     <div class="footer-right">
-      <img src="/img/logo_grande.svg" style="width:25%; height:25%;" alt="Neogranadina" class="footer-seal">
-      <img src="/img/ampl-cropped-1.png" style="width:25%; height:25%;" alt="AMP Lab, UC Santa Barbara" class="footer-seal">
+      <img src="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/img/logo_grande.svg" style="width:25%; height:25%;" alt="Neogranadina" class="footer-seal">
+      <img src="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/img/ampl-cropped-1.png" style="width:25%; height:25%;" alt="AMP Lab, UC Santa Barbara" class="footer-seal">
     </div>
   </div>
 </footer>

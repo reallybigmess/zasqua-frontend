@@ -192,7 +192,8 @@ class MillerColumnsTree {
       return this.cache.get(parentId);
     }
 
-    const response = await fetch(`/data/children/${parentId}.json`);
+    // adding .. lets zasqua work out of a subdirectory
+    const response = await fetch(`../data/children/${parentId}.json`);
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
@@ -336,7 +337,7 @@ class MillerColumnsTree {
 
     // Link to full record (flat URL structure)
     const link = document.createElement('a');
-    link.href = `/${item.reference_code.replace(/[?#]/g, '')}/`;
+    link.href = `../${item.reference_code.replace(/[?#]/g, '')}/`;
     link.className = 'metadata-link';
     link.textContent = 'View record →';
     metadata.appendChild(link);

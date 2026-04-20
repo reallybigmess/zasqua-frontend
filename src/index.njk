@@ -1,14 +1,22 @@
 ---
+css_overrides: |
+  .hero {
+    background-image: url("img/hero/hero.jpg");
+  }
 layout: base.njk
 ---
 
 <section class="hero">
+  {% if css_overrides %}
+    <style> 
+      {{ css_overrides | safe }}
+    </style>
+  {% endif %}
   <div class="hero-content">
-    {# <img src="/img/zasqua-3-burgundy-sm.svg" alt="" class="hero-logo"> #}
     <h1>
       <span class="site-name font-serif">The {{ site.title }}</span>
     </h1>
-    <form class="search-form" action="/buscar/" method="get">
+    <form class="search-form" action="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/buscar/" method="get">
       <input type="search" name="q" class="search-input" placeholder="{{ ui.search.placeholder }}">
       <button type="submit" class="search-button"><span class="material-symbols-outlined">search</span></button>
     </form>
@@ -29,13 +37,13 @@ layout: base.njk
   <div class="repo-grid">
     {% for repo in repositories | sortByOrder(repoOrder) %}
       {% set repoTitle = repo.name %}
-      {% set repoImage = "/img/repo/"+repo.code+".jpg" %}
+      {% set repoImage = "img/repo/"+repo.code+".jpg" %}
       {% set repoSubtitle = repo.notes %}
       {% set repoCategory = "" %}
       {% set repoLink = "/" + repo.code + "/" %} 
 
       <div class="repo-item">
-        <a href="{{ repoLink }}" class="repo-link">
+      <a href="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}{{ repoLink }}" class="repo-link">
           <img src="{{ repoImage }}" alt="{{ repoTitle }}" class="repo-image">
           <div class="repo-caption">
             <h3 class="repo-caption-title">{{ repoTitle }}</h3>

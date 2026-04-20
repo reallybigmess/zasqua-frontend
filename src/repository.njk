@@ -8,19 +8,24 @@ layout: base.njk
 ---
 
 {% set repoTitle = repo.name %}
+{% if baseUrl %}
+{% set repoImage = baseUrl+"/img/repo/"+repo.code+".jpg" %}
+{% else %}
 {% set repoImage = "/img/repo/"+repo.code+".jpg" %}
+{% endif %}
+
 {% set repoSubtitle = repo.notes %}
 {% set repoLink = "/" + repo.code + "/" %}
 
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <div class="container">
-    <a href="/" class="text-sm text-stone-400 hover:text-burgundy-light">{{ ui.nav.home }}</a>
+    <a href="{% if baseUrl %}{{ baseUrl }}{% else %}/"{% endif %} class="text-sm text-stone-400 hover:text-burgundy-light">{{ ui.nav.home }}</a>
     <span class="breadcrumb-separator text-stone-400">›</span>
     <span class="text-sm text-stone-500">{{ repoTitle }}</span>
   </div>
 </nav>
 
-<section class="repo-header" style="background-image: url('{{ repoImage }}');">
+<section class="repo-header" style='background-image: url("{{ repoImage }}");'>
   <div class="repo-header-overlay">
     <div class="container">
       <h1 class="repo-header-title font-sans text-white">{{ repoTitle }}</h1>
@@ -36,7 +41,7 @@ layout: base.njk
   <div class="container">
     {# Search link above tree #}
     <div class="tree-header">
-      <a href="/buscar/?ancestor={{ repo.code }}" class="search-collection-link">
+      <a href="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/buscar/?ancestor={{ repo.code }}" class="search-collection-link">
         <span class="material-symbols-outlined">search</span>
        Search this collection 
       </a>
@@ -59,4 +64,4 @@ layout: base.njk
   </div>
 </section>
 
-<script src="/js/tree.js"></script>
+<script src="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/js/tree.js"></script>

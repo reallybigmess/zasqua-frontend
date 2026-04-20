@@ -46,7 +46,8 @@ class SearchPage {
     this.parseUrlParams();
 
     try {
-      this.pagefind = await import('/pagefind/pagefind.js');
+      // switch to relative link so hosting zasqua in subdirs works
+      this.pagefind = await import('../pagefind/pagefind.js');
       await this.pagefind.init();
       // Cache global filter counts (for landing page and year validation)
       this.globalFilters = await this.pagefind.filters();
@@ -305,7 +306,7 @@ class SearchPage {
       landing.className = 'search-empty-query';
 
       const logo = document.createElement('img');
-      logo.src = '/img/zasqua-3-burgundy-sm.svg';
+      logo.src = '../img/mcm.svg';
       logo.alt = 'Zasqua';
       logo.className = 'search-landing-logo';
       landing.appendChild(logo);

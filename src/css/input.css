@@ -246,7 +246,7 @@
 
   .hero {
     position: relative;
-    background-image: url('/img/hero/hero.jpg');
+    /*background-image: url('/img/hero/hero.jpg');*/
     background-attachment: fixed;
     background-position: center center;
     background-repeat: no-repeat;

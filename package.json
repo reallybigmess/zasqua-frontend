@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "DEV_MODE=true eleventy --serve",
     "build": "eleventy && npx pagefind --site _site",
-    "clean": "rm -r _site/",
+    "build:pages":"eleventy --output zasqua && npx pagefind --site zasqua",
+    "clean": "rm -rf _site/ zasqua/",
     "css": "tailwindcss --cwd src/css -i input.css -o main.css",
     "css:dev": "tailwindcss --cwd src/css -i input.css -o main.css -w",
     "build:dev": "DEV_MODE=true eleventy && npx pagefind --site _site",

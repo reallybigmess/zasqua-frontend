@@ -9,8 +9,8 @@ permalink: /404.html
     <h1 class="section-title">{{ ui.error404.title }}</h1>
     <p class="error-message">{{ ui.error404.message }}</p>
     <div class="error-actions">
-      <a href="/" class="btn btn-primary btn-pill">{{ ui.error404.home }}</a>
-      <a href="/buscar/" class="btn btn-secondary btn-pill">{{ ui.error404.search }}</a>
+      <a href="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/" class="btn btn-primary btn-pill">{{ ui.error404.home }}</a>
+      <a href="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/buscar/" class="btn btn-secondary btn-pill">{{ ui.error404.search }}</a>
     </div>
   </div>
 </section>

@@ -11,7 +11,7 @@ permalink: /buscar/
   </div>
 </div>
 
-<script src="/js/search.js"></script>
+<script src="{% if baseUrl %}{{ baseUrl }}{% else %}{% endif %}/js/search.js"></script>
 {# <script>
 (function() {
   var q = new URLSearchParams(location.search).get('q');

@@ -7,3 +7,7 @@ src/_data/export/
 *.log
 logs/
 .env
+zasqua/
+
+# generated CSS from tailwind
+src/css/main.css

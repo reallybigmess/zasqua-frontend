@@ -103,6 +103,11 @@ module.exports = function(eleventyConfig) {
   // Shortcodes for common patterns
   eleventyConfig.addShortcode("year", () => `${new Date().getFullYear()}`);
 
+  // Uncomment this and pathPrefix below to host from a static directory (GH Pages, for example)
+  eleventyConfig.addGlobalData("baseUrl", "/zasqua");
+  eleventyConfig.addNunjucksGlobal("baseUrl", "/zasqua");
+
+
   return {
     dir: {
       input: "src",
@@ -113,6 +118,9 @@ module.exports = function(eleventyConfig) {
     },
     templateFormats: ["njk", "html", "md"],
     htmlTemplateEngine: "njk",
-    markdownTemplateEngine: "njk"
+    markdownTemplateEngine: "njk",
+
+    // Uncomment to host from a subdirectory, make sure it matches what baseUrl is set to above
+    pathPrefix: "/zasqua"
   };
 };
