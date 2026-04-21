@@ -246,12 +246,11 @@
 
   .hero {
     position: relative;
-    /*background-image: url('/img/hero/hero.jpg');*/
     background-attachment: fixed;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
-    min-height: 55vh;
+    min-height: 45vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -915,6 +914,21 @@
     gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .about-page {
+    min-height: 60vh;
+    display: flex;
+  }
+
+  .about-page .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .about-page .section-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
   }
 
   /* ====================
