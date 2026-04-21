@@ -1,5 +1,9 @@
 ## What is this?
-Local modifications to zasqua-frontend.
+Local modifications to zasqua-frontend. It generates a site specific to a project I did for my IST 660: Archival Representation course, but there's other stuff too.
+#### Other stuff too
+- Host the Zasqua site from a subdirectory by editing ‎`eleventy.config.js`. I have a much more manual pipeline plus GH pages as my host so this is what ended up working.
+- English UI (strings are just translated in place for now)
+- Style things, extra about page, etc.
 
 ## Getting Started
 Prerequisites: Node.js 18+, npm, Tailwind binary
