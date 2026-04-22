@@ -1,0 +1,85 @@
+# Zasqua Hugo site configuration
+#
+# This file tells Hugo how to build the Zasqua archive platform static site.
+# It is the first file Hugo reads on every build and sets the rules for
+# everything that follows: the site's public URL, its default language
+# (Colombian Spanish), how Hugo talks to Tailwind v4, and how large JSON
+# data reaches the page-generating content adapters.
+#
+# Two landmines this config addresses explicitly:
+#
+#   1. `build.writeStats = true` tells Hugo to emit `hugo_stats.json`
+#      during every build. Tailwind v4's JIT engine reads that file to
+#      discover which CSS classes the rendered HTML actually uses, so
+#      the generated stylesheet includes only the classes in play. If
+#      this flag is missing, Tailwind ships a skeletal stylesheet and
+#      the site looks unstyled — with no error.
+#
+#   2. The `[module]` block below mounts `hugo_stats.json` into
+#      `assets/notwatching/hugo_stats.json`. Tailwind v4's `@source`
+#      directive respects `.gitignore`, and `hugo_stats.json` is
+#      exactly the kind of build artefact most projects reflexively
+#      gitignore — at which point Tailwind silently stops seeing it
+#      and ships an incomplete stylesheet. Mounting the file into
+#      `assets/` via Hugo modules makes it visible to the Hugo Pipes
+#      CSS pipeline regardless of what `.gitignore` says, closing
+#      the silent-failure window.
+#
+# Large archival JSON (descriptions, entities, places) is NOT loaded
+# from the `data/` directory. Hugo's `data/` is reserved for small UI
+# lookup tables (e.g. `data/ui.yaml`, the Spanish UI strings); anything
+# placed there is parsed into `.Site.Data` at build start and held in
+# memory for the whole build. Large data is fetched lazily inside the
+# three content adapters at `content/{descripcion,entidad,lugar}/`
+# via `resources.Get` (single-file) or `resources.Match` (sharded),
+# which streams from disk and frees records after they're rendered.
+# The enriched descriptions JSON is sharded across
+# `assets/hugo-data/descriptions/*.json` because a single unified file
+# would exceed V8's 512 MiB max-string-length ceiling.
+#
+# Version: v1.0.0
+
+baseURL = "https://zasqua.org/"
+languageCode = "es-CO"
+defaultContentLanguage = "es"
+title = "Zasqua"
+
+[params]
+  description = "Zasqua es la plataforma de consulta de materiales de archivo, libros, revistas e instrumentos de consulta digitalizados y sistematizados por Neogranadina y sus aliados."
+  version = "1.0.0"
+  # MapTiler custom Topo-style basemap for /lugar/ and /lugares/ maps.
+  # Key is origin-restricted to *.zasqua.org, zasqua.org, and localhost.
+  maptiler_key = "vBKZJsibMDOLDhSILppQ"
+  maptiler_style_id = "019da873-63fb-7cc9-8623-b0641f80a80a"
+
+[build]
+  writeStats = true
+  [build.buildStats]
+    enable = true
+
+# Mount `hugo_stats.json` into the asset pipeline so Tailwind's
+# @source directive in assets/css/main.css can reach it regardless of
+# whether the file is gitignored. Without this mount, a gitignored
+# hugo_stats.json produces a silently incomplete stylesheet.
+[module]
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "hugo_stats.json"
+    target = "assets/notwatching/hugo_stats.json"
+    disableWatch = true
+
+[[build.cachebusters]]
+  source = 'assets/notwatching/hugo_stats\.json'
+  target = 'css'
+
+[[build.cachebusters]]
+  source = '(postcss|tailwind)\.config\.js'
+  target = 'css'
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+
+# Footer: Version: v1.0.0
