@@ -19,13 +19,16 @@
 # Hugo + Pagefind + upload stages.
 #
 # Inputs:
-#   dev_limit — optional integer cap on records processed by
-#               generate-content.js. Unset = full corpus. Setting this
-#               produces a subset build; the result is NOT a valid
-#               production artefact (never promote a DEV_LIMIT build).
-#   dry_run   — when true, runs stages 1–7 + the diff pass and prints
-#               the would-upload / would-delete counts, then exits
-#               before any PUT / DELETE / cache purge.
+#   dev_limit     — optional integer cap on records processed by
+#                   generate-content.js. Unset = full corpus. Setting this
+#                   produces a subset build; the result is NOT a valid
+#                   production artefact.
+#   dry_run       — when true, runs stages 1–7 + the diff pass and prints
+#                   the would-upload / would-delete counts, then exits
+#                   before any PUT / DELETE / cache purge.
+#   target_bucket — R2 bucket to deploy to. Defaults to zasqua-staging.
+#                   Override only when a second-target deploy is needed
+#                   while the dedicated promote workflow is offline.
 
 name: Build and deploy to staging (Hugo)
 
@@ -41,6 +44,11 @@ on:
         required: false
         type: boolean
         default: false
+      target_bucket:
+        description: "R2 bucket to deploy to. Leave as default for staging."
+        required: true
+        type: string
+        default: zasqua-staging
 
 # Serialise staging deploys so concurrent workflow_dispatch runs do not race
 # each other on the R2 LIST / PUT / DELETE pool.
@@ -185,7 +193,7 @@ jobs:
         # sidecar over the 50 KB gzipped budget. Warn, do not block.
         run: node scripts/generate-pagefind-indices.js
 
-      - name: Deploy to R2 (zasqua-staging)
+      - name: Deploy to R2 (${{ inputs.target_bucket }})
         id: upload
         env:
           PYTHONUNBUFFERED: "1"
@@ -199,7 +207,7 @@ jobs:
             DRY_RUN_FLAG="--dry-run"
             echo "::notice::dry_run=true — diff pass will run but no PUT / DELETE will be issued."
           fi
-          python3 scripts/upload-to-r2.py public zasqua-staging \
+          python3 scripts/upload-to-r2.py public "${{ inputs.target_bucket }}" \
             --concurrency 100 \
             --diff \
             $DRY_RUN_FLAG | tee upload.log
@@ -273,7 +281,7 @@ jobs:
           {
             echo "## Deploy to staging — summary"
             echo ""
-            echo "**Target bucket:** \`zasqua-staging\`"
+            echo "**Target bucket:** \`${{ inputs.target_bucket }}\`"
             echo "**Dry run:** \`${{ inputs.dry_run }}\`"
             echo "**DEV_LIMIT:** \`${{ inputs.dev_limit || 'unset' }}\`"
             echo ""
