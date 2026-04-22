@@ -2,6 +2,57 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.0] — 2026-04-21
+
+The v1.0 rebuild. Over the last six weeks Zasqua was re-engineered from the ground up: static generator swapped, search architecture rewritten, three explorer surfaces audited and tuned for corpus-scale browsing, and a proper staging → prod deploy pipeline introduced. Existing permalinks, external links, and search engines continue to resolve.
+
+### Changed
+
+- **Static site generator — Eleventy → Hugo Extended 0.160.** Every Nunjucks template ported to Go templates, all 18 Eleventy filters and shortcodes replaced or moved into the enrichment pre-compute layer, Tailwind v4 compiled through Hugo's resource pipeline with SRI integrity attributes and per-build cache-busting hashes.
+- **Search — Pagefind upgraded to 1.5, split into three corpus-isolated indices.** Descriptions, entities, and places now each have their own Pagefind bundle, generated directly from the enriched JSON by a Node-API generator rather than by walking rendered HTML. Cross-facet counts now narrow correctly on all three surfaces; the pre-1.0 regression where filter counts froze on the unfiltered baseline is gone.
+- **Cold-click performance — pivot and triple sidecars on every explorer.** Six gzipped sidecars (one pair and one triple per surface) ship alongside each Pagefind bundle and resolve first-click facet counts without waiting for Pagefind's WebAssembly to initialise. First-click deep-linked views now render in tens of milliseconds instead of ten-plus seconds.
+- **`/buscar/` (document search).** Eleven pre-audit bugs resolved in one pass: country and "Imágenes disponibles" filters now work, a `reference_code` sort key was added, backend field-name mismatches were corrected, and raw English facet values were translated to Spanish labels.
+- **`/entidades/` (entity explorer).** Year-range arrays per entity drive century/decade date facets. Sort toggle now matches the search page (most recent / alphabetical / reference code). Entity graph expandability rebuilt on per-entity `doc-entities/{code}.json` sidecars — a 900-document focal that used to take 20–45 seconds of serial Pagefind round-trips now renders in under a second.
+- **`/lugares/` (place explorer).** Singleton places no longer leak into the explorer index, restoring the Eleventy-era invariant. MapTiler vector basemap replaces the previous tiles with hover tooltips showing place names and document counts. Viewport-scoped facet counts reflect only places currently visible on the map. Century and decade date-tree facets added.
+- **Timelines and dates.** A three-bucket chronological sort on entity and place detail-page timelines puts ISO-dated entries in true chronological order, freeform-date entries in fallback string order, and undated entries at the tail. Upstream backend fixes normalised 7,271 hyphen-range dates (`1540-1549`) and 656 DD/MM/YYYY strings, which now render via `formatDateNarrative` instead of as raw literals.
+- **Record provenance.** An ISAD(G) Control section was added to every description, entity, and place detail page, carrying the per-record last-maintenance date, responsible institution, and canonical identifiers. The site-wide build-date footer was removed in favour of per-record provenance dates — the previous footer changed on every build and defeated the CDN diff-upload.
+- **Deploy pipeline.** A staging environment was introduced that hosts every build from `main` via `deploy-staging.yml`. Promote-to-prod is an explicit manual operation that copies the staging bucket to the production bucket bit-for-bit, requires a literal `PROMOTE` confirmation, and purges the production Cloudflare cache only on a fully successful copy. `scripts/upload-to-r2.py` gained an ETag-based diff pass (skips unchanged files), a 5% delete safety cap with explicit override, and bucket-to-bucket copy mode.
+
+### Added
+
+- Pre-production staging environment as a verifiable surface before any promote.
+- ISAD(G) Control section on description, entity, and place detail pages.
+- Sort toggle parity across `/buscar/`, `/entidades/`, and `/lugares/`.
+- Century and decade date-tree facets on all three explorer surfaces.
+- Hover tooltips on map markers in the place explorer and place detail pages.
+- Per-entity `doc-entities/{code}.json` sidecars driving graph expandability.
+- Pair-wise and triple-wise pivot sidecars driving cold first-click facet counts.
+- Vitest and pytest test suites covering enrichment, Pagefind facets, and the R2 uploader.
+
+### Fixed
+
+- Graph expandability on large entities (800+ documents) that previously failed or took tens of seconds now renders in under a second.
+- Chronological timeline sort on entity and place detail pages that was string-sorting freeform Spanish dates now uses three-bucket ISO-date sorting.
+- 7,927 description pages that rendered malformed date strings (DD/MM/YYYY and hyphen-range) now render formatted dates.
+- `/buscar/` cross-facet counts that stuck on the unfiltered baseline after the first filter click.
+- Post-"Ver todos" sidebar collapse on `/buscar/` when repository was the single active facet.
+- Active-single-value "(0)" badge regression on `/buscar/` and `/entidades/`.
+- Singleton places leaking into the `/lugares/` explorer.
+- Stale entity codes in `/entidades/` example buttons refreshed against the current authority export.
+- Map world copies disabled on place explorer and detail maps — South American markers no longer duplicate over the Pacific.
+
+### Removed
+
+- Eleventy and all Nunjucks templates. The `src/` tree is gone.
+- Pagefind HTML-scan indexing — replaced by the Node-API generator.
+- Merged single-index Pagefind bundle — replaced by three corpus-isolated indices.
+- Site-wide build-date footer — replaced by per-record provenance dates.
+- Eleventy-era `deploy.yml` and `test-upload.yml` workflows — replaced by `deploy-staging.yml` and `promote-to-prod.yml`.
+
+### Security
+
+- Staging is excluded from search-engine indexing at both `/robots.txt` and `X-Robots-Tag` HTTP header layers, so pre-release builds cannot be indexed or crawled.
+
 ## [0.5.1] — 2026-04-16
 
 Post-release fixes for entity and place discovery, updated data pipeline for new authority codes.
