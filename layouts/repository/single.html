@@ -1,0 +1,104 @@
+{{/*
+  Zasqua repository landing template
+
+  Port of src/repository.njk. Renders one repository page per entry in
+  assets/hugo-data/repositories.json (routed via the content adapter at
+  content/repository/_content.gotmpl).
+
+  Visual structure matches the Eleventy source byte-for-byte:
+  - Breadcrumb: Inicio > {repoTitle} (2-element, inline; not the
+    multi-crumb breadcrumb partial)
+  - Hero section with inline style="background-image: url('...')"
+    + overlay + title + optional subtitle + count paragraph
+  - 'Buscar en esta colección' link to /buscar/?ancestor={code}
+  - Miller columns tree container (+ embedded root_descriptions JSON)
+    OR 'no collections' fallback text
+  - <script src="/js/tree.js"></script> at the bottom
+
+  Per-repo title/subtitle/image overrides are hardcoded per the
+  Eleventy source. Eleventy does not define a page title for these
+  pages, so <title> falls back to site.Title = "Zasqua" — achieved
+  here by NOT defining a "title" block (baseof.html's fallback
+  resolves to just site.Title when .Title is empty).
+
+  Version: v1.0.0
+*/}}
+{{ define "main" }}
+
+{{ $repoTitle := .Params.name }}
+{{ $repoSubtitle := "" }}
+{{ $repoImage := "/img/neogranadina-placeholder.png" }}
+
+{{ if eq .Params.code "pe-bn" }}
+  {{ $repoTitle = "Narra la Independencia" }}
+  {{ $repoSubtitle = "Edición digital de la Colección documental de la Independencia del Perú, creada para el proyecto de historia pública Narra la Independencia desde tu pueblo, tu distrito o tu ciudad." }}
+  {{ $repoImage = "/img/narra.jpg" }}
+{{ end }}
+{{ if eq .Params.code "co-ahr" }}
+  {{ $repoTitle = "Archivo Histórico de Rionegro" }}
+  {{ $repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el Archivo Histórico de Rionegro, Antioquia, Colombia." }}
+  {{ $repoImage = "/img/AHR_front.jpg" }}
+{{ end }}
+{{ if eq .Params.code "co-ahrb" }}
+  {{ $repoTitle = "Archivo Histórico Regional de Boyacá" }}
+  {{ $repoSubtitle = "Materiales digitalizados por Neogranadina en el Archivo Histórico Regional de Boyacá, Tunja, Colombia." }}
+  {{ $repoImage = "/img/AHRB_front.jpg" }}
+{{ end }}
+{{ if eq .Params.code "co-cihjml" }}
+  {{ $repoTitle = "Antiguo Archivo Central del Cauca" }}
+  {{ $repoSubtitle = "Catálogos y materiales digitalizados por Neogranadina en el fondo Antiguo Archivo Central del Cauca, del Centro de Investigaciones Históricas José María Arboleda Llorente, Popayán, Colombia." }}
+  {{ $repoImage = "/img/ACC_front.jpg" }}
+{{ end }}
+{{ if eq .Params.code "co-ahjci" }}
+  {{ $repoTitle = "Archivo Histórico del Juzgado del Circuito de Istmina" }}
+  {{ $repoSubtitle = "Materiales digitalizados en el Archivo Histórico del Juzgado del Circuito de Istmina, Chocó, Colombia, en el proyecto EAP1477." }}
+  {{ $repoImage = "/img/istmina.jpg" }}
+{{ end }}
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="/" class="text-sm text-stone-400 hover:text-burgundy-light">{{ hugo.Data.ui.nav.home }}</a>
+    <span class="breadcrumb-separator text-stone-400">›</span>
+    <span class="text-sm text-stone-500">{{ $repoTitle }}</span>
+  </div>
+</nav>
+
+<section class="repo-header" style="background-image: url('{{ $repoImage }}');">
+  <div class="repo-header-overlay">
+    <div class="container">
+      <h1 class="repo-header-title font-sans text-white">{{ $repoTitle }}</h1>
+      {{ with $repoSubtitle }}
+        <p class="repo-header-subtitle text-white">{{ . }}</p>
+      {{ end }}
+      <p class="repo-header-stats text-stone-300">{{ lang.FormatNumber 0 (default 0 .Params.description_count) }} {{ hugo.Data.ui.repository.itemsCount }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="tree-header">
+      <a href="/buscar/?ancestor={{ .Params.code }}" class="search-collection-link">
+        <span class="material-symbols-outlined">search</span>
+        Buscar en esta colección
+      </a>
+    </div>
+
+    {{ if and .Params.root_descriptions (gt (len .Params.root_descriptions) 0) }}
+      <div id="collection-tree"
+           data-repo-code="{{ .Params.code }}"
+           {{ printf `data-level-labels='%s'` (jsonify hugo.Data.ui.levelsPlural) | safeHTMLAttr }}>
+      </div>
+
+      <script type="application/json" id="root-descriptions-data">
+        {{ jsonify .Params.root_descriptions | safeJS }}
+      </script>
+    {{ else }}
+      <p class="text-muted text-center">{{ hugo.Data.ui.repository.noCollections }}</p>
+    {{ end }}
+  </div>
+</section>
+
+<script src="/js/tree.js"></script>
+{{ end }}
+{{/* Version: v1.0.0 */}}

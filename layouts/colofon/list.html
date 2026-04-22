@@ -1,0 +1,137 @@
+{{/*
+  Zasqua colophon page (/colofon/)
+
+  Single canonical home for the platform's version, credits,
+  licence, source, archives represented, technical stack,
+  accessibility statement, privacy notes, and contact. Linked from
+  the site footer.
+
+  Why this page exists, from the upload-path perspective: the
+  footer partial used to carry `Zasqua v{{ site.Params.version }}`
+  as a site-wide string. Every version bump in hugo.toml
+  byte-changed every page of the corpus and forced a full re-upload.
+  Moving the version string here means only /colofon/index.html
+  re-uploads when the version number changes — the rest of the
+  corpus stays on the diff-skip path.
+
+  Styling follows the site's existing brand tokens (Cormorant
+  Garamond display, Crimson Text body, burgundy accent) and the
+  `.section` / `.container` layout rhythm used by index.html and
+  the repository landing pages. No dependency on Tailwind
+  Typography (not installed); utility classes resolve against the
+  existing @theme definitions in assets/css/main.css.
+
+  Spanish copy follows the Colombian Spanish style guide, including
+  tech and archival terminology conventions. Product names (Hugo,
+  Pagefind, Cloudflare, Backblaze B2, MapLibre, TIFY, MapTiler,
+  Ubicloud, Tailwind, GitHub) stay in their original capitalisation
+  as registered marks.
+
+  Version: v1.0.0
+*/}}
+{{ define "title" }}{{ .Title }} | {{ site.Title }}{{ end }}
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <article class="colofon max-w-3xl mx-auto">
+
+      <h1 class="font-display text-stone-900 text-4xl font-normal mb-6">Colofón</h1>
+      <img src="/img/zasqua-3-burgundy-sm.svg" alt="Zasqua" class="block max-w-[200px] mx-auto pb-8">
+
+      <p class="font-serif text-stone-900 text-lg leading-relaxed mb-10">
+        Zasqua es una plataforma de consulta de materiales de archivo desarrollada por
+        <a href="https://neogranadina.org" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Neogranadina</a>
+        y el
+        <a href="https://ampl.clair.ucsb.edu" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Laboratorio de Archivos, Memoria y Preservación (AMPL)</a>
+        de la Universidad de California, Santa Bárbara.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Versión</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">
+        Zasqua v{{ site.Params.version }} —
+        <a href="https://github.com/neogranadina/zasqua-frontend/releases/tag/v{{ site.Params.version }}" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Ver notas de esta versión en GitHub</a>.
+      </p>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        <a href="https://github.com/neogranadina/zasqua-frontend/blob/main/CHANGELOG.md" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Consultar historial completo de versiones</a>.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Archivos representados</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">Zasqua reúne materiales digitalizados de cinco instituciones aliadas en Colombia y Perú:</p>
+      <ul class="font-serif text-stone-900 leading-relaxed list-disc pl-6 space-y-1">
+        <li><a href="/co-ahr/" class="text-burgundy underline hover:text-burgundy-light">Archivo Histórico de Rionegro</a> — Rionegro, Colombia</li>
+        <li><a href="/co-ahrb/" class="text-burgundy underline hover:text-burgundy-light">Archivo Histórico Regional de Boyacá</a> — Tunja, Colombia</li>
+        <li><a href="/co-ahjci/" class="text-burgundy underline hover:text-burgundy-light">Archivo Histórico del Juzgado del Circuito de Istmina</a> — Istmina, Colombia</li>
+        <li><a href="/co-cihjml/" class="text-burgundy underline hover:text-burgundy-light">Centro de Investigaciones Históricas José María Arboleda Llorente</a>, Universidad del Cauca — Popayán, Colombia</li>
+        <li><a href="/pe-bn/" class="text-burgundy underline hover:text-burgundy-light">Biblioteca Nacional del Perú</a> — Lima, Perú</li>
+      </ul>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Cómo citar</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-2"><strong class="font-semibold">Plataforma completa:</strong></p>
+      <blockquote class="font-serif text-stone-900 leading-relaxed border-l-4 border-burgundy pl-4 py-1 mb-4 italic">
+        <em>Zasqua: plataforma de consulta de materiales de archivo</em> (v{{ site.Params.version }}). Fundación Histórica Neogranadina y Laboratorio de Archivos, Memoria y Preservación (AMPL), Universidad de California, Santa Bárbara, {{ now.Format "2006" }}. https://zasqua.org
+      </blockquote>
+      <p class="font-serif text-stone-900 leading-relaxed mb-2"><strong class="font-semibold">Descripción específica:</strong> use el identificador canónico que aparece en la sección &ldquo;Control&rdquo; de cada descripción, por ejemplo:</p>
+      <blockquote class="font-serif text-stone-900 leading-relaxed border-l-4 border-burgundy pl-4 py-1 mb-2 italic">
+        <em>Escritura de compraventa, 1723</em> (co-ahr-007-d015). Archivo Histórico de Rionegro, consultado en Zasqua. https://zasqua.org/co-ahr-007-d015/
+      </blockquote>
+      <p class="font-serif text-stone-600 italic text-sm leading-relaxed">
+        Formato genérico; adapte a las convenciones de su disciplina — Chicago, APA, MLA, ISO 690, etc.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Tecnología</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">
+        Zasqua es un sitio estático alojado en Cloudflare. Cada página HTML se genera al momento de la publicación; no hay procesos de servidor en ejecución. Esta arquitectura se alinea con los principios de
+        <a href="http://go-dh.github.io/mincomp/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light"><em>minimal computing</em></a>
+        — sostenibilidad, portabilidad y resiliencia a largo plazo.
+      </p>
+      <ul class="font-serif text-stone-900 leading-relaxed list-disc pl-6 space-y-1 mb-3">
+        <li><strong class="font-semibold">Generador de sitio estático:</strong> <a href="https://gohugo.io/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Hugo</a> (Extended 0.160)</li>
+        <li><strong class="font-semibold">Búsqueda en el navegador del usuario:</strong> <a href="https://pagefind.app/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Pagefind</a> v1.5.2 — tres índices independientes para descripciones, entidades y lugares</li>
+        <li><strong class="font-semibold">Mapas:</strong> <a href="https://maplibre.org/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">MapLibre GL JS</a> con mapa base de <a href="https://www.maptiler.com/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">MapTiler</a></li>
+        <li><strong class="font-semibold">Visor de imágenes:</strong> <a href="https://tify.rocks/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">TIFY</a> — visor IIIF con visualización de zoom profundo; imágenes servidas como mosaicos estáticos IIIF Level 0</li>
+        <li><strong class="font-semibold">Estilos:</strong> <a href="https://tailwindcss.com/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Tailwind CSS</a> v4</li>
+        <li><strong class="font-semibold">Alojamiento:</strong> <a href="https://workers.cloudflare.com/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Cloudflare Workers</a> + <a href="https://www.cloudflare.com/products/r2/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Cloudflare R2</a></li>
+        <li><strong class="font-semibold">Almacenamiento de exportaciones:</strong> <a href="https://www.backblaze.com/b2/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Backblaze B2</a></li>
+        <li><strong class="font-semibold">Integración continua:</strong> GitHub Actions mediante <a href="https://www.ubicloud.com/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Ubicloud</a></li>
+      </ul>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        El código de este sitio está disponible en
+        <a href="https://github.com/neogranadina/zasqua-frontend" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">github.com/neogranadina/zasqua-frontend</a>.
+        Las exportaciones de datos provienen del <em>backend</em> Django, disponible en
+        <a href="https://github.com/neogranadina/zasqua-backend" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">github.com/neogranadina/zasqua-backend</a>.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Accesibilidad</h2>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        Con Zasqua buscamos que cualquier persona pueda consultar el archivo sin barreras. Empleamos HTML semántico, navegación completa por teclado y etiquetas ARIA cuando la estructura HTML no describe por sí sola la función del elemento. Aún no hemos realizado una auditoría formal de accesibilidad; si encuentra una barrera, escríbanos a
+        <a href="mailto:contacto@neogranadina.org" class="text-burgundy underline hover:text-burgundy-light">contacto@neogranadina.org</a>
+        o
+        <a href="https://github.com/neogranadina/zasqua-frontend/issues" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">abra un <em>issue</em> en GitHub</a>.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Privacidad y datos</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">
+        Zasqua no utiliza <em>cookies</em> ni almacena información personal. El sitio emplea
+        <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">Cloudflare Web Analytics</a>
+        para recopilar estadísticas agregadas de uso — esta herramienta no utiliza <em>cookies</em>, no crea identificadores únicos del navegador y no comparte datos con terceros.
+      </p>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        Las búsquedas se ejecutan localmente en su navegador (motor Pagefind en WebAssembly); ninguna consulta se envía a nuestros servidores. Los registros de acceso del CDN se conservan únicamente con fines operativos, en forma agregada.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Licencia</h2>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        El código de este sitio se publica bajo la licencia
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">GPL-3.0</a>. Las descripciones archivísticas, los metadatos y las imágenes digitalizadas se publican bajo las condiciones específicas de cada archivo aliado — consulte la sección &ldquo;Condiciones de reproducción&rdquo; de cada descripción.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">Contacto</h2>
+      <ul class="font-serif text-stone-900 leading-relaxed list-disc pl-6 space-y-1">
+        <li>General: <a href="mailto:contacto@neogranadina.org" class="text-burgundy underline hover:text-burgundy-light">contacto@neogranadina.org</a></li>
+        <li>Reportar un error: <a href="https://github.com/neogranadina/zasqua-frontend/issues" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">GitHub Issues</a></li>
+      </ul>
+    </article>
+  </div>
+</section>
+{{ end }}
+{{/* Version: v1.0.0 */}}
