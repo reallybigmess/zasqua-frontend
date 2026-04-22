@@ -1,45 +1,45 @@
+'use strict';
+
 /**
  * Precompute Entity and Place Link Shards
  *
- * Build-time step that turns the flat entity/place link exports from the
- * backend into the shape the static site needs at runtime. Entity detail
- * pages and place detail pages only want the handful of links that point
- * at them, not the full 290k+ entity links or 190k+ place links. Loading
- * the full exports into every page would balloon page size and hurt load
- * times; instead this script shards the links per entity and per place
- * so each detail page fetches a single small JSON file on demand.
+ * Zasqua's archival records link to historical entities (people, organisations)
+ * and places. Those links are stored in large JSON files as flat lists, but at
+ * page-render time the site needs a fast reverse index: "given an entity code,
+ * which descriptions link to it?" and "given a description reference, which
+ * entities and places are mentioned, with what roles?". This script produces
+ * those reverse indexes and writes per-code shards to disk so the Eleventy
+ * build (later Hugo build) can pick them up without re-deriving on each run.
  *
- * Inputs (downloaded from Backblaze B2 into `data/`):
- *   entity_links.json   — every entity-to-description link
- *   place_links.json    — every place-to-description link
- *   entities.json       — entity authority records
- *   places.json         — place authority records
+ * Pipeline context: runs after the B2 download stage of `build.sh` and before
+ * the static-site build. Reads the canonical exports under `exports/` and
+ * writes per-entity/per-place shards plus enriched lookup files back into
+ * `exports/` — never into Hugo's `data/` directory, which is reserved for
+ * small UI strings.
  *
- * Outputs:
- *   data/entity-links/{entity_code}.json   — per-entity link shards
- *   data/place-links/{place_id}.json       — per-place link shards
- *   data/entity-index.json                 — trimmed entity list for the explorer
- *   data/place-index.json                  — trimmed place list for the explorer
- *   data/desc-entity-lookup.json           — reverse map used by description pages
- *   data/desc-place-lookup.json            — reverse map used by description pages
+ * Reads:
+ *   exports/{entities,places,entity_links,place_links}.json
+ * Writes:
+ *   exports/entity-links/{code}.json, exports/place-links/{code}.json
+ *   exports/doc-entities/{code}.json (per-focal ref_code → [entity_codes] map,
+ *     consumed by static/js/infinite-bipartite-explorer.js and static/js/entity.js
+ *     for O(1) doc-node expandability resolution; replaces the per-doc
+ *     Pagefind descriptions round-trips that stretched to 20–45 s on
+ *     large-focal (Bolívar-class) graphs over CDN latency)
+ *   exports/{entity-index,place-index,desc-entity-lookup,desc-place-lookup}.json
  *
- * The entity-index and place-index carry only the fields the explorers need
- * — display name, type, coordinates, linked description count, and a few
- * presence flags — so the JSON loaded by explorer pages stays small even
- * with tens of thousands of records.
+ * Env flags:
+ *   DATA_DIR   — override the default exports directory (absolute or relative path)
+ *   DEV_MODE   — "true" to limit output to DEV_LIMIT shards per type (faster local iteration)
+ *   DEV_LIMIT  — integer shard cap when DEV_MODE is enabled (default 500)
  *
- * Set `DEV_MODE=true` (optionally with `DEV_LIMIT=N`) to limit the number
- * of shards written, for faster local builds.
- *
- * @version v0.5.0
+ * @version v1.0.0
  */
-
-'use strict';
 
 const fs = require('fs');
 const path = require('path');
 
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'exports');
 const DEV_MODE = process.env.DEV_MODE === 'true';
 const DEV_LIMIT = parseInt(process.env.DEV_LIMIT || '500', 10);
 
@@ -59,8 +59,10 @@ async function main() {
   const entityLinks = JSON.parse(entityLinksRaw);
   console.log(`[precompute-links] entity_links.json: ${entityLinks.length} records`);
 
-  // Group by entity_code
+  // Group by entity_code, and simultaneously build a reference_code →
+  // Set<entity_code> reverse map used by the doc-entities shard pass below.
   const byEntity = new Map();
+  const refToEntities = new Map();
   for (const link of entityLinks) {
     const code = link.entity_code;
     if (!byEntity.has(code)) {
@@ -70,9 +72,20 @@ async function main() {
       reference_code: link.reference_code,
       title: link.title,
       date_expression: link.date_expression,
+      // date_start: ISO YYYY-MM-DD, added by the backend so the client
+      // can sort timelines chronologically instead of string-sorting the
+      // freeform Spanish date_expression ("12 y 13 de junio de 1756",
+      // "1500-1602", "-1587") which is not chronological. `|| null` is
+      // defensive for older exports that predate the backend change.
+      date_start: link.date_start || null,
       repository_code: link.repository_code,
       role: link.role,
     });
+    const ref = link.reference_code;
+    if (ref) {
+      if (!refToEntities.has(ref)) refToEntities.set(ref, new Set());
+      refToEntities.get(ref).add(code);
+    }
   }
 
   // Write per-entity shards
@@ -94,7 +107,43 @@ async function main() {
   console.log(`[precompute-links] Wrote ${entityShardCount} entity-links shards to ${entityShardsDir}`);
 
   // -------------------------------------------------------------------------
-  // 2. Build entity-index.json for the entity explorer
+  // 1b. Doc-entities shards: per focal, write a map of
+  //     reference_code → [entity_codes] for the docs linked to that focal.
+  //
+  // Consumed by static/js/infinite-bipartite-explorer.js and static/js/entity.js
+  // to render doc nodes filled (expandable) vs hollow (leaf) without paying
+  // per-doc Pagefind descriptions round-trips. Replaces the previous
+  // pagefind.search(refCode) + .data() loop whose wall time scaled linearly
+  // with CDN latency × focal doc count (20–45 s on Bolívar-class focals on
+  // prod; invisible on localhost).
+  // -------------------------------------------------------------------------
+
+  const docEntitiesShardsDir = path.join(DATA_DIR, 'doc-entities');
+  fs.mkdirSync(docEntitiesShardsDir, { recursive: true });
+
+  let docEntitiesShardCount = 0;
+  for (const code of entityCodesToWrite) {
+    const focalLinks = byEntity.get(code) || [];
+    const uniqueRefs = new Set();
+    for (const l of focalLinks) uniqueRefs.add(l.reference_code);
+    const docMap = {};
+    for (const ref of uniqueRefs) {
+      const entities = refToEntities.get(ref);
+      if (entities && entities.size) docMap[ref] = Array.from(entities);
+    }
+    fs.writeFileSync(
+      path.join(docEntitiesShardsDir, `${code}.json`),
+      JSON.stringify(docMap)
+    );
+    docEntitiesShardCount++;
+    if (docEntitiesShardCount % 10000 === 0) {
+      console.log(`[precompute-links] Wrote ${docEntitiesShardCount} doc-entities shards...`);
+    }
+  }
+  console.log(`[precompute-links] Wrote ${docEntitiesShardCount} doc-entities shards to ${docEntitiesShardsDir}`);
+
+  // -------------------------------------------------------------------------
+  // 2. Build entity-index.json (fields)
   // -------------------------------------------------------------------------
 
   // Compute per-entity roles from entity-link shards
@@ -159,6 +208,7 @@ async function main() {
       reference_code: link.reference_code,
       title: link.title,
       date_expression: link.date_expression,
+      date_start: link.date_start || null,
       repository_code: link.repository_code,
       role: link.role,
     });
@@ -186,7 +236,7 @@ async function main() {
   console.log(`[precompute-links] Wrote ${placeShardCount} place-links shards to ${placeShardsDir}`);
 
   // -------------------------------------------------------------------------
-  // 4. Build place-index.json for the place explorer
+  // 4. Build place-index.json (fields — direct pass-through of latitude/longitude)
   // -------------------------------------------------------------------------
 
   const placesPath = path.join(DATA_DIR, 'places.json');
@@ -227,11 +277,10 @@ async function main() {
 
   // -------------------------------------------------------------------------
   // 5. Enriched reverse-lookup files
-  // Build description-keyed maps so description pages can render entity
-  // and place links without a runtime fetch.
   // -------------------------------------------------------------------------
 
   // 5a. Entity enriched reverse lookup
+  // Build entity_code -> { display_name, entity_type } map from entities array
   const entityByCode = new Map(entities.map(e => [e.entity_code, e]));
   const descToEntities = new Map();
 
@@ -300,12 +349,15 @@ async function main() {
 
   console.log(`[precompute-links] Done.`);
   console.log(`  Entity shards written      : ${entityShardCount}`);
+  console.log(`  Doc-entities shards written: ${docEntitiesShardCount}`);
   console.log(`  Place shards written       : ${placeShardCount}`);
   console.log(`  entity-index records       : ${entityIndex.length}`);
   console.log(`  place-index records        : ${placeIndex.length}`);
   console.log(`  desc-entity-lookup keys    : ${descToEntities.size}`);
   console.log(`  desc-place-lookup keys     : ${descToPlaces.size}`);
 }
+
+// Version: v1.0.0
 
 main().catch(err => {
   console.error('[precompute-links] Fatal error:', err);
