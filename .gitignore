@@ -1,8 +1,48 @@
+# Build output
 _site/
+public/*
+!public/js/
+!public/lugares-facets.json
+!public/lugares-pivots.json
+!public/lugares-triples.json
+resources/_gen/
+.hugo_build.lock
+
+# Dependencies
 node_modules/
-data/
+
+# Data exports pulled at build time
+data/*
+!data/ui.yaml
+exports/
+static/data/
+assets/hugo-data/*.json
+assets/hugo-data/descriptions/
 src/_data/export/
+
+# Build tooling / artefacts
+hugo_stats.json
+tailwindcss
+tailwindcss-*
+
+# Cloudflare local dev state
+worker/.wrangler/
+worker-tiles/.wrangler/
+worker-tiles/node_modules/
+
+# Local secrets
+.env
+.dev.vars
+
+# Editor / sketch scratch
+playgrounds/
+
+# OS / editor noise
 .DS_Store
 *.log
 logs/
-.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/

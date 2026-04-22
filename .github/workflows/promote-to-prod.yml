@@ -1,0 +1,187 @@
+# Promote staging artefact to production R2 (bit-for-bit copy)
+#
+# Manual trigger only (workflow_dispatch). Takes whatever currently lives
+# in zasqua-staging and copies it into zasqua-site via S3 copy_object
+# (no rebuild). Requires an explicit PROMOTE confirm input so a typo or
+# accidental dispatch cannot ship. On success: purges prod Cloudflare
+# cache. On partial failure (any copy_object still failing after 3×
+# adaptive retries): aborts WITHOUT purging — the next run catches up
+# from the diff.
+#
+# Version: v1.0.0
+#
+# Companion to .github/workflows/deploy-staging.yml. That workflow builds
+# and uploads to zasqua-staging; this workflow promotes a verified
+# staging artefact to zasqua-site. Separating build-and-deploy from
+# promote-to-prod means prod is never touched unless an operator
+# explicitly runs this workflow with confirm=PROMOTE. What was walked on
+# staging.zasqua.org is bit-for-bit what lands on zasqua.org.
+#
+# Reuses the prod secrets (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY,
+# CLOUDFLARE_ACCOUNT_ID, CF_API_TOKEN, CF_ZONE_ID) — no new repo secrets
+# required.
+#
+# Inputs:
+#   source_bucket   — R2 bucket to copy FROM. Defaults to zasqua-staging;
+#                     overridable only in case a rollback source is needed.
+#   confirm         — must equal the literal string "PROMOTE". Any other
+#                     value (blank, typo, lowercase) aborts the workflow
+#                     on step 1 before any R2 auth or side effect.
+#   confirm_deletes — optional. Leave blank to keep the upload-to-r2.py
+#                     5% delete safety cap enforced; set to the literal
+#                     string "YES" to override. Used once for the v1.0.0
+#                     Eleventy-orphan cleanup (2026-04-21); any other
+#                     operator who trips the cap should think hard
+#                     before flipping this.
+
+name: Promote staging to prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_bucket:
+        description: "Source R2 bucket (default: zasqua-staging)"
+        required: true
+        type: string
+        default: zasqua-staging
+      confirm:
+        description: 'Type PROMOTE to confirm'
+        required: true
+        type: string
+      confirm_deletes:
+        description: 'Type YES to override the 5% delete safety cap — leave blank to keep it enforced'
+        required: false
+        type: string
+        default: ""
+
+# Serialise promotions so concurrent workflow_dispatch runs do not race
+# each other on the zasqua-site R2 LIST/COPY/DELETE pool. Separate group
+# from deploy-staging so a staging build and a prod promote can run in
+# parallel (different destination buckets, no shared state).
+concurrency:
+  group: promote-to-prod
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    # Matches deploy-staging.yml runner choice (ubicloud-standard-8) for
+    # consistency and simpler operator mental model, even though the
+    # copy-only workload is light (~192K copy_object calls, <1 GB RSS).
+    # Memory is not the deciding factor here — latency to the R2 API is.
+    runs-on: ubicloud-standard-8
+    # Explicit 60-minute ceiling. A full staging->prod copy of ~192K
+    # keys at ~345 ops/s is ≈ 9 minutes; this value is a 7× safety
+    # margin to catch runaway states without inheriting the deploy-
+    # staging 6 h ceiling (that workflow does full builds; this one
+    # does only copy_object calls).
+    timeout-minutes: 60
+
+    steps:
+      - name: Verify PROMOTE confirmation
+        # PROMOTE guardrail. Runs BEFORE checkout / setup-python / any R2
+        # auth so a typo or accidental dispatch fails instantly with
+        # no side effects. Exact string comparison — case, whitespace,
+        # and length all matter.
+        run: |
+          if [ "${{ inputs.confirm }}" != "PROMOTE" ]; then
+            echo "::error::confirm input must equal \"PROMOTE\" (got: \"${{ inputs.confirm }}\")"
+            exit 1
+          fi
+          echo "Confirmed: promoting ${{ inputs.source_bucket }} → zasqua-site"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        # Lockfile-only pinning — scripts/requirements.txt is the single
+        # source of truth for boto3 (used by the copy mode).
+        run: pip install -r scripts/requirements.txt --quiet
+
+      - name: Copy staging to prod
+        id: copy
+        env:
+          PYTHONUNBUFFERED: "1"
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          set -o pipefail
+          CONFIRM_DELETES_FLAG=""
+          if [ "${{ inputs.confirm_deletes }}" = "YES" ]; then
+            CONFIRM_DELETES_FLAG="--confirm-deletes"
+            echo "::warning::5% delete safety cap OVERRIDDEN by confirm_deletes=YES — large orphan delete will proceed"
+          elif [ -n "${{ inputs.confirm_deletes }}" ]; then
+            echo "::error::confirm_deletes input must be empty or literally \"YES\" (got: \"${{ inputs.confirm_deletes }}\")"
+            exit 1
+          fi
+          # Concurrency 50 (not 100) for copy mode: the first v1.0
+          # promote at 100 threads + adaptive retries capped at ~77
+          # copies/sec because R2's copy_object returned throttle
+          # signals at that concurrency. Script v0.5.1 dropped retry
+          # mode to "standard" for copy mode (upload mode keeps
+          # adaptive); dialling concurrency down removes the other
+          # half of the throttle-trip surface. Revisit once prod
+          # steady-state cycles land — if diff skip rate is high,
+          # fewer keys ever reach the copy pool.
+          python3 scripts/upload-to-r2.py \
+            --copy-from "${{ inputs.source_bucket }}" \
+            zasqua-site \
+            --concurrency 50 \
+            $CONFIRM_DELETES_FLAG | tee promote.log
+          # upload-to-r2.py exits 1 on any failed copy_object (after 3×
+          # adaptive retries) OR if the 5% delete safety cap aborted the
+          # delete pass. Either way the step fails and subsequent steps
+          # gated on success() are skipped — Cloudflare cache purge in
+          # particular (partial-failure policy).
+
+      - name: Purge prod Cloudflare cache
+        # Purge only on a fully-successful copy. If any
+        # copy_object failed after retries, this step skips and the
+        # CDN keeps serving the prior content for the failed subset
+        # until the next promote run's diff catches up.
+        if: success()
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        run: |
+          curl -sf -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything": true}'
+          echo "Prod cache purged"
+
+      - name: Write GHA summary
+        # Always run so the operator sees the r2-upload summary line
+        # even when the copy step failed. Mirrors the deploy-staging
+        # summary shape (grep-able line surfaced as a fenced code
+        # block in $GITHUB_STEP_SUMMARY).
+        if: always()
+        run: |
+          {
+            echo "## Promote to prod — summary"
+            echo ""
+            echo "**Source:** \`${{ inputs.source_bucket }}\`"
+            echo "**Destination:** \`zasqua-site\`"
+            echo ""
+            echo "### r2-upload summary"
+            echo ''
+            echo '```'
+            grep '^r2-upload ' promote.log 2>/dev/null | tail -1 || echo "(no r2-upload summary line — workflow aborted before copy ran, or the copy step failed before emission)"
+            echo '```'
+            echo ""
+            echo "### Cache purge"
+            echo ''
+            if [ "${{ job.status }}" = "success" ]; then
+              echo "Purged (copy completed without failures)."
+            else
+              echo "Skipped — partial failure. Re-run this workflow to retry failed copies; the diff on the next run targets only the keys that still differ."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+# Version: v1.0.0

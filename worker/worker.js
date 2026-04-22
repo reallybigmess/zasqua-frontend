@@ -1,52 +1,54 @@
 /**
- * Edge Worker — Serves the Site from R2
+ * @file worker/worker.js
+ * @description Cloudflare Worker serving zasqua.org (prod) and
+ *   staging.zasqua.org (staging) from R2. Handles pretty-URL resolution,
+ *   edge caching, PMTiles range requests on /tiles/*, and — on the
+ *   staging deployment only (STAGING=true in wrangler.toml
+ *   [env.staging].vars) — two crawler-deterrent mitigations:
+ *     1. /robots.txt returns a blanket Disallow: / .
+ *     2. Every response carries X-Robots-Tag: noindex, nofollow.
  *
- * This Cloudflare Worker is the code that answers every HTTP request
- * for zasqua.org. Cloudflare runs it in their edge network — close to
- * the visitor, not in a traditional datacentre — and gives it direct
- * bindings to the `zasqua-site` R2 bucket that holds the built site
- * and the `zasqua-map-tiles` R2 bucket that holds the PMTiles used by
- * the place explorer's clustered marker map.
+ *   Mitigation 2 was added in v0.3.0 after the first staging deploy
+ *   showed that Cloudflare's zone-level Managed Robots.txt feature
+ *   prepends its own content-signal block (including User-agent: *
+ *   Allow: /) before the Worker's Disallow. First-match REP parsers
+ *   (Googlebot, per RFC 9309) would see the Allow and ignore the
+ *   later Disallow. X-Robots-Tag on every response is the reliable
+ *   belt-and-braces signal.
  *
- * The worker has two responsibilities:
+ *   Prod and staging share this one source file; behaviour diverges
+ *   only on env.STAGING. No build step.
  *
- *   1. Regular site traffic. Accept only `GET` and `HEAD`; normalise
- *      the URL path so it maps to a file key in R2 (trailing slash or
- *      extension-less paths become `/index.html`); check the edge
- *      cache first; fall back to R2; try `404.html` if the object is
- *      missing; attach the right `Content-Type`, `Cache-Control`, and
- *      `ETag` headers; and store a clone of the response in the edge
- *      cache. The cache lifetimes mirror the ones applied at upload
- *      time by `scripts/upload-to-r2.py` — short for HTML and JSON,
- *      week-long for CSS and JS, a year with the `immutable` flag for
- *      fonts and images.
- *
- *   2. PMTiles on the `/tiles/*` path. The place explorer's map loads
- *      `zasqua-places.pmtiles` via the PMTiles JS library, which makes
- *      HTTP Range requests to fetch only the tiles it needs. Serving
- *      the file from the same origin avoids CORS preflights, and the
- *      worker translates the `Range` header into R2's partial-read API
- *      so R2 only streams the requested byte range back to the edge.
- *
- * Pipeline context: the deploy workflow uploads `_site/` to the
- * `zasqua-site` R2 bucket, and this worker is what turns those objects
- * into a live site. PMTiles are uploaded separately to `zasqua-map-tiles`.
- * The worker is configured in `wrangler.toml` and deployed with
- * `wrangler deploy`.
- *
- * @version v0.5.0
+ * @version v1.0.0
  */
+
 export default {
   async fetch(request, env) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
-      return new Response('Method Not Allowed', { status: 405 });
+      return stagingHeaders(new Response('Method Not Allowed', { status: 405 }), env);
     }
 
     const url = new URL(request.url);
 
+    // On the staging deployment (STAGING=true in wrangler.toml
+    // [env.staging].vars), intercept /robots.txt and serve a blanket
+    // Disallow so crawlers don't index staging.zasqua.org. Prod Worker
+    // passes /robots.txt through to R2 (STAGING is undefined there).
+    // Paired with the X-Robots-Tag injection (see stagingHeaders) for
+    // resilience against Cloudflare's Managed Robots.txt prepending an
+    // Allow: / block ahead of our Disallow (v0.3.0).
+    if (env.STAGING === 'true' && url.pathname === '/robots.txt') {
+      return stagingHeaders(new Response('User-agent: *\nDisallow: /\n', {
+        headers: {
+          'content-type': 'text/plain; charset=utf-8',
+          'cache-control': 'public, max-age=3600',
+        },
+      }), env);
+    }
+
     // Serve PMTiles from /tiles/ path — same-origin, no CORS needed
     if (url.pathname.startsWith('/tiles/')) {
-      return handleTiles(request, env, url);
+      return stagingHeaders(await handleTiles(request, env, url), env);
     }
 
     let path = url.pathname;
@@ -66,7 +68,7 @@ export default {
     const cache = caches.default;
     const cacheKey = new Request(url.toString(), request);
     let response = await cache.match(cacheKey);
-    if (response) return response;
+    if (response) return stagingHeaders(response, env);
 
     // Fetch from R2
     const object = await env.SITE.get(key);
@@ -79,9 +81,9 @@ export default {
           status: 404,
           headers: { 'content-type': 'text/html; charset=utf-8' },
         });
-        return response;
+        return stagingHeaders(response, env);
       }
-      return new Response('Not Found', { status: 404 });
+      return stagingHeaders(new Response('Not Found', { status: 404 }), env);
     }
 
     const headers = new Headers();
@@ -94,9 +96,20 @@ export default {
     // Store in edge cache (non-blocking)
     request.method === 'GET' && cache.put(cacheKey, response.clone());
 
-    return response;
+    return stagingHeaders(response, env);
   },
 };
+
+// Inject X-Robots-Tag: noindex, nofollow on every staging response so
+// crawlers that ignore or misparse robots.txt (or land before our
+// Disallow in Cloudflare's managed robots.txt block) still skip the
+// content. Prod responses pass through untouched (v0.3.0).
+function stagingHeaders(response, env) {
+  if (env.STAGING !== 'true') return response;
+  const headers = new Headers(response.headers);
+  headers.set('x-robots-tag', 'noindex, nofollow');
+  return new Response(response.body, { status: response.status, headers });
+}
 
 function contentType(key) {
   const ext = key.split('.').pop().toLowerCase();
@@ -173,3 +186,5 @@ async function handleTiles(request, env, url) {
   headers.set('content-length', object.size);
   return new Response(object.body, { status: 200, headers });
 }
+
+// Version: v1.0.0

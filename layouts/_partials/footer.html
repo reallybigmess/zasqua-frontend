@@ -1,0 +1,31 @@
+{{/*
+  Zasqua site footer partial
+
+  Renders the credits paragraph, copyright line with dynamic year,
+  a link to /colofon/, and two seal images (Neogranadina + AMPL).
+
+  The {year} placeholder in hugo.Data.ui.footer.copyright is replaced
+  at build time with `now.Format "2006"` — a single four-digit year
+  that is stable for ~12 months, so it does not churn per-page ETags
+  materially on a given deploy.
+
+  The version string and release-notes link live on /colofon/ rather
+  than in this partial, so a version bump in hugo.toml re-uploads
+  one page rather than every page in the corpus.
+
+  Version: v1.0.0
+*/}}
+<footer class="site-footer bg-burgundy-dark text-white">
+  <div class="container">
+    <div class="footer-left text-sm">
+      <p>Zasqua es una plataforma de consulta de materiales de archivo desarrollada por <a href="https://neogranadina.org" target="_blank" class="text-white font-semibold hover:text-periwinkle">Neogranadina</a> y el <a href="https://ampl.clair.ucsb.edu" target="_blank" class="text-white font-semibold hover:text-periwinkle">Laboratorio de Archivos, Memoria y Preservación (AMPL)</a> de la Universidad de California, Santa Bárbara.</p>
+      <p class="footer-copyright">{{ replace hugo.Data.ui.footer.copyright "{year}" (now.Format "2006") }}.
+      <br><a href="/colofon/" class="text-white hover:text-periwinkle">{{ hugo.Data.ui.footer.colofon_link_text }}</a>.</p>
+    </div>
+    <div class="footer-right">
+      <img src="/img/logo_grande.svg" alt="Neogranadina" class="footer-seal">
+      <img src="/img/ampl-cropped-1.png" alt="AMP Lab, UC Santa Barbara" class="footer-seal">
+    </div>
+  </div>
+</footer>
+{{/* Version: v1.0.0 */}}

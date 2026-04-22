@@ -1,34 +1,23 @@
-# Wrangler Configuration for the Zasqua Edge Worker
+# Cloudflare Worker for serving zasqua.org from R2.
 #
-# Wrangler is Cloudflare's deployment tool for Workers — the small
-# programs that run at Cloudflare's edge — and this file is what it
-# reads to know how to build and publish `worker.js`. The worker
-# serves zasqua.org by reading objects straight out of the
-# `zasqua-site` R2 bucket, and also serves the place explorer's
-# PMTiles from the `zasqua-map-tiles` bucket.
-#
-# Settings defined here:
-#
-#   - `name` is the Worker's name in the Cloudflare dashboard
-#   - `main` points at the entry module (`worker.js`)
-#   - `compatibility_date` pins the Workers runtime behaviour to a known
-#     snapshot so deploys stay reproducible
-#   - The first `[[r2_buckets]]` block binds `zasqua-site` to the `SITE`
-#     variable the worker uses at runtime (`env.SITE.get(...)`)
-#   - The second `[[r2_buckets]]` block binds `zasqua-map-tiles` to the
-#     `TILES` variable used by the `/tiles/*` PMTiles route
-#
-# The Cloudflare account ID is intentionally not stored in this file —
-# the repo is public. Wrangler reads it from the `CLOUDFLARE_ACCOUNT_ID`
-# environment variable instead:
+# account_id is read from the CLOUDFLARE_ACCOUNT_ID env var — not stored here
+# because this repo is public. Set it in your shell profile or pass it inline:
 #
 #   CLOUDFLARE_ACCOUNT_ID=... npx wrangler deploy
 #
-# Common commands:
-#   cd worker && npx wrangler deploy   # publish the worker
-#   cd worker && npx wrangler tail     # stream live logs
+# To deploy staging: cd worker && npx wrangler deploy --env staging
+# To deploy prod:    cd worker && npx wrangler deploy
+# To tail:           cd worker && npx wrangler tail
 #
-# Version: v0.5.0
+# Bucket topology:
+#   * Prod (zasqua.org)            -> zasqua-site bucket
+#   * Staging (staging.zasqua.org) -> zasqua-staging bucket
+#
+# The CI pipeline builds and uploads to `zasqua-staging`; a separate
+# `promote-to-prod` workflow then copies that bucket into `zasqua-site`
+# bit-for-bit, so what was walked on staging is exactly what lands on prod.
+# Prod and staging read from distinct buckets, so staging changes never go
+# live on prod without an explicit promote and Cloudflare cache purge.
 
 name = "zasqua-site"
 main = "worker.js"
@@ -41,3 +30,27 @@ bucket_name = "zasqua-site"
 [[r2_buckets]]
 binding = "TILES"
 bucket_name = "zasqua-map-tiles"
+
+# Route staging.zasqua.org/* attached via Cloudflare dashboard (matches
+# prod convention — wrangler.toml stays host-agnostic). Dashboard: Workers
+# & Pages → zasqua-staging → Triggers → Custom Domains → Add Custom Domain.
+
+# Staging environment — deployed separately via `wrangler deploy --env staging`.
+# Serves staging.zasqua.org from the zasqua-staging R2 bucket. STAGING=true
+# gates the Worker-injected robots.txt disallow and X-Robots-Tag header
+# (see worker.js) so staging content is never indexed.
+[env.staging]
+name = "zasqua-staging"
+
+[[env.staging.r2_buckets]]
+binding = "SITE"
+bucket_name = "zasqua-staging"
+
+[[env.staging.r2_buckets]]
+binding = "TILES"
+bucket_name = "zasqua-map-tiles"
+
+[env.staging.vars]
+STAGING = "true"
+
+# Version: v1.0.0

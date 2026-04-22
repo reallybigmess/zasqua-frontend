@@ -1,0 +1,303 @@
+# Build and deploy to staging R2 (Hugo pipeline)
+#
+# Mirrors build.sh stages 1–7 in GitHub Actions: B2 download, precompute-
+# links, npm ci, enrich, npm test, Hugo Extended build, Pagefind Node API
+# (three bundles + six sidecars), diff-based upload to the zasqua-staging
+# R2 bucket, Cloudflare cache purge on changes, and a scan-links smoke.
+# Manual trigger only (workflow_dispatch); target bucket is always
+# zasqua-staging — prod promotion is a separate workflow
+# (promote-to-prod.yml).
+#
+# Version: v1.0.0
+#
+# Replaces the Eleventy-era .github/workflows/deploy.yml. Dependency
+# pinning is lockfile-only: Node via .nvmrc + package-lock.json, Python
+# via scripts/requirements.txt, Hugo Extended via
+# peaceiris/actions-hugo@v3 pinned to hugo-version 0.160.1 (the one
+# exception — Hugo is not managed by npm or pip). Step ordering is fail-
+# fast: vitest runs after the enrich stage but before the expensive
+# Hugo + Pagefind + upload stages.
+#
+# Inputs:
+#   dev_limit — optional integer cap on records processed by
+#               generate-content.js. Unset = full corpus. Setting this
+#               produces a subset build; the result is NOT a valid
+#               production artefact (never promote a DEV_LIMIT build).
+#   dry_run   — when true, runs stages 1–7 + the diff pass and prints
+#               the would-upload / would-delete counts, then exits
+#               before any PUT / DELETE / cache purge.
+
+name: Build and deploy to staging (Hugo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dev_limit:
+        description: "Optional DEV_LIMIT (integer) — cap records for fast iteration. Leave blank for full corpus."
+        required: false
+        type: string
+      dry_run:
+        description: "Run stages 1–7 + diff pass, print would-upload / would-delete, skip PUT / DELETE / purge."
+        required: false
+        type: boolean
+        default: false
+
+# Serialise staging deploys so concurrent workflow_dispatch runs do not race
+# each other on the R2 LIST / PUT / DELETE pool.
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Ubicloud-standard-8 (8 vCPU / 32 GB) — benchmarking on an 8-core
+    # runner showed Hugo's working set at 191K pagesources peaks at
+    # Alloc=9.4 GB / Sys=10.7 GB, which OOMs GitHub's free private-repo
+    # ubuntu-latest runner (7 GB). Ubicloud's 8-core tier gives 32 GB
+    # headroom and 4x the parallelism at roughly half the price of an
+    # equivalent GHA Team larger runner.
+    runs-on: ubicloud-standard-8
+    # 6-hour explicit timeout. Full-corpus local benchmark is well under
+    # 60 min (Hugo ~12 min + Pagefind ~3 min + upload ~1–5 min); the
+    # 360-min ceiling exists to catch runaway stages, not because we
+    # expect to use it.
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        # Lockfile-only pinning — requirements.txt is the single source
+        # of truth for b2[full] + boto3 versions. Do NOT inline pip
+        # install here (the old deploy.yml mistake).
+        run: pip install -r scripts/requirements.txt --quiet
+
+      - name: DEV_LIMIT banner
+        if: inputs.dev_limit != ''
+        run: |
+          echo "::warning::DEV_LIMIT=${{ inputs.dev_limit }} — building a subset; this is NOT a production build."
+          echo "DEV_LIMIT=${{ inputs.dev_limit }}" >> "$GITHUB_ENV"
+
+      - name: Download data from B2 (stage 1)
+        env:
+          B2_APPLICATION_KEY_ID: ${{ secrets.B2_APPLICATION_KEY_ID }}
+          B2_APPLICATION_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+        run: |
+          b2 account authorize "$B2_APPLICATION_KEY_ID" "$B2_APPLICATION_KEY"
+          mkdir -p exports/children exports/entity-links exports/place-links
+          b2 file download b2://zasqua-export/descriptions.json exports/descriptions.json
+          b2 file download b2://zasqua-export/repositories.json exports/repositories.json
+          b2 sync b2://zasqua-export/children/ exports/children/
+          ls -lh exports/descriptions.json exports/repositories.json
+          echo "Children files: $(ls exports/children/ | wc -l)"
+          b2 file download b2://zasqua-export/entities.json exports/entities.json
+          b2 file download b2://zasqua-export/places.json exports/places.json
+          b2 file download b2://zasqua-export/entity_links.json exports/entity_links.json
+          b2 file download b2://zasqua-export/place_links.json exports/place_links.json
+          ls -lh exports/entities.json exports/places.json exports/entity_links.json exports/place_links.json
+
+      - name: Pre-compute link shards and index files (stage 2)
+        run: |
+          node scripts/precompute-links.js
+          echo "Entity shards:       $(ls exports/entity-links/ | wc -l)"
+          echo "Doc-entities shards: $(ls exports/doc-entities/ | wc -l)"
+          echo "Place shards:        $(ls exports/place-links/ | wc -l)"
+          ls -lh exports/entity-index.json exports/place-index.json
+
+      - name: Install npm dependencies (stage 3)
+        run: npm ci
+
+      - name: Enrich data (stage 4)
+        env:
+          DEV_LIMIT: ${{ inputs.dev_limit }}
+        run: node scripts/generate-content.js
+
+      - name: Populate static/data runtime shards (stage 5)
+        # Mirrors build.sh stage 5: Hugo's static passthrough serves these
+        # at runtime for the client JS (tree.js, entity-explorer.js, etc.)
+        # that fetches shards on demand.
+        run: |
+          mkdir -p static/data
+          rm -rf static/data/children static/data/entity-links static/data/place-links static/data/doc-entities
+          cp -r exports/children static/data/children
+          cp -r exports/entity-links static/data/entity-links
+          cp -r exports/place-links static/data/place-links
+          cp -r exports/doc-entities static/data/doc-entities
+          cp exports/entity-index.json static/data/entity-index.json
+          cp exports/place-index.json static/data/place-index.json
+          if [ -f exports/graph.json ]; then cp exports/graph.json static/data/graph.json; fi
+
+      - name: Run tests (blocking)
+        # Fail-fast ordering: vitest runs AFTER enrich (so enriched-counts.test.js
+        # + pagefind-parity.test.js have their JSON inputs) but BEFORE the
+        # expensive Hugo + Pagefind + upload stages. A failure here stops
+        # the pipeline before any R2 side effects.
+        # SKIP_BUILD_TESTS=1 gates the two post-build asserters
+        # (tests/build/url-scheme + tests/build/css-compiled) which require
+        # public/ — they run post-Hugo in a follow-up step.
+        env:
+          SKIP_BUILD_TESTS: "1"
+        run: npm test
+
+      - name: Setup Hugo Extended
+        # Hugo Extended v0.160.1 via the peaceiris action (v3 major tag).
+        # Extended is required for css.TailwindCSS + SCSS.
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.160.1"
+          extended: true
+
+      - name: Build site with Hugo (stage 6)
+        env:
+          DEV_LIMIT: ${{ inputs.dev_limit }}
+        run: |
+          hugo --minify
+          echo "Pages: $(find public -name 'index.html' | wc -l)"
+          echo "Site size: $(du -sh public | cut -f1)"
+
+      - name: Run build-artefact tests (post-Hugo, blocking)
+        # tests/build/url-scheme + tests/build/css-compiled assert on the
+        # Hugo output under public/ — they were skipped in the pre-Hugo
+        # test step via SKIP_BUILD_TESTS=1. Re-run them now with public/
+        # populated. A failure here means the build itself is broken
+        # (missing pe-bn-cdip-01 smoke page, near-empty compiled CSS)
+        # and must block before Pagefind + upload.
+        run: npm test -- tests/build/
+
+      - name: Generate Pagefind indices (stage 7 — 3 bundles + 6 sidecars)
+        # One sequential invocation writes all three bundles AND all six
+        # pivot/triples sidecars. The generator emits
+        # `pagefind-sidecar <name> bytes=<raw> gzipped=<gz> budget=51200
+        # status=<ok|over>` for each sidecar; when running under
+        # GITHUB_ACTIONS it also emits `::warning::` annotations for any
+        # sidecar over the 50 KB gzipped budget. Warn, do not block.
+        run: node scripts/generate-pagefind-indices.js
+
+      - name: Deploy to R2 (zasqua-staging)
+        id: upload
+        env:
+          PYTHONUNBUFFERED: "1"
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          set -o pipefail
+          DRY_RUN_FLAG=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+            echo "::notice::dry_run=true — diff pass will run but no PUT / DELETE will be issued."
+          fi
+          python3 scripts/upload-to-r2.py public zasqua-staging \
+            --concurrency 100 \
+            --diff \
+            $DRY_RUN_FLAG | tee upload.log
+
+          # Extract counts from the summary line emitted by
+          # scripts/upload-to-r2.py for the skip-purge guard. The
+          # summary line is emitted on every run; its shape is:
+          #   r2-upload uploaded=<N> skipped=<N> deleted=<N> failed=<N> ...
+          # Dry-run emits `r2-upload mode=dry-run would_upload=<N> ...` and
+          # we treat that as no-change (no real side effects were applied).
+          SUMMARY=$(grep '^r2-upload ' upload.log | tail -1 || true)
+          if echo "$SUMMARY" | grep -q 'mode=dry-run'; then
+            UPLOADED=0
+            DELETED=0
+          else
+            UPLOADED=$(echo "$SUMMARY" | grep -oE 'uploaded=[0-9]+' | head -1 | cut -d= -f2)
+            DELETED=$(echo "$SUMMARY" | grep -oE 'deleted=[0-9]+' | head -1 | cut -d= -f2)
+          fi
+          if [ "${UPLOADED:-0}" -gt 0 ] || [ "${DELETED:-0}" -gt 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "summary_line=$SUMMARY" >> "$GITHUB_OUTPUT"
+
+      - name: Purge Cloudflare cache (staging)
+        # Skip-when-no-change guard plus dry_run suppression. Reuses the
+        # prod `CF_API_TOKEN`/`CF_ZONE_ID` secrets; if staging later
+        # needs separate Cloudflare credentials, add new secret names
+        # and update this step.
+        if: steps.upload.outputs.changed == 'true' && inputs.dry_run != true
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        run: |
+          # Capture HTTP status + body separately so a non-2xx reply prints
+          # the Cloudflare error JSON into the job log instead of silently
+          # failing with curl exit 22 (the `-sf` pattern swallowed the body).
+          # The body is masked in the log if it contains ${CF_API_TOKEN}
+          # because we never echo the token, only the JSON response body.
+          response=$(curl -s -w "\n__HTTP_STATUS__%{http_code}" -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything": true}')
+          http_code="${response##*__HTTP_STATUS__}"
+          body="${response%__HTTP_STATUS__*}"
+          echo "Cloudflare purge HTTP ${http_code}"
+          echo "Cloudflare purge body:"
+          echo "${body}"
+          if [ "${http_code}" -ne 200 ]; then
+            echo "::error::Cloudflare cache purge returned HTTP ${http_code}"
+            exit 1
+          fi
+          echo "Staging cache purged"
+
+      - name: Smoke — scan-links against build output
+        # Structural smoke: scans the just-built public/ tree for broken
+        # internal links and missing assets. scan-links.js v1.0.0 reads
+        # from public/ and does not yet accept a remote base URL; running
+        # it post-build catches Hugo-level regressions (missing partials,
+        # fingerprinted asset drift) without hitting the live origin. A
+        # live origin probe is a follow-up once the full-corpus build is
+        # steady-state.
+        if: inputs.dry_run != true
+        run: node scripts/scan-links.js
+
+      - name: Write GHA summary
+        if: always()
+        run: |
+          {
+            echo "## Deploy to staging — summary"
+            echo ""
+            echo "**Target bucket:** \`zasqua-staging\`"
+            echo "**Dry run:** \`${{ inputs.dry_run }}\`"
+            echo "**DEV_LIMIT:** \`${{ inputs.dev_limit || 'unset' }}\`"
+            echo ""
+            echo "### r2-upload summary"
+            echo ''
+            echo '```'
+            grep '^r2-upload ' upload.log 2>/dev/null | tail -1 || echo "(no r2-upload summary line — upload step did not run or failed before emission)"
+            echo '```'
+            echo ""
+            echo "### Pagefind sidecar size check"
+            echo ''
+            echo '```'
+            echo "(See job log for \`pagefind-sidecar\` lines emitted by scripts/generate-pagefind-indices.js. Any sidecar over the 50 KB gzipped budget appears above as a ::warning:: annotation — warn, not block.)"
+            echo '```'
+            echo ""
+            echo "### Cache purge"
+            echo ''
+            if [ "${{ steps.upload.outputs.changed }}" = "true" ] && [ "${{ inputs.dry_run }}" != "true" ]; then
+              echo "Purged (uploaded or deleted > 0)."
+            elif [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "Skipped (dry_run=true)."
+            else
+              echo "Skipped (no changes detected)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+# Version: v1.0.0

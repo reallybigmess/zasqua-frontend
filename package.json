@@ -1,24 +1,35 @@
 {
   "name": "zasqua-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Zasqua archival catalog frontend",
   "scripts": {
-    "dev": "DEV_MODE=true eleventy --serve",
-    "build": "eleventy && npx pagefind --site _site --output-subdir pagefind --exclude-selectors \"[data-pagefind-entity-page],[data-pagefind-place-page]\" && npx pagefind --site _site --output-subdir pagefind-entities --glob \"ne-*/**/*.html\" && npx pagefind --site _site --output-subdir pagefind-places --glob \"nl-*/**/*.html\"",
-    "build:dev": "DEV_MODE=true eleventy && npx pagefind --site _site --output-subdir pagefind --exclude-selectors \"[data-pagefind-entity-page],[data-pagefind-place-page]\" && npx pagefind --site _site --output-subdir pagefind-entities --glob \"ne-*/**/*.html\" && npx pagefind --site _site --output-subdir pagefind-places --glob \"nl-*/**/*.html\"",
-    "debug": "DEBUG=Eleventy* eleventy"
+    "dev": "hugo server --bind 127.0.0.1 --port 1313",
+    "build": "./build.sh",
+    "build:dev": "SKIP_DOWNLOAD=1 DEV_LIMIT=100 ./build.sh",
+    "enrich": "node scripts/generate-content.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "archive",
     "catalog",
-    "11ty"
+    "hugo"
   ],
   "author": "Neogranadina",
   "license": "GPL-3.0-only",
+  "homepage": "https://zasqua.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neogranadina/zasqua-frontend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neogranadina/zasqua-frontend/issues"
+  },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.2",
     "graphology": "^0.26.0",
-    "graphology-layout-forceatlas2": "^0.10.1"
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "pagefind": "^1.5.2",
+    "vitest": "^2.1.0"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.2.2",
