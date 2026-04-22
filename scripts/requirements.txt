@@ -1,0 +1,16 @@
+# Python dependency pins for Zasqua frontend deploy pipeline.
+#
+# Installed in CI by `.github/workflows/deploy-staging.yml` before stage 1
+# (B2 download) and consumed by `scripts/upload-to-r2.py` (boto3) and the
+# B2 download step (b2 CLI). Pin exact versions so a CI run is reproducible.
+# Test pins (pytest, moto[s3]) installed only by the test job.
+#
+# Version: v1.0.0
+
+# Runtime deps (consumed by CI deploy workflow)
+b2[full]==4.6.0
+boto3==1.42.91
+
+# Test deps (consumed by pytest job only)
+pytest==9.0.3
+moto[s3]==5.1.22
