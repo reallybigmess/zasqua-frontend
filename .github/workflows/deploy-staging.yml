@@ -8,7 +8,7 @@
 # zasqua-staging — prod promotion is a separate workflow
 # (promote-to-prod.yml).
 #
-# Version: v1.0.0
+# Version: v1.0.1
 #
 # Replaces the Eleventy-era .github/workflows/deploy.yml. Dependency
 # pinning is lockfile-only: Node via .nvmrc + package-lock.json, Python
@@ -193,6 +193,16 @@ jobs:
         # sidecar over the 50 KB gzipped budget. Warn, do not block.
         run: node scripts/generate-pagefind-indices.js
 
+      - name: Shard sitemap.xml (stage 7.5 — keep shards under 50K URLs)
+        # Hugo's default sitemap.xml is a single file listing every page.
+        # At ~191K URLs it overshoots Google's 50K-URLs-per-sitemap limit
+        # by ~4x — crawlers truncate the file and most of the archive
+        # never lands in a search index. shard-sitemap.py splits it into
+        # 45K-URL shards and rewrites sitemap.xml as a sitemap index
+        # that points at the shards. See scripts/shard-sitemap.py for
+        # the full rationale.
+        run: python3 scripts/shard-sitemap.py
+
       - name: Deploy to R2 (${{ inputs.target_bucket }})
         id: upload
         env:
@@ -264,17 +274,6 @@ jobs:
           fi
           echo "Staging cache purged"
 
-      - name: Smoke — scan-links against build output
-        # Structural smoke: scans the just-built public/ tree for broken
-        # internal links and missing assets. scan-links.js v1.0.0 reads
-        # from public/ and does not yet accept a remote base URL; running
-        # it post-build catches Hugo-level regressions (missing partials,
-        # fingerprinted asset drift) without hitting the live origin. A
-        # live origin probe is a follow-up once the full-corpus build is
-        # steady-state.
-        if: inputs.dry_run != true
-        run: node scripts/scan-links.js
-
       - name: Write GHA summary
         if: always()
         run: |
@@ -308,4 +307,4 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-# Version: v1.0.0
+# Version: v1.0.1

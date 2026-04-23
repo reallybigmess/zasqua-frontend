@@ -37,12 +37,20 @@
 # `assets/hugo-data/descriptions/*.json` because a single unified file
 # would exceed V8's 512 MiB max-string-length ceiling.
 #
-# Version: v1.0.0
+# Version: v1.0.1
 
 baseURL = "https://zasqua.org/"
 languageCode = "es-CO"
 defaultContentLanguage = "es"
 title = "Zasqua"
+
+# Emit a robots.txt rendered from `layouts/robots.txt`. Hugo's
+# default is false — leaving it off means Cloudflare's zone-level
+# Managed Robots.txt is the only source of truth for crawler rules,
+# and it never includes a `Sitemap:` directive. Turning this on lets
+# our template contribute the Sitemap pointer while Cloudflare's AI-
+# bot controls still merge ahead of it at the edge.
+enableRobotsTXT = true
 
 [params]
   description = "Zasqua es la plataforma de consulta de materiales de archivo, libros, revistas e instrumentos de consulta digitalizados y sistematizados por Neogranadina y sus aliados."
@@ -82,4 +90,4 @@ title = "Zasqua"
   [markup.goldmark.renderer]
     unsafe = true
 
-# Footer: Version: v1.0.0
+# Footer: Version: v1.0.1
