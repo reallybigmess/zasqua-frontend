@@ -2,6 +2,25 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] — 2026-04-22
+
+Post-v1.0 hotfix pass. Fixes a class of 404s on non-ASCII URLs, brings search-engine indexability into proper shape, and cleans up a couple of build-pipeline loose ends.
+
+### Fixed
+
+- **Non-ASCII URL 404s.** The Cloudflare Worker was passing the percent-encoded `url.pathname` to R2 as a literal key, while R2 stores keys as raw UTF-8. Every URL containing a diacritic — e.g. `co-cihjml-acc-09474-eclesiástico-i-cap` — returned 404 on both zasqua.org and staging.zasqua.org. The Worker now decodes the pathname up front; all diacritic-containing slugs resolve correctly.
+
+### Added
+
+- **Sitemap index with shards.** A new post-build step (`scripts/shard-sitemap.py`) splits the sitemap into shards of at most 45,000 URLs and rewrites `sitemap.xml` as a sitemap index. The single 191,501-URL sitemap previously overshot Google's 50,000-URLs-per-file limit by roughly four-fold; crawlers were silently truncating the file and ingesting only the first 50K entries, leaving about three-quarters of the archive unindexed.
+- **`<link rel="canonical">` on every page.** Injected in the base layout head. Resolves duplicate-content ambiguity for search engines on any URL-variant entry points.
+- **Hugo-rendered `robots.txt` with `Sitemap:` directive.** Cloudflare's Managed Robots.txt feature prepends its AI-bot rules at the edge, so the served file ends up with both Cloudflare's bot controls and our `Sitemap:` pointer.
+
+### Removed
+
+- Stale `scan-links` smoke step from the staging deploy workflow. The `scripts/scan-links.js` it called had been removed during the v1.0 cleanup but the workflow step was left behind, causing every deploy to fail at that step regardless of whether the upload itself succeeded.
+- Five build-output files previously tracked by mistake under `public/` (`public/js/entity-explorer.js`, `public/js/place-explorer.js`, and three Pagefind sidecar JSON files). The `static/` tree is the real source for the JS; Pagefind regenerates the sidecars every build.
+
 ## [1.0.0] — 2026-04-21
 
 The v1.0 rebuild. Over the last six weeks Zasqua was re-engineered from the ground up: static generator swapped, search architecture rewritten, three explorer surfaces audited and tuned for corpus-scale browsing, and a proper staging → prod deploy pipeline introduced. Existing permalinks, external links, and search engines continue to resolve.

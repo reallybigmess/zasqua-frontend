@@ -13,11 +13,10 @@
 #   * Prod (zasqua.org)            -> zasqua-site bucket
 #   * Staging (staging.zasqua.org) -> zasqua-staging bucket
 #
-# The CI pipeline builds and uploads to `zasqua-staging`; a separate
-# `promote-to-prod` workflow then copies that bucket into `zasqua-site`
-# bit-for-bit, so what was walked on staging is exactly what lands on prod.
 # Prod and staging read from distinct buckets, so staging changes never go
-# live on prod without an explicit promote and Cloudflare cache purge.
+# live on prod without an explicit deploy against the prod bucket and a
+# Cloudflare cache purge. See the publishing-zasqua skill for the current
+# deploy workflow shape and input variables.
 
 name = "zasqua-site"
 main = "worker.js"
@@ -53,4 +52,4 @@ bucket_name = "zasqua-map-tiles"
 [env.staging.vars]
 STAGING = "true"
 
-# Version: v1.0.0
+# Version: v1.0.1
