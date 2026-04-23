@@ -1,12 +1,12 @@
-# Build and deploy to staging R2 (Hugo pipeline)
+# Build and deploy R2 (Hugo pipeline)
 #
-# Mirrors build.sh stages 1–7 in GitHub Actions: B2 download, precompute-
+# Mirrors build.sh stages 1–7.5 in GitHub Actions: B2 download, precompute-
 # links, npm ci, enrich, npm test, Hugo Extended build, Pagefind Node API
-# (three bundles + six sidecars), diff-based upload to the zasqua-staging
-# R2 bucket, Cloudflare cache purge on changes, and a scan-links smoke.
-# Manual trigger only (workflow_dispatch); target bucket is always
-# zasqua-staging — prod promotion is a separate workflow
-# (promote-to-prod.yml).
+# (three bundles + six sidecars), post-build sitemap sharding, and a
+# diff-based upload to R2. Manual trigger only (workflow_dispatch).
+# target_bucket defaults to zasqua-staging but also accepts zasqua-site
+# for direct-to-prod deploys; the bucket name is the whole switch between
+# staging and production — there is no separate promote workflow.
 #
 # Version: v1.0.1
 #

@@ -96,10 +96,7 @@ Search is split into three separate Pagefind bundles — one for descriptions, o
 
 ## Deploy pipeline
 
-Two GitHub Actions workflows manage deploys:
-
-- **`deploy-staging.yml`** runs on manual dispatch and builds from `main` into the `zasqua-staging` R2 bucket. The pipeline runs vitest after enrichment as a fail-fast gate, then Hugo, then Pagefind, then a diff-aware upload that only transfers changed objects and a Cloudflare cache purge if anything moved.
-- **`promote-to-prod.yml`** runs manually and requires the operator to type `PROMOTE` in the confirm field. It does not rebuild — it copies `zasqua-staging` to `zasqua-site` bit-for-bit via S3 `copy_object`, so what has been verified on staging is exactly what lands on production. The Cloudflare cache for production is purged only after a fully successful copy; partial failures leave the cache untouched so the next run's diff can catch up.
+A single GitHub Actions workflow, `deploy-staging.yml`, handles both staging and production deploys. Manual dispatch only. The `target_bucket` input selects the destination: `zasqua-staging` (default) for the pre-production environment, or `zasqua-site` for production. The pipeline runs vitest after enrichment as a fail-fast gate, then Hugo, then Pagefind, then post-build sitemap sharding, then a diff-aware upload that only transfers changed objects, followed by a Cloudflare cache purge if anything moved.
 
 The staging environment is gated from search engines at both `/robots.txt` and the `X-Robots-Tag` HTTP header, injected by the Worker when `STAGING=true`.
 
