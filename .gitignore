@@ -1,10 +1,6 @@
 # Build output
 _site/
-public/*
-!public/js/
-!public/lugares-facets.json
-!public/lugares-pivots.json
-!public/lugares-triples.json
+public/
 resources/_gen/
 .hugo_build.lock
 
@@ -26,6 +22,7 @@ tailwindcss
 tailwindcss-*
 
 # Cloudflare local dev state
+.wrangler/
 worker/.wrangler/
 worker-tiles/.wrangler/
 worker-tiles/node_modules/
