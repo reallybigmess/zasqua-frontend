@@ -19,7 +19,7 @@
  *   Prod and staging share this one source file; behaviour diverges
  *   only on env.STAGING. No build step.
  *
- * @version v1.0.0
+ * @version v1.0.1
  */
 
 export default {
@@ -30,6 +30,22 @@ export default {
 
     const url = new URL(request.url);
 
+    // R2 stores keys as raw UTF-8 bytes (e.g. `co-cihjml-acc-09474-
+    // eclesiástico-i-cap/index.html`). Cloudflare Workers expose
+    // `url.pathname` in its percent-encoded form
+    // (`…eclesi%C3%A1stico…`), so a literal R2 lookup against
+    // pathname would miss for every non-ASCII slug. Decode once up
+    // front so subsequent logic runs against the true key. A
+    // malformed %-escape (rare, usually a misbehaving client) falls
+    // back to the raw pathname — the R2 lookup then misses and the
+    // normal 404 path handles it, rather than the Worker throwing.
+    let decodedPathname;
+    try {
+      decodedPathname = decodeURIComponent(url.pathname);
+    } catch (_) {
+      decodedPathname = url.pathname;
+    }
+
     // On the staging deployment (STAGING=true in wrangler.toml
     // [env.staging].vars), intercept /robots.txt and serve a blanket
     // Disallow so crawlers don't index staging.zasqua.org. Prod Worker
@@ -37,7 +53,7 @@ export default {
     // Paired with the X-Robots-Tag injection (see stagingHeaders) for
     // resilience against Cloudflare's Managed Robots.txt prepending an
     // Allow: / block ahead of our Disallow (v0.3.0).
-    if (env.STAGING === 'true' && url.pathname === '/robots.txt') {
+    if (env.STAGING === 'true' && decodedPathname === '/robots.txt') {
       return stagingHeaders(new Response('User-agent: *\nDisallow: /\n', {
         headers: {
           'content-type': 'text/plain; charset=utf-8',
@@ -47,11 +63,11 @@ export default {
     }
 
     // Serve PMTiles from /tiles/ path — same-origin, no CORS needed
-    if (url.pathname.startsWith('/tiles/')) {
+    if (decodedPathname.startsWith('/tiles/')) {
       return stagingHeaders(await handleTiles(request, env, url), env);
     }
 
-    let path = url.pathname;
+    let path = decodedPathname;
 
     // Resolve directory paths to index.html
     if (path.endsWith('/')) {
@@ -187,4 +203,4 @@ async function handleTiles(request, env, url) {
   return new Response(object.body, { status: 200, headers });
 }
 
-// Version: v1.0.0
+// Version: v1.0.1
