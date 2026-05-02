@@ -54,7 +54,7 @@ enableRobotsTXT = true
 
 [params]
   description = "Zasqua es la plataforma de consulta de materiales de archivo, libros, revistas e instrumentos de consulta digitalizados y sistematizados por Neogranadina y sus aliados."
-  version = "1.0.1"
+  version = "1.0.2"
   # MapTiler custom Topo-style basemap for /lugar/ and /lugares/ maps.
   # Key is origin-restricted to *.zasqua.org, zasqua.org, and localhost.
   maptiler_key = "vBKZJsibMDOLDhSILppQ"

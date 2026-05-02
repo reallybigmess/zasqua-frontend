@@ -2,7 +2,9 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.2] — 2026-05-02
+
+Licensing and rename pass. The repo is now `zasqua` (was `zasqua-frontend`), and the site ships under AGPL-3.0 instead of GPL-3.0. The footer carries an explicit "Código fuente" link to the GitHub repo on every page, satisfying AGPL §13's network-service source-offer requirement directly rather than relying on the colofon link alone. Citation metadata and credits in `CITATION.cff`, `package.json`, and the README are updated to match.
 
 ### Changed
 
