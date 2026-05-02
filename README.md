@@ -1,10 +1,10 @@
-# Zasqua Frontend
+# Zasqua
 
-Static site frontend for [Zasqua](https://zasqua.org), an open-source archival platform for hosting and discovering large collections of digitized historical documents.
+Source for [zasqua.org](https://zasqua.org), an open-source archival platform for hosting and discovering large collections of digitized historical documents.
 
 ## Overview
 
-Zasqua Frontend generates the public site at [zasqua.org](https://zasqua.org), providing access to over 106,000 archival descriptions, 78,000 entity authority records, and 6,900 place authority records drawn from five repositories in Colombia and Peru. The entire site is static — every description, entity, and place is a pre-rendered HTML page. No server is required at runtime. Search runs client-side in the browser, hierarchical navigation loads pre-built JSON on demand, and all images are served as IIIF Level 0 static tiles.
+Zasqua generates the public site at [zasqua.org](https://zasqua.org), providing access to over 106,000 archival descriptions, 78,000 entity authority records, and 6,900 place authority records drawn from five repositories in Colombia and Peru. The entire site is static — every description, entity, and place is a pre-rendered HTML page. No server is required at runtime. Search runs client-side in the browser, hierarchical navigation loads pre-built JSON on demand, and all images are served as IIIF Level 0 static tiles.
 
 This architecture is a deliberate application of minimal computing principles. Serving a corpus of this size with faceted search, force-directed entity graphs, clustered-marker maps, and high-resolution image viewing — all without a single server-side process — makes the site fast, cacheable, cheap to host, and resilient. Because the public site is just files, it can be archived, mirrored, or rebuilt from exports with no dependencies on running services.
 
@@ -136,12 +136,18 @@ No secrets are stored in the repository. In CI they are provided as GitHub Actio
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or pull request at [github.com/neogranadina/zasqua-frontend](https://github.com/neogranadina/zasqua-frontend). Note that this repository handles presentation only — edits to the archival content itself happen upstream in the cataloguing system, and the exports produced there are what this site builds from.
+Contributions are welcome. Please open an issue or pull request at [github.com/neogranadina/zasqua](https://github.com/neogranadina/zasqua). Note that this repository handles presentation only — edits to the archival content itself happen upstream in the cataloguing system, and the exports produced there are what this site builds from.
 
 ## License
 
-GPL-3.0. See [LICENSE](LICENSE) for the full text.
+Zasqua is licensed under the [GNU Affero General Public License v3.0](LICENSE).
+
+Anyone may use, modify, and self-host Zasqua under AGPL terms. If you run a modified version as a network service for others, you must publish your modifications under the same license. The license governs the software; the archival content published with Zasqua belongs to the institutions that hold and describe it.
+
+## Trademarks
+
+"Zasqua", "Fisqua", "AMPL", and the associated logos are not covered by the AGPL-3.0 license. Forks may use the code freely under AGPL terms but should not present themselves as official Zasqua, Fisqua, or AMPL releases.
 
 ## Credits
 
-Zasqua is developed by [Neogranadina](https://neogranadina.org) and the [Archives, Memory, and Preservation Lab](https://ampl.clair.ucsb.edu) of the University of California, Santa Barbara.
+Zasqua is developed by Juan Cobo Betancourt at the [Archives, Memory, and Preservation Lab](https://ampl.clair.ucsb.edu) (AMPL) of the University of California, Santa Barbara, and [Neogranadina](https://neogranadina.org).

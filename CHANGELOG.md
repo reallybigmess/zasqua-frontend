@@ -2,6 +2,22 @@
 
 All notable changes to the Zasqua frontend will be documented in this file. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Changed
+
+- **Repository renamed from `zasqua-frontend` to `zasqua`.** GitHub auto-redirects the old URL, so existing clones, issues, and PR references continue to resolve. The `package.json` `name` field, `CITATION.cff` metadata, README heading and intro, and all colofon GitHub links are updated to the new name.
+- **Footer source-code link.** `layouts/_partials/footer.html` now carries a "Código fuente" link to the GitHub repo on every page, alongside the existing colofon link, satisfying AGPL §13's network-service source-offer requirement explicitly. File version footer bumped from `v1.0.0` to `v1.0.1`.
+- **Relicensed from GPL-3.0 to AGPL-3.0.** Zasqua now ships under the [GNU Affero General Public License v3.0](LICENSE), bringing it in line with the rest of AMPL's open-source platforms. The practical effect is narrow but pointed: anyone running a modified Zasqua as a network service for third parties must publish their modifications under the same license. Self-hosting institutions have no additional obligation. This change was made by the sole copyright holder; no contributor consent process was required.
+- **`package.json`** — `license` swapped from `GPL-3.0-only` to `AGPL-3.0-only`; `author` restructured to name Juan Cobo Betancourt, with AMPL and Neogranadina moved into a new `contributors` array.
+- **Colofon licence section** at `/colofon/` (`layouts/colofon/list.html`) updated to advertise AGPL-3.0 and link to `gnu.org/licenses/agpl-3.0.html`, keeping the live site coherent with the new `LICENSE` file. The Colombian-Spanish tone of the section is preserved unchanged.
+
+### Added
+
+- **Citation file.** The repo now ships a `CITATION.cff` file with author and project metadata, enabling GitHub's "Cite this repository" button. Authors are Juan Cobo Betancourt, with AMPL and Neogranadina credited as institutional contributors.
+- **Trademark notice.** README clarifies that AGPL covers the code, not the names "Zasqua", "Fisqua", or "AMPL".
+- **Credits section in README** names Juan Cobo Betancourt as developer alongside the existing AMPL and Neogranadina institutional credits.
+
 ## [1.0.1] — 2026-04-22
 
 Post-v1.0 hotfix pass. Fixes a class of 404s on non-ASCII URLs, brings search-engine indexability into proper shape, and cleans up a couple of build-pipeline loose ends.
