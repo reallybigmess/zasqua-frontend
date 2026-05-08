@@ -1,162 +1,153 @@
-# Zasqua Frontend
+# Zasqua
 
-Static site frontend for [Zasqua](https://zasqua.org), an open-source archival platform for hosting and discovering large collections of digitized historical documents. Built with [Eleventy](https://www.11ty.dev/) (11ty) and [Pagefind](https://pagefind.app/).
+Source for [zasqua.org](https://zasqua.org), an open-source archival platform for hosting and discovering large collections of digitized historical documents.
 
 ## Overview
 
-Zasqua Frontend generates the public site at [zasqua.org](https://zasqua.org), providing access to over 104,000 archival descriptions from five repositories in Colombia and Peru. The entire site is static — no server required at runtime. Search runs client-side via Pagefind's WASM engine, hierarchical navigation loads pre-built JSON trees on demand, and all images are served as IIIF Level 0 static tiles.
+Zasqua generates the public site at [zasqua.org](https://zasqua.org), providing access to over 106,000 archival descriptions, 78,000 entity authority records, and 6,900 place authority records drawn from five repositories in Colombia and Peru. The entire site is static — every description, entity, and place is a pre-rendered HTML page. No server is required at runtime. Search runs client-side in the browser, hierarchical navigation loads pre-built JSON on demand, and all images are served as IIIF Level 0 static tiles.
 
-This architecture is a deliberate application of minimal computing principles: the platform serves over 100,000 descriptions with faceted search, Miller column hierarchy browsing, and high-resolution image viewing — all without a single server-side process. The result is a site that is fast, cacheable, cheap to host, and resilient. Because the public site is just files — HTML, JSON, static image tiles — it can be archived, mirrored, or rebuilt from exports with no dependencies on running services.
+This architecture is a deliberate application of minimal computing principles. Serving a corpus of this size with faceted search, force-directed entity graphs, clustered-marker maps, and high-resolution image viewing — all without a single server-side process — makes the site fast, cacheable, cheap to host, and resilient. Because the public site is just files, it can be archived, mirrored, or rebuilt from exports with no dependencies on running services.
 
-**Key features:**
+## Key features
 
-- Static HTML pages for every archival description
-- Client-side search with faceting, accent tolerance, and hierarchical date filtering
-- Miller column tree navigation for browsing archival hierarchies
-- IIIF deep-zoom viewer for 121,000+ digitized images
+- Static HTML pages for every archival description, entity authority record, and place authority record
+- Client-side search with faceting, accent-tolerant matching, and hierarchical date filtering (century / decade / year)
+- Entity explorer with a force-directed graph and infinite entity-document-entity navigation
+- Place explorer with a MapLibre vector basemap and clustered markers, plus hover tooltips
+- Miller-column tree navigation for browsing archival hierarchies
+- IIIF deep-zoom viewer for digitized images
 - Full-text search across OCR content from digitized materials
-- Bilingual metadata (English and Spanish)
-- Responsive design with mobile-optimized viewer
+- Bilingual presentation — English UI labels, Spanish archival content
+- Semantic HTML, keyboard navigation, and ARIA labels where HTML structure does not convey function; no formal accessibility audit has been conducted yet — please write to us if you find a barrier
+
+## Architecture
+
+The site is built with [Hugo Extended](https://gohugo.io/) 0.160.1, which generates every page at build time. Search is implemented with [Pagefind](https://pagefind.app/) 1.5 and runs entirely in the browser via WebAssembly — there is no search server. At runtime a small Cloudflare Worker fronts two R2 buckets (production and staging) and serves the prebuilt site along with IIIF images and map tiles. The build toolchain is Node 22 for enrichment, Hugo Extended for templating and CSS (Tailwind v4 through Hugo Pipes), and Python 3 for the R2 uploader.
+
+## Project structure
+
+```
+assets/            Hugo asset pipeline inputs — Tailwind CSS entry, JS bundles,
+                   and enriched JSON (assets/hugo-data/) consumed by content adapters
+content/           Hugo content — descripcion/, entidad/, lugar/ adapters that
+                   stream sharded archival JSON; plus flat pages (buscar, colofon, etc.)
+data/              Small UI lookup tables (e.g. ui.yaml) loaded into .Site.Data;
+                   not used for the large archival corpus
+layouts/           Go templates — base layout, partials, per-section templates
+scripts/           Build pipeline — precompute-links.js, generate-content.js,
+                   generate-pagefind-indices.js, upload-to-r2.py
+static/            Passthrough assets served as-is; populated at build time with
+                   runtime JSON shards under static/data/
+tests/             Vitest suites (enrichment, Pagefind facets, build artefacts) and
+                   pytest suite for the R2 uploader
+worker/            Cloudflare Worker fronting the R2 buckets (prod + staging)
+hugo.toml          Hugo site configuration
+build.sh           Seven-stage end-to-end build pipeline
+package.json       Node dependencies and npm scripts
+```
 
 ## Requirements
 
-- Node.js 18+
-- npm
+- Node.js 22 (matches `.nvmrc`)
+- Hugo Extended 0.160.1 — Extended is required for Tailwind and SCSS support
+- Python 3 — used by `scripts/upload-to-r2.py` and the B2 download step
 
-## Data
+## Development
 
-The frontend reads pre-exported JSON data at build time. This data is produced by the Django backend's `export_frontend_data` management command and placed in a `data/` directory (gitignored):
-
-```
-data/
-  descriptions.json   # All descriptions with metadata + OCR text (~150 MB)
-  repositories.json   # Repository records (~8 KB)
-  children/           # Tree children per parent (1,602 files, ~40 MB)
-```
-
-The `DATA_DIR` environment variable overrides the default `./data/` path.
-
-## Build
+The frontend reads pre-exported JSON archival data at build time. Place the exports (descriptions, entities, places, repositories, link tables, and child trees) in `exports/` — CI downloads them from Backblaze B2; local developers typically copy them from wherever the backend export lives.
 
 ```bash
-# Install dependencies
+# Install Node dependencies
 npm install
 
-# Full build (Eleventy + Pagefind index)
+# Full build — runs build.sh end to end
 npm run build
 
-# Development build (limited to 100 descriptions for speed)
-npm run build:dev
+# Fast subset build — 100 records, skips the B2 download
+DEV_LIMIT=100 npm run build:dev
 
-# Development server with live reload
+# Hugo dev server with live reload
 npm run dev
+
+# Vitest suites (enrichment, Pagefind facets, build artefacts)
+npm test
+
+# Python tests for the R2 uploader
+cd tests/upload-to-r2 && pytest
 ```
 
-The built site is output to `_site/`.
+The built site is written to `public/`.
 
-### Build stages
+## Build pipeline
 
-`npm run build` runs two stages:
+`build.sh` — and the matching `deploy-staging.yml` workflow — run the same seven stages:
 
-1. **Eleventy** generates static HTML from the JSON data and Nunjucks templates
-2. **Pagefind** indexes the built pages for client-side search
-
-Tree children JSON files are copied to `_site/data/children/` via Eleventy's passthrough copy — no separate build step required.
-
-### Build performance
-
-| Stage | Full build | Dev build (100 pages) |
-|-------|-----------|----------------------|
-| Eleventy | ~15 min | ~1 sec |
-| Pagefind | ~3 min | ~1 sec |
-| **Total** | **~18 min** | **~2 sec** |
-
-## Project Structure
-
-```
-src/
-  _data/            Data layer (reads local JSON files)
-    descriptions.js   104K descriptions (with OCR text)
-    repositories.js   5 repositories (with root descriptions)
-    entities.js       Stub (templates use denormalized fields)
-    places.js         Stub (templates use denormalized fields)
-    site.js           Site metadata (title, URL, language)
-    ui.js             UI strings (Spanish)
-  _includes/        Nunjucks partials
-    header.njk        Site header with responsive hamburger menu
-    footer.njk        Site footer
-    breadcrumb.njk    Breadcrumb navigation
-    children-tree.njk Collapsible children tree for description pages
-  _layouts/         Page layouts
-    base.njk          Base HTML layout
-  css/
-    main.css          All styles (Neogranadina visual identity)
-  img/              Static images
-  js/               Client-side JavaScript
-    search.js         Pagefind search with facets, filters, pagination
-    tree.js           Miller columns tree navigation (lazy-loads children JSON)
-    description.js    Description page interactions
-    header.js         Responsive header toggle
-  index.njk         Home page (repository grid)
-  repository.njk    Repository landing pages
-  description.njk   Description detail pages (104K+)
-  buscar.njk        Search page (/buscar/)
-eleventy.config.js  Eleventy configuration and custom filters
-```
-
-## Pages
-
-| Page | URL | Template |
-|------|-----|----------|
-| Home | `/` | `index.njk` |
-| Repository | `/{repo-code}/` | `repository.njk` |
-| Description | `/{reference-code}/` | `description.njk` |
-| Search | `/buscar/` | `buscar.njk` |
+1. **Download archival exports from Backblaze B2** into `exports/`. Skip with `SKIP_DOWNLOAD=1` when `exports/` is already populated.
+2. **Pre-compute link shards** — `scripts/precompute-links.js` produces per-entity and per-place link shards, date-tree pivots, and per-entity `doc-entities/{code}.json` sidecars.
+3. **Install Node dependencies** via `npm ci`.
+4. **Enrichment** — `scripts/generate-content.js` denormalises the archival JSON into the inputs Hugo consumes, writing sharded descriptions plus single-file entities and places under `assets/hugo-data/`.
+5. **Populate runtime shards** under `static/data/` so client-side JS (tree navigation, entity explorer, place explorer) can fetch shards on demand.
+6. **Hugo build** — `hugo --minify` renders every page. Tailwind v4 is compiled through Hugo's resource pipeline with fingerprinted, SRI-tagged CSS.
+7. **Pagefind indices** — `scripts/generate-pagefind-indices.js` writes three corpus-pure bundles plus six pivot sidecars using Pagefind's Node API.
 
 ## Search
 
-Search uses [Pagefind](https://pagefind.app/) — a static search library that runs entirely in the browser via WebAssembly. No search server is required.
+Search is split into three separate Pagefind bundles — one for descriptions, one for entities, one for places — each generated from the enriched JSON rather than by scanning HTML. Alongside each bundle the build ships a pair of sidecars: a pair-wise pivot file and a triple-wise pivot file. These let the UI resolve first-click facet counts from a small gzipped lookup without waiting for Pagefind's WebAssembly engine to initialise, which makes deep-linked filtered views render quickly on a cold load. Queries are accent-tolerant and run entirely client-side — there is no search backend.
 
-**Indexed content per page:**
-- Title and metadata (default weight)
-- OCR full text for PE-BN digitized materials (weight 0.5 — metadata matches rank higher)
+## Deploy pipeline
 
-**Search features:**
-- Multi-word AND queries
-- Quoted phrase search
-- Accent-insensitive matching (García finds Garcia)
-- Spanish stemming
-- Faceted filtering: repository, description level, digital status, date (century/decade/year)
-- Sorting by date, title, reference code, or relevance
+A single GitHub Actions workflow, `deploy-staging.yml`, handles both staging and production deploys. Manual dispatch only. The `target_bucket` input selects the destination: `zasqua-staging` (default) for the pre-production environment, or `zasqua-site` for production. The pipeline runs vitest after enrichment as a fail-fast gate, then Hugo, then Pagefind, then post-build sitemap sharding, then a diff-aware upload that only transfers changed objects, followed by a Cloudflare cache purge if anything moved.
 
-## Data Pipeline
+The staging environment is gated from search engines at both `/robots.txt` and the `X-Robots-Tag` HTTP header, injected by the Worker when `STAGING=true`.
 
-The full publish workflow:
+## Hosting
 
-1. **Catalog** in Django admin (backend running locally)
-2. **Export** data with `manage.py export_frontend_data`
-3. **Upload** JSON to Backblaze B2 private bucket
-4. **Build** triggered manually via GitHub Actions — downloads data from B2, runs Eleventy + Pagefind
-5. **Deploy** to Netlify CDN
+A single Cloudflare Worker fronts two R2 buckets: `zasqua-site` (production) and `zasqua-staging` (pre-production). The Worker also proxies IIIF images from the same object store and serves vector map tiles (PMTiles) from a third bucket, `zasqua-map-tiles`, with HTTP Range request support.
 
-The Django backend is only needed during cataloging and export — not at runtime.
+## Environment variables
 
-## Environment Variables
+Runtime (build and local dev):
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATA_DIR` | `./data/` | Path to exported JSON data |
-| `DEV_MODE` | `false` | Limit descriptions to 100 for faster builds |
-| `SITE_URL` | `http://localhost:8080` | Base URL for the site |
+| Variable | Purpose |
+|---|---|
+| `B2_APPLICATION_KEY_ID` | Backblaze B2 key ID for downloading archival exports |
+| `B2_APPLICATION_KEY` | Backblaze B2 application key |
+| `SITE_URL` | Base URL override for the site (defaults to the value in `hugo.toml`) |
+| `SKIP_DOWNLOAD` | Any value skips the B2 download in stage 1 |
+| `DEV_LIMIT` | Integer cap on records processed during enrichment — for fast local iteration only |
 
-## Related
+R2 upload (used by `scripts/upload-to-r2.py` and the workflows):
 
-- [Zasqua Backend](https://github.com/neogranadina/zasqua-backend) — Django application for cataloguing and data export
+| Variable | Purpose |
+|---|---|
+| `R2_ACCESS_KEY_ID` | R2 access key for the target bucket |
+| `R2_SECRET_ACCESS_KEY` | R2 secret key |
+| `R2_ENDPOINT` | R2 S3-compatible endpoint (derived from `CLOUDFLARE_ACCOUNT_ID`) |
+
+Cloudflare cache purge:
+
+| Variable | Purpose |
+|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account that owns the R2 buckets and Worker |
+| `CF_API_TOKEN` | API token with cache-purge permission |
+| `CF_ZONE_ID` | Zone ID for zasqua.org |
+
+No secrets are stored in the repository. In CI they are provided as GitHub Actions secrets; locally they are expected in the developer's shell environment.
+
+## Contributing
+
+Contributions are welcome. Please open an issue or pull request at [github.com/neogranadina/zasqua](https://github.com/neogranadina/zasqua). Note that this repository handles presentation only — edits to the archival content itself happen upstream in the cataloguing system, and the exports produced there are what this site builds from.
 
 ## License
 
-GPL-3.0. See [LICENSE](LICENSE) for details.
+Zasqua is licensed under the [GNU Affero General Public License v3.0](LICENSE).
 
----
+Anyone may use, modify, and self-host Zasqua under AGPL terms. If you run a modified version as a network service for others, you must publish your modifications under the same license. The license governs the software; the archival content published with Zasqua belongs to the institutions that hold and describe it.
 
-Zasqua is developed by [Neogranadina](https://neogranadina.org) and the [Archives, Memory, and Preservation Lab](https://ampl.clair.ucsb.edu) of the University of California, Santa Barbara.
+## Trademarks
+
+"Zasqua", "Fisqua", "AMPL", and the associated logos are not covered by the AGPL-3.0 license. Forks may use the code freely under AGPL terms but should not present themselves as official Zasqua, Fisqua, or AMPL releases.
+
+## Credits
+
+Zasqua is developed by Juan Cobo Betancourt at the [Archives, Memory, and Preservation Lab](https://ampl.clair.ucsb.edu) (AMPL) of the University of California, Santa Barbara, and [Neogranadina](https://neogranadina.org).

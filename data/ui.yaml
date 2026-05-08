@@ -1,0 +1,350 @@
+# Zasqua UI strings — English
+#
+# This file holds every piece of short English text the Hugo templates
+# need at render time: navigation labels, button copy, facet names,
+# archival level names (ISAD(G) — Fondo, Serie, Expediente, etc.),
+# role translations for entity links (Productor, Testigo, Escribano…),
+# per-record provenance strings for ISAD(G) 3.7.3 / ISAAR(CPF) 5.4.7
+# revision dates, and the error-page and footer wording. Templates
+# reach these strings via `.Site.Data.ui`, so e.g.
+# `{{ .Site.Data.ui.nav.home }}` renders "Inicio". The file is small
+# on purpose — only flat lookups live here, not the large archival
+# JSON, which is sharded on disk and loaded lazily inside the content
+# adapters.
+#
+# Role labels are intentionally lowercase (Productor, Testigo...) —
+# they appear mid-sentence in rendered entity-link rows, not as
+# standalone headings.
+#
+# Version: v1.0.0
+
+# Navigation
+nav:
+  home: "Home"
+  search: "Search"
+  about: "About"
+  catalogacion: "Catalog"
+  browse: "Browse"
+  entity: "Entities"
+  place: "Places"
+
+# Error pages
+error404:
+  title: "Page not found"
+  message: "The page was not found or has moved."
+  home: "Go Home"
+  search: "Search the catalog"
+
+# Breadcrumbs
+breadcrumb:
+  home: "Home"
+
+# Search page
+search:
+  placeholder: "Search the catalog..."
+  button: "Search"
+  results: "{count} results"
+  noResults: "No results found"
+  clearFilters: "Clear filters"
+  filtersHeader: "Filters"
+  sidebarHeading: "Filter by:"
+  sidebarSearch: "Search results..."
+  sort:
+    label: "Sort by"
+    relevance: "Relevance"
+    dateAsc: "Date (Oldest)"
+    dateDesc: "Date (Newest)"
+    titleAsc: "Title (A-Z)"
+  filterToggle: "Filters"
+  noResultsSuggestion: "Try clearing filters or modifying your query."
+  dateFrom: "From"
+  dateTo: "To"
+
+# Facet labels
+facets:
+  repository: "Repository"
+  level: "Level of description"
+  dateRange: "Date range"
+  hasDigital: "Digital version available"
+  country: "Country"
+
+# Description levels (singular)
+levels:
+  fonds: "Fonds"
+  subfonds: "Subfonds"
+  series: "Series"
+  subseries: "Subseries"
+  file: "File"
+  item: "Item"
+  collection: "Collection"
+  section: "Section"
+  volume: "Volume"
+
+# Description levels (plural, for child counts)
+levelsPlural:
+  fonds: "Fonds"
+  subfonds: "Subfonds"
+  series: "Series"
+  subseries: "Subseries"
+  file: "Files"
+  item: "Items"
+  collection: "Collections"
+  section: "Sections"
+  volume: "Volumes"
+  # Container types (from titles)
+  caja: "boxes"
+  carpeta: "folders"
+  legajo: "files"
+  tomo: "volumes"
+
+# Shared record-provenance strings (description / entity / place
+# detail pages). Archival convention:
+#   ISAD(G)    3.7.3 — "Dates of description"
+#   ISAAR(CPF) 5.4.7 — "Dates of creation, revision or deletion"
+# Rendered as a labelled `detail-field` row inside each record's
+# "Control" section. The value is `.Lastmod.Format "2006-01-02"`
+# (ISO YYYY-MM-DD), sourced from the backend's per-record
+# `modified_at` via the content adapter's `dates.lastmod`. Kept as
+# an ISO string for consistency with other date fields on the site
+# (date_start etc.); the Spanish narrative form is reserved for the
+# archival `date_expression` field.
+recordMeta:
+  descriptionDateLabel: "Date of description"
+  descriptionDateValue: "This description was last updated on {date}."
+
+# Description page
+description:
+  metadataHeader: "Description"
+  bibliographicHeader: "Bibliographic information"
+  accessConditionsHeader: "Access conditions"
+  relatedMaterialsHeader: "Related materials"
+  notesHeader: "Notes"
+  entitiesHeader: "Related people and entities"
+  placesHeader: "Places"
+  controlHeader: "Control"
+  reuseHeader: "Reuse"
+  metsLabel: "METS metadata"
+  iiifLabel: "IIIF Manifest"
+  childrenHeader: "Contents"
+  previous: "Previous"
+  next: "Next"
+  notDigitised: "Material not digitized"
+  notDigitisedText: "This document doesn't have a digital version available. To view it, go to the source repository."
+  externalDigital: "Digital version available"
+  externalDigitalText: "This document has a digital version available in the custodial institution's repository."
+  viewAllChildren: "View the {count} documents"
+  reproHeader: "Catalogs and Descriptions"
+  reproText: "Catalogs and descriptions in Zasqua are freely available."
+  reprosubheadDocs: "Original documents"
+  reprosubheadImages: "Images"
+  reuseBlurb: "Zasqua draws inspiration from FAIR principles to make its collections more open and reusable. It uses the METS standard to publish metadata"
+  reuseIIIF: "and IIIF to publish images. Copy the IIIF manifest URL below to open or embed this document in an IIIF-compatible viewer."
+
+# Entity roles (complete 29-role vocabulary)
+roles:
+  # Core roles (existing 5)
+  creator: "Creator"
+  contributor: "Contributor"
+  publisher: "Publisher"
+  subject: "Subject"
+  mentioned: "Mentioned"
+  # Extended roles from entity_links.json
+  sender: "Sender"
+  recipient: "Recipient"
+  defendant: "Defendant"
+  plaintiff: "Plaintiff"
+  witness: "Witness"
+  official: "Official"
+  scribe: "Scribe"
+  notary: "Notary"
+  judge: "Judge"
+  author: "Author"
+  buyer: "Buyer"
+  seller: "Seller"
+  guarantor: "Guarantor"
+  petitioner: "Petitioner"
+  appellant: "Appellant"
+  executor: "Executor"
+  guardian: "Guardian"
+  attorney: "Attorney"
+  interpreter: "Interpreter"
+  appraiser: "Appraiser"
+  lessee: "Lessee"
+  lessor: "Lessor"
+  debtor: "Debtor"
+  creditor: "Creditor"
+
+# Entity authority records (ISAAR CPF)
+entity:
+  # Type labels (ISAAR CPF)
+  types:
+    person: "Person"
+    corporate_body: "Corporate body"
+    corporate: "Corporation"
+    family: "Family"
+  # Section headers (ISAAR CPF areas)
+  sections:
+    identification: "Identification"
+    functions: "Functions"
+    history: "History"
+    relations: "Relations"
+    authorityLinks: "External authorities"
+    control: "Control"
+    reuse: "Reuse"
+    sources: "Sources"
+  # Field labels
+  fields:
+    entityCode: "Entity code"
+    name: "Name"
+    normalizedName: "Normalized name"
+    type: "Type"
+    datesOfExistence: "Dates of existence"
+    primaryFunction: "Primary function"
+    nameVariants: "Name variants"
+    history: "History"
+    roleInDocument: "Role in document"
+  # Empty-state copy
+  noFunctionsRecorded: "No functions recorded"
+  # Authority-link labels — DBE and VIAF only; Wikidata intentionally omitted.
+  authorityLinks:
+    dbe: "View in Diccionario Biográfico Español (DBE)"
+    viaf: "View in VIAF"
+  # Page copy
+  breadcrumbParent: "Entities"
+  timelineHeader: "Appearances in archive"
+  linkedDescriptions: "Linked descriptions"
+  linkedDescriptionsLink: "View {count} linked descriptions"
+  noLinkedDescriptions: "No linked descriptions were found in this repository."
+  shardError: The linked descriptions didn't load. Try refreshing the page."
+  noDateLabel: "No date"
+  viewTimeline: "Timeline"
+  viewGraph: "Entity map [?]"
+  graphPerson: "Person"
+  graphCorp: "Corporate body / family"
+  graphDescwith: "Item with connections"
+  graphDescwithout: "Item with no connections"
+
+
+# Explorer - entity
+eexplorer:
+  pageSpan: "Entities"
+  pageTitle: "Explore entities"
+  pageIntro: "people, families, or companie asre linked to descriptions in Zasqua. Search by name, and filter by type, date, or role."
+  emptyText: "Each entity (a person, family, or corporate entity) is connected with the documents in which it appears. Select an entity to see its linked documents; click on a document to discover the other entities that appear in it, and follow the thread through the archive."
+  emptyTextCont: "Scroll down to select an entity, search for one by name, or filter the index by type and date. "
+  selectedEntityStub: "Select an entity to see more details"
+  vpFiltering: "Filtering by explorer view"
+  vpFilterBy: "Filter by explorer view"
+
+# Place authority records
+place:
+  # Type labels 
+  types:
+    city: "City"
+    administrative_division: "Administrative division"
+    region: "Region"
+    country: "Country"
+    geographical_feature: "Geographic feature"
+    river: "River"
+    other: "Other"
+  # Section headers
+  sections:
+    identification: "Identification"
+    externalIds: "External identifiers"
+    control: "Control"
+    reuse: "Reuse"
+  # Field labels
+  fields:
+    name: "Name"
+    type: "Type"
+    placeCode: "Place identifier"
+    nameVariants: "Name variants"
+    coordinates: "Coordinates"
+    countryCode: "Country"
+  # Page copy
+  breadcrumbParent: "Places"
+  timelineHeader: "Appearances in archive"
+  map: "Map"
+  linkedDescriptions: "Linked descriptions"
+  linkedDescriptionsLink: "View {count} linked descriptions"
+  noLinkedDescriptions: "No linked descriptions were found in this repository."
+  shardError: The linked descriptions didn't load. Try refreshing the page."
+  noDateLabel: "No date"
+  noCoordinatesTitle: "Location unavailable"
+  noCoordinatesText: "This location doesn't have coordinates in its authority record."
+  viewExplorer: "View in place explorer"
+  manifestLabel: "Linked Places"
+  reuseSoon: "Coming soon"
+  sortChrono: "Chronological"
+  sortAlpha: "Alphabetical"
+  reuseBlurb: "Zasqua draws inspiration from FAIR principles to make its authority records more open and reusable. It uses the Linked Places format to publish geographic records."
+
+# Explorer - place
+explorer:
+  pageSpan: "Place explorer"
+  pageTitle: "Explore places"
+  pageIntro: "places are associated with descriptions in Zasqua. Search by name, filter by type, or select a place on the map."
+  selectedEntityStub: "Select a location to see more details"
+  filterLabel: "Filter by map view"
+
+
+# Metadata field labels
+fields:
+  referenceCode: "Reference code"
+  title: "Title"
+  date: "Date"
+  extent: "Extent"
+  scopeContent: "Scope and content"
+  arrangement: "Arrangement"
+  accessConditions: "Access conditions"
+  reproductionConditions: "Reproduction conditions"
+  language: "Language"
+  repository: "Repository"
+  locationOfOriginals: "Location of originals"
+  locationOfCopies: "Location of copies"
+  relatedMaterials: "Related materials"
+  findingAids: "Finding aids"
+  notes: "Notes"
+  # Bibliographic
+  publicationTitle: "Publication"
+  imprint: "Imprint"
+  editionStatement: "Edition"
+  seriesStatement: "Series"
+  uniformTitle: "Uniform Title"
+  sectionTitle: "Section"
+  pages: "Pages"
+  country: "Country"
+
+# Repository page
+repository:
+  itemsCount: "items"
+  dateRange: "Date range"
+  collections: "Collections"
+  noCollections: "No collections available"
+  searchCollection: "Search this collection"
+
+# Intro
+intro:
+  introText: "This site details the Micro Computing Machines, Inc. collection at the York University Computer Museum (YUCoM). To begin, select the museum below."
+  collectionIntro: "Explore our collections"
+
+# Footer
+footer:
+  credits: "Developed by Neogranadina with help from the University of California, Santa Bárbara"
+  copyright: "© {year} Fundación Histórica Neogranadina"
+  # Link text on the "about / colophon" footer anchor. The colophon
+  # page (content/colofon/ + layouts/colofon/list.html) carries the
+  # version string, credits, licence, and technical stack. Keeping
+  # the version out of the site-wide footer means a version bump in
+  # hugo.toml re-uploads one page, not all ~192K (see footer.html
+  # narrative header for the history).
+  colofon_link_text: "Colophon"
+
+# General
+general:
+  loading: "Loading..."
+  error: "An error has occurred"
+  viewMore: "View more"
+  back: "Back"
+
+# Version: v1.0.0

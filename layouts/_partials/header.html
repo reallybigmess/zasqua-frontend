@@ -1,0 +1,50 @@
+{{/*
+  Zasqua site header partial
+
+  Port of src/_includes/header.njk. Renders the top-of-page chrome:
+  logo link, hamburger toggle button, nav list (home / Explorar
+  dropdown with dropdown menu items / Acerca / Catalogación / search
+  form).
+
+  The hamburger toggle and the nav-dropdown open/close behaviour are
+  wired by /js/header.js (injected by baseof.html). This partial is
+  HTML-only — all interactivity lives in that script.
+
+  Literal strings preserved from header.njk:
+  - "Neogranadina:" prefix on the logo text
+  - "Documentos", "Entidades", "Lugares" labels in the dropdown menu
+    (these were hardcoded in the Eleventy source too)
+
+  Version: v1.0.0
+*/}}
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <img src="/img/yucom.svg" alt="{{ site.Title }}">
+      <span class="site-logo-text font-serif"><strong>{{ site.Title }}</strong></span>
+    </a>
+    <button class="hamburger-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <nav class="site-nav font-sans">
+      <a href="/" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.home }}</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger text-sm uppercase tracking-wide">
+          {{ site.Data.ui.nav.browse }} <span class="material-symbols-outlined nav-dropdown-arrow">expand_more</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/buscar/">{{ site.Data.ui.nav.search }}</a>
+          <a href="/entidades/">{{ site.Data.ui.nav.entity }}</a>
+          <a href="/lugares/">{{ site.Data.ui.nav.place }}</a>
+        </div>
+      </div>
+      <a href="https://neogranadina.org/proyectos/zasqua" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.about }}</a>
+      <a href="https://neogranadina.fisqua.org" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.catalogacion }}</a>
+      <form class="header-search" action="/buscar/" method="get">
+        <input type="search" name="q" placeholder="{{ site.Data.ui.search.placeholder }}">
+        <button type="submit"><span class="material-symbols-outlined">search</span></button>
+      </form>
+    </nav>
+  </div>
+</header>
+{{/* Version: v1.0.0 */}}

@@ -1,0 +1,78 @@
+{{/*
+  Zasqua home page
+
+  Renders the hero section (logo + site name + search form that posts
+  to /buscar/), and the repository grid with five
+  repository cards.
+
+  Repository data is loaded from assets/hugo-data/repositories.json
+  (copied from exports/repositories.json by scripts/generate-content.js
+  during enrichment).
+
+  No `{{`{{`}} define "title" {{`}}`}}` block — the fallback in baseof.html
+  produces `<title>Zasqua</title>` for the home page.
+
+  Version: v1.0.0
+*/}}
+{{ define "main" }}
+{{ $repos := slice }}
+{{ with resources.Get "hugo-data/repositories.json" }}
+  {{ $repos = . | transform.Unmarshal }}
+{{ end }}
+
+<section class="hero" style="background-image: url('img/hero/hero.jpg');">
+  <div class="hero-content">
+    <img src="/img/yucom.svg" alt="" class="hero-logo">
+    <h1>
+      <span class="site-name font-serif">{{ site.Title }}</span>
+    </h1>
+    <form class="search-form" action="/buscar/" method="get">
+      <input type="search" name="q" class="search-input" placeholder="{{ site.Data.ui.search.placeholder }}">
+      <button type="submit" class="search-button"><span class="material-symbols-outlined">search</span></button>
+    </form>
+  </div>
+</section>
+
+<section class="section intro-section">
+  <div class="container">
+    <p class="section-intro font-display">{{ site.Data.ui.intro.introText }}
+  </div>
+</section>
+
+<section class="section repo-section">
+  <h2 class="section-title font-display">{{ site.Data.ui.intro.collectionIntro }}</h2>
+
+  <div class="repo-grid">
+    {{ $order := slice "yucom" }}
+    {{ range $code := $order }}
+      {{ $matches := where $repos "code" $code }}
+      {{ if eq (len $matches) 0 }}{{ continue }}{{ end }}
+      {{ $repo := index $matches 0 }}
+
+      {{ $repoImage := printf "/img/repo/%s.jpg" $repo.code }}
+      {{ $repoTitle := $repo.name }}
+      {{ $repoSubtitle := $repo.notes }}
+      {{ $repoCategory := "" }}
+      {{ $repoLink := printf "/%s/" $repo.code }}
+
+      <div class="repo-item">
+        <a href="{{ $repoLink }}" class="repo-link">
+          <img src="{{ $repoImage }}" alt="{{ $repoTitle }}" class="repo-image">
+          <div class="repo-caption">
+            <h3 class="repo-caption-title">{{ $repoTitle }}</h3>
+            {{ with $repoCategory }}<p class="repo-caption-category">{{ . }}</p>{{ end }}
+          </div>
+          <div class="repo-overlay">
+            <div class="repo-info">
+              <h3 class="repo-title">{{ $repoTitle }}</h3>
+              {{ with $repoSubtitle }}<p class="repo-subtitle">{{ . }}</p>{{ end }}
+              <p class="repo-subtitle">{{ lang.FormatNumber 0 (default 0 $repo.description_count) }} {{ site.Data.ui.repository.itemsCount }}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+{{/* Version: v1.0.0 */}}

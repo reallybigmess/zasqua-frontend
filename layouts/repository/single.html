@@ -1,0 +1,79 @@
+{{/*
+  Zasqua repository landing template
+
+  Port of src/repository.njk. Renders one repository page per entry in
+  assets/hugo-data/repositories.json (routed via the content adapter at
+  content/repository/_content.gotmpl).
+
+  Visual structure matches the Eleventy source byte-for-byte:
+  - Breadcrumb: Inicio > {repoTitle} (2-element, inline; not the
+    multi-crumb breadcrumb partial)
+  - Hero section with inline style="background-image: url('...')"
+    + overlay + title + optional subtitle + count paragraph
+  - 'Buscar en esta colección' link to /buscar/?ancestor={code}
+  - Miller columns tree container (+ embedded root_descriptions JSON)
+    OR 'no collections' fallback text
+  - <script src="/js/tree.js"></script> at the bottom
+
+  Per-repo title/subtitle/image overrides are hardcoded per the
+  Eleventy source. Eleventy does not define a page title for these
+  pages, so <title> falls back to site.Title = "Zasqua" — achieved
+  here by NOT defining a "title" block (baseof.html's fallback
+  resolves to just site.Title when .Title is empty).
+
+  Version: v1.0.0
+*/}}
+{{ define "main" }}
+
+{{ $repoTitle := .Params.name }}
+{{ $repoSubtitle := .Params.note }}
+{{ $repoImage := printf "/img/repo/%s.jpg" .Params.code }}
+
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="/" class="text-sm text-stone-400 hover:text-burgundy-light">{{ site.Data.ui.nav.home }}</a>
+    <span class="breadcrumb-separator text-stone-400">›</span>
+    <span class="text-sm text-stone-500">{{ $repoTitle }}</span>
+  </div>
+</nav>
+
+<section class="repo-header" style="background-image: url('{{ $repoImage }}');">
+  <div class="repo-header-overlay">
+    <div class="container">
+      <h1 class="repo-header-title font-sans text-white">{{ $repoTitle }}</h1>
+      {{ with $repoSubtitle }}
+        <p class="repo-header-subtitle text-white">{{ . }}</p>
+      {{ end }}
+      <p class="repo-header-stats text-stone-300">{{ lang.FormatNumber 0 (default 0 .Params.description_count) }} {{ site.Data.ui.repository.itemsCount }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="tree-header">
+      <a href="/buscar/?ancestor={{ .Params.code }}" class="search-collection-link">
+        <span class="material-symbols-outlined">search</span>
+        {{ site.Data.ui.repository.searchCollection }}
+      </a>
+    </div>
+
+    {{ if and .Params.root_descriptions (gt (len .Params.root_descriptions) 0) }}
+      <div id="collection-tree"
+           data-repo-code="{{ .Params.code }}"
+           {{ printf `data-level-labels='%s'` (jsonify site.Data.ui.levelsPlural) | safeHTMLAttr }}>
+      </div>
+
+      <script type="application/json" id="root-descriptions-data">
+        {{ jsonify .Params.root_descriptions | safeJS }}
+      </script>
+    {{ else }}
+      <p class="text-muted text-center">{{ site.Data.ui.repository.noCollections }}</p>
+    {{ end }}
+  </div>
+</section>
+
+<script src="/js/tree.js"></script>
+{{ end }}
+{{/* Version: v1.0.0 */}}

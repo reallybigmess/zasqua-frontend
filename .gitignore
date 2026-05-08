@@ -1,13 +1,49 @@
-backup/
+# Build output
 _site/
+public/
+resources/_gen/
+.hugo_build.lock
+
+# Dependencies
 node_modules/
-data/
+
+# Data exports pulled at build time
+data/*
+!data/ui.yaml
+exports/
+static/data/
+assets/hugo-data/*.json
+assets/hugo-data/descriptions/
 src/_data/export/
+
+# Build tooling / artefacts
+hugo_stats.json
+tailwindcss
+tailwindcss-*
+
+# Cloudflare local dev state
+.wrangler/
+worker/.wrangler/
+worker-tiles/.wrangler/
+worker-tiles/node_modules/
+
+# Local secrets
+.env
+.dev.vars
+
+# Editor / sketch scratch
+playgrounds/
+
+# OS / editor noise
 .DS_Store
 *.log
 logs/
-.env
-zasqua/
 
-# generated CSS from tailwind
-src/css/main.css
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# local stuff
+static/img/
+backup/

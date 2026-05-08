@@ -1,0 +1,112 @@
+[
+  {
+    "id": 832841,
+    "entity_code": "ne-da5jn",
+    "display_name": "A Alzate",
+    "sort_name": "A Alzate",
+    "entity_type": "person",
+    "given_name": "A",
+    "surname": "Alzate",
+    "honorific": "",
+    "date_earliest": 1911,
+    "date_latest": 1911,
+    "name_variants": [],
+    "primary_function": "",
+    "functions": [],
+    "dates_of_existence": "fl. 1911",
+    "history": "",
+    "viaf_id": "",
+    "dbe_id": null,
+    "wikidata_id": ""
+  },
+  {
+    "id": 833050,
+    "entity_code": "ne-3ngwy",
+    "display_name": "A Gaviria",
+    "sort_name": "A Gaviria",
+    "entity_type": "person",
+    "given_name": "A",
+    "surname": "Gaviria",
+    "honorific": "",
+    "date_earliest": 1920,
+    "date_latest": 1920,
+    "name_variants": [],
+    "primary_function": "",
+    "functions": [],
+    "dates_of_existence": "fl. 1920",
+    "history": "",
+    "viaf_id": "",
+    "dbe_id": null,
+    "wikidata_id": ""
+  },
+  {
+    "id": 843849,
+    "entity_code": "ne-qkc8a",
+    "display_name": "A Méndez",
+    "sort_name": "A Méndez",
+    "entity_type": "person",
+    "given_name": "A",
+    "surname": "Méndez",
+    "honorific": "",
+    "date_earliest": 1852,
+    "date_latest": 1852,
+    "name_variants": [],
+    "primary_function": "",
+    "functions": [],
+    "dates_of_existence": "fl. 1852",
+    "history": "",
+    "viaf_id": "",
+    "dbe_id": null,
+    "wikidata_id": ""
+  },
+  {
+    "id": 840970,
+    "entity_code": "ne-3cnsa",
+    "display_name": "A Mendoza",
+    "sort_name": "A Mendoza",
+    "entity_type": "person",
+    "given_name": "A",
+    "surname": "Mendoza",
+    "honorific": "",
+    "date_earliest": 1845,
+    "date_latest": 1852,
+    "name_variants": [],
+    "primary_function": "Gobernador",
+    "functions": [
+      {
+        "function": "Gobernador",
+        "count": 2
+      }
+    ],
+    "dates_of_existence": "fl. 1845-1852",
+    "history": "",
+    "viaf_id": "",
+    "dbe_id": null,
+    "wikidata_id": ""
+  },
+  {
+    "id": 826476,
+    "entity_code": "ne-h3k75",
+    "display_name": "A. & T. Meluk & Cía.",
+    "sort_name": "A. & T. Meluk & Cía.",
+    "entity_type": "corporate",
+    "given_name": "",
+    "surname": "",
+    "honorific": "",
+    "date_earliest": 1928,
+    "date_latest": 1928,
+    "name_variants": [],
+    "primary_function": "",
+    "functions": [
+      {
+        "function": "Comercio",
+        "count": 1
+      }
+    ],
+    "dates_of_existence": "fl. 1928",
+    "history": "",
+    "viaf_id": "",
+    "dbe_id": null,
+    "wikidata_id": ""
+  }
+]

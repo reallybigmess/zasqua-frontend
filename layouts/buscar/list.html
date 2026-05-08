@@ -1,0 +1,22 @@
+{{/*
+  Zasqua search page (/buscar/)
+
+  Port of src/buscar.njk. Mounts the #search-page hook that /js/search.js
+  initialises to render the client-side search UI (Pagefind-backed, with
+  facet sidebar and results list). Data attributes provide the UI string
+  translations so JS can render faceted labels.
+
+  Version: v1.0.0
+*/}}
+{{ define "title" }}{{ .Title }} | {{ site.Title }}{{ end }}
+{{ define "main" }}
+<div class="container font-sans">
+  <div id="search-page"
+       {{ printf `data-level-labels='%s'` (jsonify site.Data.ui.levels) | safeHTMLAttr }}
+       {{ printf `data-facet-labels='%s'` (jsonify site.Data.ui.facets) | safeHTMLAttr }}>
+  </div>
+</div>
+
+<script src="/js/search.js"></script>
+{{ end }}
+{{/* Version: v1.0.0 */}}

@@ -1,0 +1,50 @@
+{{/*
+  Zasqua base HTML layout
+
+  The HTML skeleton every page inherits: <head> (meta, fonts, favicon,
+  styles), <body> with the header partial, a <main class="page-content">
+  block, the footer partial, + the /js/header.js script for
+  hamburger/dropdown behaviour.
+
+  Page templates fill the block "main" (and optionally "title",
+  "head", and "scripts") to plug their content into this chassis.
+
+  Version: v1.0.1
+*/}}
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ block "title" . }}{{ if .Title }}{{ .Title }} | {{ end }}{{ site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&family=Crimson+Text:wght@400;700&family=Cormorant+Garamond:wght@300;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+
+  <!-- Styles -->
+  {{ with (templates.Defer (dict "key" "global")) }}
+    {{ partial "css.html" . }}
+  {{ end }}
+
+  {{ block "head" . }}{{ end }}
+</head>
+<body class="bg-bg font-sans text-stone-600">
+  {{ partial "header.html" . }}
+
+  <main class="page-content">
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  {{ partial "footer.html" . }}
+
+  <script src="/js/header.js"></script>
+  {{ block "scripts" . }}{{ end }}
+</body>
+</html>
+{{/* Version: v1.0.1 */}}
