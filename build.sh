@@ -102,6 +102,7 @@ hugo --minify
 # addCustomRecord. The JSON is now the search contract — empirical parity
 # was verified against a side-by-side HTML-scan baseline during v1.0.0
 # development.
+rm -rf public/pagefind
 echo "=== Stage 7: generate-pagefind-indices.js (Node API, 3 bundles) ==="
 node scripts/generate-pagefind-indices.js
 

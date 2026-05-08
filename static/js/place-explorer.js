@@ -458,7 +458,7 @@ class PlaceExplorer {
     var clearBtn = document.createElement('button');
     clearBtn.type = 'button';
     clearBtn.className = 'clear-filters-btn';
-    clearBtn.textContent = 'Borrar todos los filtros';
+    clearBtn.textContent = 'Clear all filters';
     clearBtn.addEventListener('click', () => this.clearFilters());
     this.clearBtnEl.appendChild(clearBtn);
     this.container.appendChild(this.clearBtnEl);

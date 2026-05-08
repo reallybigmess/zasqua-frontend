@@ -1798,7 +1798,7 @@ class EntityExplorer {
     panelBottom.className = 'filter-panel-bottom-close';
     panelBottom.innerHTML =
       '<button type="button">' +
-      '<span class="material-symbols-outlined">expand_less</span> Cerrar filtros</button>';
+      '<span class="material-symbols-outlined">expand_less</span> Clear filters</button>';
     sidebar.appendChild(panelBottom);
 
     // Wire up close handlers

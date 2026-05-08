@@ -33,13 +33,12 @@
           {{ site.Data.ui.nav.browse }} <span class="material-symbols-outlined nav-dropdown-arrow">expand_more</span>
         </button>
         <div class="nav-dropdown-menu">
-          <a href="/buscar/">{{ site.Data.ui.nav.search }}</a>
+          <a href="/buscar/?repository=York+University+Computer+Museum">{{ site.Data.ui.nav.search }}</a>
           <a href="/entidades/">{{ site.Data.ui.nav.entity }}</a>
           <a href="/lugares/">{{ site.Data.ui.nav.place }}</a>
         </div>
       </div>
-      <a href="https://neogranadina.org/proyectos/zasqua" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.about }}</a>
-      <a href="https://neogranadina.fisqua.org" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.catalogacion }}</a>
+      <a href="https://neogranadina.org/projects/zasqua" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.about }}</a>
       <form class="header-search" action="/buscar/" method="get">
         <input type="search" name="q" placeholder="{{ site.Data.ui.search.placeholder }}">
         <button type="submit"><span class="material-symbols-outlined">search</span></button>

@@ -39,25 +39,20 @@
 #
 # Version: v1.0.1
 
+baseURL = 'https://zasqua.veryminor.net'
 languageCode = "en-US"
 defaultContentLanguage = "en"
 title = "MCM Collection"
 
-# Emit a robots.txt rendered from `layouts/robots.txt`. Hugo's
-# default is false — leaving it off means Cloudflare's zone-level
-# Managed Robots.txt is the only source of truth for crawler rules,
-# and it never includes a `Sitemap:` directive. Turning this on lets
-# our template contribute the Sitemap pointer while Cloudflare's AI-
-# bot controls still merge ahead of it at the edge.
-enableRobotsTXT = true
+enableRobotsTXT = false
 
 [params]
   description = "Zasqua site"
   version = "1.0.2"
   # MapTiler custom Topo-style basemap for /lugar/ and /lugares/ maps.
   # Key is origin-restricted to *.zasqua.org, zasqua.org, and localhost.
-  maptiler_key = "vBKZJsibMDOLDhSILppQ"
-  maptiler_style_id = "019da873-63fb-7cc9-8623-b0641f80a80a"
+  maptiler_key = "cBBbJl2iureiY9GCSW4h"
+  maptiler_style_id = "openstreetmap"
 
 [build]
   writeStats = true
