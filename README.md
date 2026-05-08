@@ -1,11 +1,11 @@
 ## What is this?
 A fork of the [Zasqua](https://github.com/neogranadina/zasqua) frontend. It generates a site specific to a project I did for my IST 660: Archival Representation course, but there's other stuff too.
 
-All modifications are done organically by me and I'm not associated with the wider Zasqua project, AMPL, etc.
+All modifications are done organically by me and I'm not associated with the main Zasqua project, AMPL, etc.
 
 #### Other stuff too
 - Builds local by default
-~- Host the Zasqua site from a subdirectory by editing ‎`eleventy.config.js`. I have a much more manual pipeline plus GH pages as my host so this is what ended up working.~ Does not work since they moved to Hugo.
+- ~Host the Zasqua site from a subdirectory by editing ‎`eleventy.config.js`. I have a much more manual pipeline plus GH pages as my host so this is what ended up working.~ Does not work since they moved to Hugo.
 - English UI stapled on. Some added variables data/ui.yaml for Hugo templates. (Vars in Javascript are string changes)
 - Style things, extra about page, etc.
 

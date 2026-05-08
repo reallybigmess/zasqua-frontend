@@ -229,7 +229,7 @@ entity:
 eexplorer:
   pageSpan: "Entities"
   pageTitle: "Explore entities"
-  pageIntro: "people, families, or companie asre linked to descriptions in Zasqua. Search by name, and filter by type, date, or role."
+  pageIntro: "people, families, or companies are linked to descriptions in Zasqua. Search by name, and filter by type, date, or role."
   emptyText: "Each entity (a person, family, or corporate entity) is connected with the documents in which it appears. Select an entity to see its linked documents; click on a document to discover the other entities that appear in it, and follow the thread through the archive."
   emptyTextCont: "Scroll down to select an entity, search for one by name, or filter the index by type and date. "
   selectedEntityStub: "Select an entity to see more details"
@@ -281,7 +281,7 @@ place:
 
 # Explorer - place
 explorer:
-  pageSpan: "Place explorer"
+  pageSpan: "Places"
   pageTitle: "Explore places"
   pageIntro: "places are associated with descriptions in Zasqua. Search by name, filter by type, or select a place on the map."
   selectedEntityStub: "Select a location to see more details"

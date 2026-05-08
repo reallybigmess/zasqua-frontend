@@ -1006,7 +1006,7 @@ class SearchPage {
     const opBtn = document.createElement('button');
     opBtn.type = 'button';
     opBtn.className = 'refine-op-btn';
-    opBtn.innerHTML = 'S\u00ED <span class="refine-op-caret">\u25BE</span>';
+    opBtn.innerHTML = 'Yes <span class="refine-op-caret">\u25BE</span>';
 
     const opMenu = document.createElement('div');
     opMenu.className = 'refine-op-menu';

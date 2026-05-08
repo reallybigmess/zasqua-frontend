@@ -41,7 +41,7 @@
 
 languageCode = "en-US"
 defaultContentLanguage = "en"
-title = "Zasqua"
+title = "MCM Collection"
 
 # Emit a robots.txt rendered from `layouts/robots.txt`. Hugo's
 # default is false — leaving it off means Cloudflare's zone-level
