@@ -39,8 +39,6 @@
 #
 # Version: v1.0.1
 
-#baseURL = "/zasqua"
-#baseURL = "https://reallybigmess.github.io/zasqua/"
 languageCode = "en-US"
 defaultContentLanguage = "en"
 title = "Zasqua"
