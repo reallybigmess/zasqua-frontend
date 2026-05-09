@@ -18,9 +18,8 @@
 <footer class="site-footer bg-burgundy-dark text-white">
   <div class="container">
     <div class="footer-left text-sm">
-      <p>Zasqua es una plataforma de consulta de materiales de archivo desarrollada por <a href="https://neogranadina.org" target="_blank" class="text-white font-semibold hover:text-periwinkle">Neogranadina</a> y el <a href="https://ampl.clair.ucsb.edu" target="_blank" class="text-white font-semibold hover:text-periwinkle">Laboratorio de Archivos, Memoria y Preservación (AMPL)</a> de la Universidad de California, Santa Bárbara.</p>
-      <p class="footer-copyright">{{ replace site.Data.ui.footer.copyright "{year}" (now.Format "2006") }}.
-      <br><a href="/colofon/" class="text-white hover:text-periwinkle">{{ site.Data.ui.footer.colofon_link_text }}</a> · <a href="https://github.com/neogranadina/zasqua" target="_blank" rel="noopener" class="text-white hover:text-periwinkle">Código fuente</a> (AGPL-3.0).</p>
+      <p class="footer-copyright"><a href="https://github.com/neogranadina/zasqua/" class="underline" target="_blank" rel="noopener" >{{ site.Data.ui.about.creditsTextZasqualink }}</a>
+        v{{ site.Params.version }}<p>{{ replace site.Data.ui.footer.copyright "{year}" (now.Format "2006") }}.</p>
     </div>
     <div class="footer-right">
       <img src="/img/logo_grande.svg" alt="Neogranadina" class="footer-seal">

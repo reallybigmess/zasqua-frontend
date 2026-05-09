@@ -1,0 +1,41 @@
+{{/*
+  About page
+  Version: v1.0.0
+*/}}
+{{ define "title" }}{{ .Title }} | {{ site.Title }}{{ end }}
+{{ define "main" }}
+<section class="section">
+  <div class="container">
+    <article class="colofon max-w-3xl mx-auto">
+
+      <h1 class="font-display text-stone-900 text-4xl font-normal mb-6">{{ site.Data.ui.about.introlabel }}</h1>
+
+      <p class="font-serif text-stone-900 text-lg leading-relaxed mb-10">
+        {{ site.Data.ui.about.introText }}
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">{{ site.Data.ui.about.navilabel }}</h2>
+      <p class="font-serif text-stone-900 leading-relaxed">
+        {{ site.Data.ui.about.navitext }}
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">{{ site.Data.ui.about.creditslabel }}</h2>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">
+        {{ site.Data.ui.about.creditsText }}</p>
+      <p class="font-serif text-stone-900 leading-relaxed mb-3">
+      {{ site.Data.ui.about.creditsText2 }}</p>
+      <p class="font-serif text-stone-600 leading-relaxed mb-3">{{ site.Data.ui.about.creditsTextZasqua }}
+        <a href="https://github.com/neogranadina/zasqua/" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">{{ site.Data.ui.about.creditsTextZasqualink }}</a>
+        v{{ site.Params.version }}.
+      </p>
+
+      <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">{{ site.Data.ui.about.contactlabel }}</h2>
+      {{ site.Data.ui.about.contacttext }}
+    </article>
+  </div>
+
+</section>
+<img src="/img/yucom.svg" alt="Zasqua" class="block max-w-[200px] mx-auto pb-8">
+
+{{ end }}
+{{/* Version: v1.0.0 */}}

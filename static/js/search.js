@@ -1942,7 +1942,7 @@ class SearchPage {
 
       const clearLink = document.createElement('a');
       clearLink.href = '#';
-      clearLink.textContent = 'Clear filtros';
+      clearLink.textContent = 'Clear filters';
       clearLink.addEventListener('click', (e) => {
         e.preventDefault();
         this.handleClearAll();

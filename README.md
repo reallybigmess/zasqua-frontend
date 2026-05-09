@@ -21,3 +21,8 @@ Prerequisites: Node.js 22+, npm
 - `npm install`
 
 `npm run build && npm run dev` will open a dev server at localhost:1313
+
+## To-Do:
+- In entity explorer, centered fam/corp should be blue not red
+- Entity explorer, show document labels?
+- Repo note (description) doesn't show

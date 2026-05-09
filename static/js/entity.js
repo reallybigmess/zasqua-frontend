@@ -697,7 +697,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       var typeWord = (node.entityType === 'person') ? 'person' : 'entity';
       html += '<div class="graph-tooltip-actions">';
       html += 'This ' + typeWord + ' is connected to ' + otherDocs + ' other document' + (otherDocs !== 1 ? 's' : '') + ' in Zasqua. ';
-      html += '<a href="/' + escapeHtml(node.id) + '/?vista=red" class="graph-tooltip-btn">Open in relationship explorer</a>';
+      html += '<a href="/' + escapeHtml(node.id) + '/?vista=red" class="graph-tooltip-btn"><b>Open in entity explorer</a>';
       html += '</div>';
     }
 

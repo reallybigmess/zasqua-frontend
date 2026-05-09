@@ -33,12 +33,25 @@
           {{ site.Data.ui.nav.browse }} <span class="material-symbols-outlined nav-dropdown-arrow">expand_more</span>
         </button>
         <div class="nav-dropdown-menu">
-          <a href="/buscar/?repository=York+University+Computer+Museum">{{ site.Data.ui.nav.search }}</a>
+          <a href="/yucom/">{{ site.Data.ui.nav.descriptions }}</a>
           <a href="/entidades/">{{ site.Data.ui.nav.entity }}</a>
           <a href="/lugares/">{{ site.Data.ui.nav.place }}</a>
         </div>
       </div>
-      <a href="https://neogranadina.org/projects/zasqua" class="text-sm uppercase tracking-wide">{{ site.Data.ui.nav.about }}</a>
+      <a href="/buscar/?repository=York+University+Computer+Museum">{{ site.Data.ui.nav.search }}</a>
+    <button class="hamburger-toggle" type="button" aria-label="Menu-About" aria-expanded="false">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <nav class="site-nav font-sans">
+      <div class="nav-dropdown">
+        <button type="button" class="nav-dropdown-trigger text-sm uppercase tracking-wide">
+          {{ site.Data.ui.nav.about }} <span class="material-symbols-outlined nav-dropdown-arrow">expand_more</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/about/" class="text-sm tracking-wide">{{ site.Data.ui.nav.aboutText.aboutSite }}</a>
+                <a href="https://neogranadina.org/projects/zasqua" class="text-sm tracking-wide">{{ site.Data.ui.nav.aboutText.aboutZasqua }}</a>
+        </div>
+      </div>
       <form class="header-search" action="/buscar/" method="get">
         <input type="search" name="q" placeholder="{{ site.Data.ui.search.placeholder }}">
         <button type="submit"><span class="material-symbols-outlined">search</span></button>

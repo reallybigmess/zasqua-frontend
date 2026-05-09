@@ -1180,14 +1180,15 @@ class EntityExplorer {
     // Date range
     const dateEarliest = hit.meta.date_earliest || '';
     const dateLatest = hit.meta.date_latest || '';
-    if (dateEarliest) {
+
+    if (dateEarliest !== 'None') {
       const dateMeta = document.createElement('span');
       dateMeta.className = 'result-meta';
       dateMeta.style.fontSize = '0.875rem';
-      if (dateLatest && dateLatest !== dateEarliest) {
+      if (dateLatest && dateLatest !== dateEarliest && dateLatest !== 'None') {
         dateMeta.textContent = `${dateEarliest}\u2013${dateLatest}`;
       } else {
-        dateMeta.textContent = dateEarliest;
+        dateMeta.textContent = `${dateEarliest}\u2013`;
       }
       row1.appendChild(dateMeta);
     }
