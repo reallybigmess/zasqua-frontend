@@ -8,7 +8,7 @@
   <div class="container">
     <article class="colofon max-w-3xl mx-auto">
 
-      <h1 class="font-display text-stone-900 text-4xl font-normal mb-6">{{ site.Data.ui.about.introlabel }}</h1>
+      <h1 class="font-display text-stone-900 text-4xl font-normal mb-6">{{ site.Data.ui.about.introlabel }}</h1><img src="/img/yucom.svg" alt="Zasqua" class="block max-w-[200px] mx-auto pb-8">
 
       <p class="font-serif text-stone-900 text-lg leading-relaxed mb-10">
         {{ site.Data.ui.about.introText }}
@@ -30,12 +30,12 @@
       </p>
 
       <h2 class="font-display text-stone-900 text-2xl font-normal mt-10 mb-3 border-b border-stone-300 pb-2">{{ site.Data.ui.about.contactlabel }}</h2>
-      {{ site.Data.ui.about.contacttext }}
+              <p class="font-serif text-stone-900 leading-relaxed mb-3">
+        {{ site.Data.ui.about.contactText }}<a href="https://github.com/reallybigmess/zasqua-frontend" target="_blank" rel="noopener" class="text-burgundy underline hover:text-burgundy-light">{{ site.Data.ui.about.creditsTextcontactlink }}.</a></p>        <a href="https://museum.eecs.yorku.ca/" target="_blank" rel="noopener"> <img src="https://museum.eecs.yorku.ca/files/theme_uploads/8208aaced6856a1ccbfa54ade65ceb02.png" alt="YUCoM Logo" class="max-w-[200px]"/> </a>
+      
     </article>
   </div>
-
 </section>
-<img src="/img/yucom.svg" alt="Zasqua" class="block max-w-[200px] mx-auto pb-8">
 
 {{ end }}
 {{/* Version: v1.0.0 */}}

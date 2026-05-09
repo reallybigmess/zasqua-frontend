@@ -228,6 +228,7 @@ entity:
   graphDescwith: "Item with entity connections"
   graphDescwithout: "Item with no connections"
   explore: "View in explorer"
+  reuseBlurb: "Zasqua draws inspiration from FAIR principles to make its authority records more open and reusable."
 
 
 # Explorer - entity
@@ -330,20 +331,21 @@ repository:
 
 about:
   introlabel: "About this website"
-  introText: "An archival collection contains many items which are all connected in multiple ways. This site is an experimental way to explore archival components at multiple levels and map them together."
+  introText: "An archival collection contains items which can be wildly and individually different yet share common threads of information. This site is an experimental way to explore that data."
   creditslabel: "Credits"
   creditsText: "Much of the text in the archival descriptions was written by Zbigniew Stachniak, who also wrote the original collection finding aid. Assistance also indirectly came from the past efforts of YorkU librarians, archivists, and other YUCoM volunteers."
   creditsText2: "The materials were donated from the following individuals: M. Kutt, E. M. Edwards Estate, E. Elliott, C. Farnell, L. Gladstone, G. Ramer, A. Arpen, R. Bernecky, J. Laraya, A. Michaels, G. Ramer, R. Rea, G. Seeds, M. Smyth, Z. Stachniak, and J. Woods."
   creditsTextZasqua: "Built with "
   creditsTextZasqualink: "Zasqua"
   contactlabel: "Contact"
-  contactText: ""
+  contactText: "This site is a work in progress and probably contains many issues. Errors specific to this fork can be reported on "
+  creditsTextcontactlink: "Github"
   navilabel: "Navigating the collection"
-  navitext: "Choose a selection under the Browse menu at the top. You can browse through Descriptions, Entities (people, families, or companies), and Places. "
+  navitext: "Choose a selection under the Browse menu at the top. You can browse through Descriptions, Entities (people, families, or companies), and Places. Try browsing by person or place, or searching for an item to see what's there. "
 
 # Intro
 intro:
-  introText: "Welcome to the Micro Computing Machines, Inc. collection. To start browsing, select the museum below."
+  introText: "Welcome to the Micro Computing Machines, Inc. collection. To start browsing, click below."
   #collectionIntro: "Explore our collections"
 
 # Footer
