@@ -141,7 +141,8 @@ description:
   reproText: "Catalogs and descriptions in Zasqua are freely available."
   reprosubheadDocs: "Original documents"
   reprosubheadImages: "Images"
-  reuseBlurb: "Zasqua draws inspiration from FAIR principles to make its collections more open and reusable. It uses the METS standard to publish metadata"
+  reuseBlurb: "Zasqua draws inspiration from FAIR principles to make its collections more open and reusable."
+  reuseMETS: " It uses the METS standard to publish metadata"
   reuseIIIF: "and IIIF to publish images. Copy the IIIF manifest URL below to open or embed this document in an IIIF-compatible viewer."
 
 # Entity roles (complete 29-role vocabulary)

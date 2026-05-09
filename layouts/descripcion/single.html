@@ -315,7 +315,9 @@
         <div class="detail-section">
           <h3>{{ site.Data.ui.description.reuseHeader }}</h3>
           {{ site.Data.ui.description.reuseBlurb }}
-          {{ if .Params.iiif_manifest_url }}
+
+<!-- commented out until IIIF is up
+           {{ if .Params.iiif_manifest_url }}
           {{ site.Data.ui.description.reuseIIIF }}
 
           {{ else }}.
@@ -339,11 +341,11 @@
                 <code class="reuse-manifest-url">{{ . }}</code>
                 <button class="reuse-copy-btn" data-copy-url="{{ . }}">
                   <span class="material-symbols-outlined">content_copy</span>
-                  Copiar
+                  Copy
                 </button>
               </div>
             </div>
-          {{ end }}
+          {{ end }} -->
         </div>
 
       </div>
