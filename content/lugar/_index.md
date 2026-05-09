@@ -1,5 +1,5 @@
 ---
-title: "Lugares"
+title: "Places"
 ---
 
 <!--

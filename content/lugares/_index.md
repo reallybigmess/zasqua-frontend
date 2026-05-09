@@ -1,5 +1,5 @@
 ---
-title: "Explorar lugares"
+title: "Place explorer"
 ---
 
 <!--

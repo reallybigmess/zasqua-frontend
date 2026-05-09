@@ -1,5 +1,5 @@
 ---
-title: "Descripciones"
+title: "Descriptions"
 ---
 
 <!--

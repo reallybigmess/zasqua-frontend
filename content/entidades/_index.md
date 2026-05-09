@@ -1,5 +1,5 @@
 ---
-title: "Explorar entidades"
+title: "Entity explorer"
 ---
 
 <!--

@@ -1,5 +1,5 @@
 ---
-title: "Entidades"
+title: "Entities"
 ---
 
 <!--
