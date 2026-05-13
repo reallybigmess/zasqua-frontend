@@ -787,8 +787,10 @@ class SearchPage {
       const hints = document.createElement('div');
       hints.className = 'search-landing-hints';
       hints.innerHTML =
-        '<p>Zasqua has a flexible search system based on filters: type a term or select a filter from the filter panel to start exploring the catalog. Then add more until you find what you\'re looking for. The system will ignore accents and diacritics, and suggest similar terms with the same root.</p>';
-        '<p>Add terms by typing them into the filter panel—select yes or no to include or exclude, and press + or Enter. Each term or filter will appear as a tag that you can easily remove and replace, so feel free to experiment.</p>';
+        '<p>Zasqua has a flexible search system based on filters. Type a term in the the Search bar or select a filter from the filter panel to start exploring the catalog. Then add more until you find what you\'re looking for. The system will ignore accents and diacritics, and suggest similar words.</p>' +
+        '<p>Add terms by typing them into the filter panel -- select <em>yes</em> or <em>no</em> to include or exclude, and press <em>+</em> or Enter. Each term or filter will appear as a tag that you can easily remove and replace, so feel free to experiment.</p>' +
+        '<p>Some suggested terms: <em><a href="/buscar/?q=computer">computer</a></em>, <em><a href="/buscar/?q=interview">interview</a></em>, <em><a href="/buscar/?q=Denmark">Denmark</a></em> </p>';
+
       landing.appendChild(hints);
 
       resultsCol.appendChild(landing);

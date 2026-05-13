@@ -98,17 +98,13 @@
         "creator_display" .creator_display
         "place_display" .place_display
     }}
-    {{ $lastmod := now }}
-  {{ with .modified_at }}
-    {{ $lastmod = time.AsTime . }}
-  {{ end }}
     {{ $page := dict
         "kind" "page"
         "path" .reference_code
         "title" .title
         "params" $params
         "content" (dict "mediaType" "text/html" "value" "")
-        "dates" (dict "lastmod" $lastmod)
+        "dates" (dict "lastmod" (time.AsTime .modified_at))
     }}
     {{/* Flat short-code URL override: /{reference_code}/ not /descripcion/{reference_code}/ */}}
     {{ $page = merge $page (dict "url" (printf "/%s/" .reference_code)) }}

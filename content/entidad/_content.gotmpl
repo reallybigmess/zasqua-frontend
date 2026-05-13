@@ -63,19 +63,13 @@
       "date_formatted" .date_formatted
       "_linked_count" ._linked_count
   }}
-
-  {{ $lastmod := now }}
-  {{ with .modified_at }}
-    {{ $lastmod = time.AsTime . }}
-  {{ end }}
-
   {{ $page := dict
       "kind" "page"
       "path" .entity_code
       "title" .display_name
       "params" $params
       "content" (dict "mediaType" "text/html" "value" "")
-      "dates" (dict "lastmod" $lastmod)
+      "dates" (dict "lastmod" (time.AsTime .modified_at))
   }}
   {{/* Flat short-code URL override — /ne-xxxxxx/ not /entidad/ne-xxxxxx/ */}}
   {{ $page = merge $page (dict "url" (printf "/%s/" .entity_code)) }}

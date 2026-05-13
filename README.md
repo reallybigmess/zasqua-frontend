@@ -5,7 +5,6 @@ All modifications are done organically by me and I'm not associated with the mai
 
 #### Other stuff too
 - Builds local by default
-- ~Host the Zasqua site from a subdirectory by editing ‎`eleventy.config.js`. I have a much more manual pipeline plus GH pages as my host so this is what ended up working.~ Does not work since they moved to Hugo.
 - English UI stapled on. Some added variables data/ui.yaml for Hugo templates. (Vars in Javascript are string changes)
 - Style things, extra about page, etc.
 
@@ -22,7 +21,10 @@ Prerequisites: Node.js 22+, npm
 
 `npm run build && npm run dev` will open a dev server at localhost:1313
 
-## To-Do:
-- In entity explorer, centered fam/corp should be blue not red
-- Entity explorer, show document labels?
-- Repo note (description) doesn't show
+## To-Do/Fix:
+- Index description notes so that they're searchable
+- Show document labels of individual items in entity explorer?
+- Repo note (description) doesn't show in /description 
+- Passthru formatting (or at least line breaks etc) in Django fields?
+- Search.js - adding "no" to a search doesn't seem to work (i.e. searching for "Kutt" and No:"president" or "Correspondence" and No:"Intel")
+- Integrating entities/places into search?

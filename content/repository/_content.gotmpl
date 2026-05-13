@@ -56,18 +56,12 @@
       "city" .city
       "root_descriptions" .root_descriptions
   }}
-  {{ $lastmod := now }}
-  {{ with .modified_at }}
-    {{ $lastmod = time.AsTime . }}
-  {{ end }}
-
-
   {{ $page := dict
       "kind" "page"
       "path" .code
       "params" $params
       "content" (dict "mediaType" "text/html" "value" "")
-      "dates" (dict "lastmod" $lastmod)
+      "dates" (dict "lastmod" (time.AsTime .modified_at))
   }}
   {{/* Flat short-code URL override */}}
   {{ $page = merge $page (dict "url" (printf "/%s/" .code)) }}

@@ -60,17 +60,13 @@
       "colonial_region" .colonial_region
       "_linked_count" ._linked_count
   }}
-  {{ $lastmod := now }}
-  {{ with .modified_at }}
-    {{ $lastmod = time.AsTime . }}
-  {{ end }}
   {{ $page := dict
       "kind" "page"
       "path" .place_code
       "title" .display_name
       "params" $params
       "content" (dict "mediaType" "text/html" "value" "")
-      "dates" (dict "lastmod" $lastmod)
+      "dates" (dict "lastmod" (time.AsTime .modified_at))
   }}
   {{/* Flat short-code URL override — /nl-xxxxxx/ not /lugar/nl-xxxxxx/ */}}
   {{ $page = merge $page (dict "url" (printf "/%s/" .place_code)) }}

@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     var entityTypeEl = document.querySelector('.level-badge');
     var eType = entityTypeEl ? entityTypeEl.textContent.trim().toLowerCase() : 'person';
     var entityNameEl = document.querySelector('.detail-title');
-    var TYPE_MAP = { 'person': 'person', 'institution': 'corporate_body', 'corporate body': 'corporate_body', 'family': 'family' };
+    var TYPE_MAP = { 'person': 'person', 'institution': 'corporate_body', 'corporation': 'corporate_body', 'family': 'family' };
     var mappedType = TYPE_MAP[eType] || 'person';
 
     graphNodes.set(entityCode, {
